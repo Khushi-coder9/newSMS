@@ -523,8 +523,8 @@
             </ul>
 
             <div class="nav-actions">
-                <button class="btn-login">Login</button>
-                <button class="btn-signup">Sign Up</button>
+                <button class="btn-login" id="loginBtn">Login</button>
+                <button class="btn-signup" id="signupBtn">Sign Up</button>
             </div>
         </div>
     </header>
@@ -751,5 +751,215 @@
             <div class="footer-right">Better Minds • Brighter Futures ♡</div>
         </div>
     </footer>
+
+    <!-- Signup Modal -->
+    <div class="modal-bg" id="signupModal">
+        <div class="modal">
+            <h2>Sign Up</h2>
+            <p>Create your account to get started</p>
+            <form id="signupForm">
+                <input type="email" id="signupEmail" placeholder="Email address" required>
+                <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" required minlength="6">
+                <div class="modal-actions">
+                    <button type="button" class="icon-btn" id="cancelSignup">Cancel</button>
+                    <button type="submit" class="btn-signup">Sign Up</button>
+                </div>
+            </form>
+            <p id="signupError" class="error-message"></p>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-bg" id="loginModal">
+        <div class="modal">
+            <h2>Login</h2>
+            <p>Welcome back! Enter your credentials</p>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email address" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <div class="modal-actions">
+                    <button type="button" class="icon-btn" id="cancelLogin">Cancel</button>
+                    <button type="submit" class="btn-signup">Login</button>
+                </div>
+            </form>
+            <p id="loginError" class="error-message"></p>
+        </div>
+    </div>
+
+    <style>
+        .modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(28, 24, 72, 0.45);
+            display: none;
+            place-items: center;
+            z-index: 50;
+            padding: 20px;
+        }
+
+        .modal-bg.show { display: grid; }
+
+        .modal {
+            width: min(400px, 100%);
+            background: #fff;
+            border-radius: 20px;
+            padding: 22px;
+        }
+
+        .modal h2 { font-size: 20px; margin-bottom: 8px; }
+        .modal p { font-size: 13.5px; color: var(--text); margin-bottom: 14px; line-height: 1.55; }
+        .modal input {
+            width: 100%;
+            border: 1.5px solid #e6e0ff;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+
+        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .error-message {
+            color: #dc2626;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+        .error-message.show { display: block; }
+    </style>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let authToken = localStorage.getItem('authToken');
+
+        // Check if user is logged in
+        function updateAuthUI() {
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+
+            if (authToken) {
+                loginBtn.textContent = 'Logout';
+                signupBtn.style.display = 'none';
+            } else {
+                loginBtn.textContent = 'Login';
+                signupBtn.style.display = 'block';
+            }
+        }
+
+        // Signup Modal
+        const signupModal = document.getElementById('signupModal');
+        const signupForm = document.getElementById('signupForm');
+        const signupError = document.getElementById('signupError');
+
+        document.getElementById('signupBtn').addEventListener('click', () => {
+            signupModal.classList.add('show');
+        });
+
+        document.getElementById('cancelSignup').addEventListener('click', () => {
+            signupModal.classList.remove('show');
+            signupForm.reset();
+            signupError.classList.remove('show');
+        });
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('userEmail', data.user.email);
+                    signupModal.classList.remove('show');
+                    signupForm.reset();
+                    updateAuthUI();
+                    alert('Account created successfully!');
+                } else {
+                    signupError.textContent = data.error || 'Signup failed';
+                    signupError.classList.add('show');
+                }
+            } catch (error) {
+                signupError.textContent = 'Network error. Please try again.';
+                signupError.classList.add('show');
+            }
+        });
+
+        // Login Modal
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            if (authToken) {
+                // Logout
+                authToken = null;
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userEmail');
+                updateAuthUI();
+                alert('Logged out successfully');
+            } else {
+                loginModal.classList.add('show');
+            }
+        });
+
+        document.getElementById('cancelLogin').addEventListener('click', () => {
+            loginModal.classList.remove('show');
+            loginForm.reset();
+            loginError.classList.remove('show');
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('userEmail', data.user.email);
+                    loginModal.classList.remove('show');
+                    loginForm.reset();
+                    updateAuthUI();
+                    alert('Login successful!');
+                } else {
+                    loginError.textContent = data.error || 'Login failed';
+                    loginError.classList.add('show');
+                }
+            } catch (error) {
+                loginError.textContent = 'Network error. Please try again.';
+                loginError.classList.add('show');
+            }
+        });
+
+        // Close modals on background click
+        signupModal.addEventListener('click', (e) => {
+            if (e.target === signupModal) signupModal.classList.remove('show');
+        });
+
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) loginModal.classList.remove('show');
+        });
+
+        // Initialize UI
+        updateAuthUI();
+    </script>
 </body>
 </html>
