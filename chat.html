@@ -347,30 +347,6 @@
 
         .send:disabled { opacity: .55; cursor: not-allowed; }
 
-        .mic-btn {
-            background: #f4f1ff;
-            color: var(--purple);
-            border: none;
-            border-radius: 14px;
-            min-width: 48px;
-            height: 48px;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .mic-btn:hover { background: #ece6ff; }
-        .mic-btn.recording {
-            background: #ff6b6b;
-            color: white;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
         .modal-bg {
             position: fixed;
             inset: 0;
@@ -481,7 +457,6 @@
                     </div>
                 </div>
                 <div>
-                    <button class="icon-btn" id="soundBtn" type="button">🔊 Sound</button>
                     <button class="icon-btn" id="keyBtn" type="button">API key</button>
                     <button class="icon-btn" id="clearBtn" type="button">New chat</button>
                 </div>
@@ -489,7 +464,6 @@
             <div class="messages" id="messages" aria-live="polite"></div>
             <form class="composer" id="composer">
                 <textarea id="input" rows="1" placeholder="Share what’s on your mind..." required></textarea>
-                <button class="mic-btn" id="micBtn" type="button" title="Speak to type">🎤</button>
                 <button class="send" id="sendBtn" type="submit">→</button>
             </form>
         </section>
@@ -541,14 +515,8 @@ Safety:
         const sendBtn = document.getElementById("sendBtn");
         const keyModal = document.getElementById("keyModal");
         const keyInput = document.getElementById("keyInput");
-        const soundBtn = document.getElementById("soundBtn");
-        const micBtn = document.getElementById("micBtn");
 
         let history = [];
-        let soundEnabled = localStorage.getItem("sms_sound_enabled") === "true";
-        let currentUtterance = null;
-        let recognition = null;
-        let isRecording = false;
 
         function getKey() {
             const fromConfig = window.SMS_CONFIG && window.SMS_CONFIG.GEMINI_API_KEY;
@@ -563,92 +531,6 @@ Safety:
 
         function hideKeyModal() {
             keyModal.classList.remove("show");
-        }
-
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            localStorage.setItem("sms_sound_enabled", soundEnabled);
-            updateSoundButton();
-            if (!soundEnabled && currentUtterance) {
-                window.speechSynthesis.cancel();
-                currentUtterance = null;
-            }
-        }
-
-        function updateSoundButton() {
-            soundBtn.textContent = soundEnabled ? "🔊 Sound on" : "🔇 Sound off";
-            soundBtn.style.background = soundEnabled ? "#e7f4fb" : "#f4f1ff";
-        }
-
-        function speak(text) {
-            if (!soundEnabled || !window.speechSynthesis) return;
-
-            window.speechSynthesis.cancel();
-            currentUtterance = new SpeechSynthesisUtterance(text);
-            currentUtterance.rate = 1;
-            currentUtterance.pitch = 1;
-            currentUtterance.volume = 1;
-
-            window.speechSynthesis.speak(currentUtterance);
-        }
-
-        function initSpeechRecognition() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                micBtn.style.display = 'none';
-                return null;
-            }
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const rec = new SpeechRecognition();
-            rec.continuous = false;
-            rec.interimResults = true;
-            rec.lang = 'en-US';
-
-            rec.onstart = () => {
-                isRecording = true;
-                micBtn.classList.add('recording');
-                micBtn.title = 'Stop recording';
-            };
-
-            rec.onend = () => {
-                isRecording = false;
-                micBtn.classList.remove('recording');
-                micBtn.title = 'Speak to type';
-            };
-
-            rec.onresult = (event) => {
-                const transcript = Array.from(event.results)
-                    .map(result => result[0].transcript)
-                    .join('');
-
-                if (event.results[0].isFinal) {
-                    input.value = transcript;
-                    input.focus();
-                } else {
-                    input.value = transcript;
-                }
-            };
-
-            rec.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
-                isRecording = false;
-                micBtn.classList.remove('recording');
-            };
-
-            return rec;
-        }
-
-        function toggleRecording() {
-            if (!recognition) {
-                alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
-                return;
-            }
-
-            if (isRecording) {
-                recognition.stop();
-            } else {
-                recognition.start();
-            }
         }
 
         function addBubble(role, text, extraClass) {
@@ -816,7 +698,6 @@ Safety:
                 setStatus("● Online • Gemini");
                 addBubble("bot", reply);
                 history.push({ role: "model", text: reply });
-                speak(reply);
             } catch (err) {
                 removeTyping();
                 const quota = err && (err.status === 429 || /quota|rate[- ]limit|resource_exhausted/i.test(err.message || ""));
@@ -824,7 +705,6 @@ Safety:
                 setStatus("● Online • offline first-aid");
                 addBubble("bot", reply);
                 history.push({ role: "model", text: reply });
-                speak(reply);
                 if (quota) {
                     addBubble("error", "Gemini API quota exceeded. Your API key is valid but has hit the free tier limit. Create a new Google Cloud project and generate a fresh API key at aistudio.google.com/apikey, or enable billing for higher limits.");
                 }
@@ -855,8 +735,6 @@ Safety:
 
         document.getElementById("clearBtn").addEventListener("click", welcome);
         document.getElementById("keyBtn").addEventListener("click", showKeyModal);
-        document.getElementById("soundBtn").addEventListener("click", toggleSound);
-        document.getElementById("micBtn").addEventListener("click", toggleRecording);
         document.getElementById("cancelKey").addEventListener("click", hideKeyModal);
         document.getElementById("saveKey").addEventListener("click", () => {
             const value = keyInput.value.trim();
@@ -868,8 +746,6 @@ Safety:
             if (e.target === keyModal) hideKeyModal();
         });
 
-        recognition = initSpeechRecognition();
-        updateSoundButton();
         welcome();
         if (!getKey()) setStatus("● Online • offline first-aid");
     </script>
