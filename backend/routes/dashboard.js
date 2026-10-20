@@ -12,6 +12,13 @@ const authMiddleware = require('../middleware/auth');
 router.get('/student', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.userId;
+    const userRole = (req.user.role || '').toLowerCase();
+
+    // Strict role check: only student or admin
+    if (userRole !== 'student' && userRole !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. This dashboard is only accessible to students.' });
+    }
+
     const userDoc = req.userDoc || await User.findById(userId).lean();
 
     // 1. Fetch student's chat messages
@@ -38,13 +45,6 @@ router.get('/student', authMiddleware, async (req, res) => {
         keywordCounts[kw] = (keywordCounts[kw] || 0) + 1;
       });
     });
-
-    // Provide default fallback categories if student is new
-    if (Object.keys(difficultyCounts).length === 0) {
-      difficultyCounts['Academic Stress'] = 2;
-      difficultyCounts['Exam Anxiety'] = 1;
-      difficultyCounts['Sleep & Rest'] = 1;
-    }
 
     // 2. Compute wellness & improvement trajectory over time (last 7 points)
     const timelineLabels = [];
@@ -158,42 +158,59 @@ router.get('/student', authMiddleware, async (req, res) => {
 
 /**
  * GET /api/dashboard/counsellor
- * Appointments, assigned students, clinical difficulties, and reports
+ * Appointments, assigned students, clinical difficulties, and reports for THIS specific counsellor
  */
 router.get('/counsellor', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const userDoc = req.userDoc || await User.findById(userId).lean();
+    const userRole = (req.user.role || '').toLowerCase();
 
-    // 1. Fetch appointments where user is counsellor, or all if none
-    let appointments = await Appointment.find({ counsellor: userId })
-      .sort({ createdAt: -1 })
-      .lean();
-
-    // If new counsellor has 0 specific appointments, show all appointments to manage
-    if (appointments.length === 0) {
-      appointments = await Appointment.find()
-        .sort({ createdAt: -1 })
-        .limit(25)
-        .lean();
+    // Strict role check: only counsellor or admin
+    if (userRole !== 'counsellor' && userRole !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. This dashboard is only accessible to counsellors.' });
     }
 
-    // 2. Fetch distinct students associated with these appointments or chats
-    const studentIds = [...new Set(appointments.map(a => a.student.toString()))];
-    const students = await User.find({
-      $or: [
-        { _id: { $in: studentIds } },
-        { role: 'student' }
-      ]
-    }).select('name email age role createdAt').limit(20).lean();
+    const userDoc = req.userDoc || await User.findById(userId).lean();
+    const counsellorEmail = (userDoc.email || '').toLowerCase().trim();
 
-    // 3. Difficulties and severity monitoring among students
+    // 1. Fetch appointments strictly for THIS particular counsellor
+    const appointments = await Appointment.find({
+      $or: [
+        { counsellor: userId },
+        { counsellorEmail }
+      ]
+    }).sort({ createdAt: -1 }).lean();
+
+    // 2. Fetch distinct students strictly associated with this counsellor's appointments
+    const studentIds = [...new Set(appointments.map(a => a.student ? a.student.toString() : null).filter(Boolean))];
+    const studentEmails = [...new Set(appointments.map(a => a.studentEmail ? a.studentEmail.toLowerCase() : null).filter(Boolean))];
+
+    let students = [];
+    if (studentIds.length > 0 || studentEmails.length > 0) {
+      students = await User.find({
+        $or: [
+          { _id: { $in: studentIds } },
+          { email: { $in: studentEmails } }
+        ]
+      }).select('name email age role createdAt').lean();
+    }
+
+    // 3. Difficulties and severity monitoring strictly for these students
     const studentDifficulties = {};
     const studentKeywords = {};
     let severeAlertsCount = 0;
     let moderateCount = 0;
 
-    const chatLogs = await ChatMessage.find({ sender: 'user' }).lean();
+    let chatLogs = [];
+    if (studentIds.length > 0 || studentEmails.length > 0) {
+      chatLogs = await ChatMessage.find({
+        $or: [
+          { user: { $in: studentIds } },
+          { userEmail: { $in: studentEmails } }
+        ],
+        sender: 'user'
+      }).lean();
+    }
 
     chatLogs.forEach(c => {
       if (c.severity === 'crisis') severeAlertsCount++;
@@ -206,13 +223,6 @@ router.get('/counsellor', authMiddleware, async (req, res) => {
         studentKeywords[k] = (studentKeywords[k] || 0) + 1;
       });
     });
-
-    if (Object.keys(studentDifficulties).length === 0) {
-      studentDifficulties['Academic Stress'] = 8;
-      studentDifficulties['Exam Anxiety'] = 6;
-      studentDifficulties['Sleep & Burnout'] = 4;
-      studentDifficulties['Loneliness & Peers'] = 3;
-    }
 
     // Calculate appointment counts
     const pendingCount = appointments.filter(a => a.status === 'pending').length;
@@ -234,7 +244,7 @@ router.get('/counsellor', authMiddleware, async (req, res) => {
         completedAppointments: completedCount,
         activeStudents: students.length,
         severeAlertsCount,
-        avgRating: '4.8 ★'
+        avgRating: '4.9 ★'
       },
       charts: {
         studentDifficulties,
@@ -259,6 +269,11 @@ router.get('/counsellor', authMiddleware, async (req, res) => {
  */
 router.post('/feedback/:appointmentId', authMiddleware, async (req, res) => {
   try {
+    const userRole = (req.user.role || '').toLowerCase();
+    if (userRole !== 'counsellor' && userRole !== 'admin') {
+      return res.status(403).json({ error: 'Only counsellors can submit feedback.' });
+    }
+
     const { appointmentId } = req.params;
     const { feedback, improvementRating, actionItems, markCompleted } = req.body;
 
@@ -293,8 +308,12 @@ router.post('/feedback/:appointmentId', authMiddleware, async (req, res) => {
  * GET /api/dashboard/admin
  * Platform-wide overview tracking students, counsellors, severe cases, and metrics
  */
-router.get('/admin', async (req, res) => {
+router.get('/admin', authMiddleware, async (req, res) => {
   try {
+    const userRole = (req.user.role || '').toLowerCase();
+    if (userRole !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Administrator privileges required.' });
+    }
     // 1. User Counts
     const totalStudents = await User.countDocuments({ role: 'student' });
     const totalCounsellors = await User.countDocuments({ role: 'counsellor' });

@@ -177,39 +177,30 @@
             margin-top: 3px;
         }
 
-        .role-switcher-tabs {
-            display: inline-flex;
-            background: #ffffff;
-            padding: 5px;
-            border-radius: 16px;
-            box-shadow: 0 4px 18px rgba(109, 77, 255, 0.07);
-            border: 1px solid var(--border);
-            gap: 4px;
-        }
-
-        .role-switch-btn {
+        .user-role-badge-banner {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            background: #ffffff;
             padding: 8px 18px;
-            border-radius: 12px;
-            border: none;
-            background: transparent;
+            border-radius: 999px;
+            box-shadow: 0 4px 18px rgba(109, 77, 255, 0.08);
+            border: 1.5px solid var(--border);
             font-size: 13.5px;
             font-weight: 700;
-            color: var(--text);
-            cursor: pointer;
-            transition: all 0.2s ease;
+            color: var(--heading);
         }
-        .role-switch-btn:hover {
-            color: var(--navy);
-            background: #faf8ff;
+        .user-role-badge-banner .role-chip {
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
-        .role-switch-btn.active {
-            background: var(--purple);
-            color: #ffffff;
-            box-shadow: 0 4px 14px rgba(109, 77, 255, 0.25);
-        }
+        .user-role-badge-banner .role-chip.student { background: #f0ebff; color: #6d4dff; }
+        .user-role-badge-banner .role-chip.counsellor { background: #e0f7fa; color: #0891b2; }
+        .user-role-badge-banner .role-chip.admin { background: #fee2e2; color: #dc2626; }
 
         /* Metric KPI Cards Grid */
         .metrics-grid {
@@ -643,24 +634,30 @@
     </header>
 
     <main class="wrap" style="flex: 1; padding-bottom: 40px;">
-        <!-- Top Title Bar & Role Selector -->
-        <div class="dashboard-header-bar">
+        <!-- Login Required Screen (Shown if user is not logged in) -->
+        <div id="loginRequiredState" style="display: none; padding: 60px 20px; text-align: center;">
+            <div style="max-width: 480px; margin: 0 auto; background: #ffffff; padding: 40px 32px; border-radius: 24px; box-shadow: 0 16px 40px rgba(109, 77, 255, 0.08); border: 1.5px solid var(--border);">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: #f0ebff; color: #6d4dff; font-size: 28px; display: grid; place-items: center; margin: 0 auto 18px;">🔒</div>
+                <h2 style="font-size: 22px; font-weight: 800; color: var(--heading); margin-bottom: 8px;">Login Required</h2>
+                <p style="font-size: 14px; color: var(--text); line-height: 1.55; margin-bottom: 24px;">Your wellness analytics, reports, and appointments are private to your registered account. Please log in with your role to access your dedicated dashboard.</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="index.html?loginRole=student&redirect=dashboard.html" class="btn-auth" style="background: var(--purple); color: #fff; text-align: center; padding: 12px; font-weight: 700; border-radius: 12px; border: none; display: block; text-decoration: none;">🎓 Login as Student</a>
+                    <a href="index.html?loginRole=counsellor&redirect=dashboard.html" class="btn-auth" style="background: #0891b2; color: #fff; text-align: center; padding: 12px; font-weight: 700; border-radius: 12px; border: none; display: block; text-decoration: none;">💼 Login as Counsellor</a>
+                    <a href="index.html?loginRole=admin&redirect=dashboard.html" class="btn-auth" style="background: #1f1b4d; color: #fff; text-align: center; padding: 12px; font-weight: 700; border-radius: 12px; border: none; display: block; text-decoration: none;">🛡️ Login as Admin</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Title Bar (Personalized based on authenticated user) -->
+        <div class="dashboard-header-bar" id="dashboardHeaderBar" style="display: none;">
             <div class="dash-title-group">
-                <h1 id="dashboardMainTitle">Student Wellness Dashboard</h1>
-                <p id="dashboardMainSub">Interactive insights from your AI assistant chats, counsellor feedback, and appointments</p>
+                <h1 id="dashboardMainTitle">Wellness Dashboard</h1>
+                <p id="dashboardMainSub">Private dashboard for your registered account</p>
             </div>
 
-            <!-- Role Selector Control -->
-            <div class="role-switcher-tabs" role="tablist">
-                <button type="button" class="role-switch-btn active" data-target="student" id="tabStudent">
-                    <span>🎓</span> Student View
-                </button>
-                <button type="button" class="role-switch-btn" data-target="counsellor" id="tabCounsellor">
-                    <span>💼</span> Counsellor View
-                </button>
-                <button type="button" class="role-switch-btn" data-target="admin" id="tabAdmin">
-                    <span>🛡️</span> Admin View
-                </button>
+            <!-- Personalized Role Portal Badge (Strictly isolated - no switching to other roles!) -->
+            <div class="user-role-badge-banner" id="userRoleBadgeBanner">
+                <!-- Dynamically populated with role tag -->
             </div>
         </div>
 
@@ -1143,128 +1140,50 @@
             }
         });
 
-        // Tab Switching
-        const roleTabs = document.querySelectorAll('.role-switch-btn');
-        const roleViews = document.querySelectorAll('.role-view');
-
-        function switchView(targetRole) {
-            roleTabs.forEach(t => t.classList.toggle('active', t.dataset.target === targetRole));
-            roleViews.forEach(v => v.classList.toggle('active', v.id === `view${targetRole.charAt(0).toUpperCase() + targetRole.slice(1)}`));
-
-            const titleEl = document.getElementById('dashboardMainTitle');
-            const subEl = document.getElementById('dashboardMainSub');
-
-            if (targetRole === 'student') {
-                titleEl.textContent = 'Student Wellness Dashboard';
-                subEl.textContent = 'Interactive insights from your AI assistant chats, counsellor feedback, and appointments';
-                loadStudentDashboard();
-            } else if (targetRole === 'counsellor') {
-                titleEl.textContent = 'Counsellor Clinical Dashboard';
-                subEl.textContent = 'Monitor student difficulty analytics, confirm sessions, and submit clinical evaluations';
-                loadCounsellorDashboard();
-            } else if (targetRole === 'admin') {
-                titleEl.textContent = 'Platform Administrator Dashboard';
-                subEl.textContent = 'Track student and counsellor registrations, severe vs moderate cases, and campus health trends';
-                loadAdminDashboard();
-            }
-        }
-
-        roleTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                switchView(tab.dataset.target);
-            });
-        });
-
         // ==========================================
         // 1. STUDENT DASHBOARD LOADER
         // ==========================================
         async function loadStudentDashboard() {
             try {
-                let data = null;
-                if (authToken) {
-                    const res = await fetch(`${API_BASE}/dashboard/student`, {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    if (res.ok) data = await res.json();
+                if (!authToken) return;
+
+                const res = await fetch(`${API_BASE}/dashboard/student`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    console.error('Failed to load student dashboard:', err);
+                    return;
                 }
 
-                // Fallback Mock Data if logged out or demo
-                if (!data) {
-                    data = {
-                        stats: {
-                            totalChats: 14,
-                            totalAppointments: 2,
-                            upcomingAppointments: 1,
-                            primaryDifficulty: 'Academic & Exam Stress',
-                            improvementRating: '4.5',
-                            improvementPercentage: 82,
-                            improvementLevelText: 'Positive Growth'
-                        },
-                        charts: {
-                            difficultyBreakdown: {
-                                'Academic Stress': 6,
-                                'Exam Anxiety': 4,
-                                'Sleep Quality': 3,
-                                'Loneliness & Social': 2,
-                                'Low Mood': 1
-                            },
-                            wellnessTrajectory: {
-                                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'This Week'],
-                                scores: [62, 68, 74, 80, 88]
-                            }
-                        },
-                        appointments: [
-                            {
-                                counsellorName: 'Dr. Sunita Sharma',
-                                date: '2026-10-24',
-                                time: '02:30 PM',
-                                sessionType: 'meet',
-                                status: 'confirmed',
-                                meetingLink: 'https://meet.jit.si/SMS-DrSunitaSharma-20261024',
-                                counsellorFeedback: 'Consistent coping habits observed. Recommended 10min daily breathwork.'
-                            },
-                            {
-                                counsellorName: 'Ms. Ananya Roy',
-                                date: '2026-10-14',
-                                time: '11:00 AM',
-                                sessionType: 'chat',
-                                status: 'completed',
-                                counsellorFeedback: 'Addressed study burnout and sleep routine. Patient responded well to grounding exercises.'
-                            }
-                        ],
-                        counsellorFeedback: [
-                            {
-                                counsellorName: 'Dr. Sunita Sharma',
-                                counsellorDesignation: 'Senior Clinical Psychologist',
-                                date: 'Oct 20, 2026',
-                                improvementRating: 5,
-                                feedback: 'Great emotional recovery during our session. We practiced the 4-7-8 breathing method to alleviate exam anxiety. Keep continuing the daily quiet walks.',
-                                actionItems: ['Practice 4-7-8 breathing before exams', 'Take 5min screen breaks every 45min', 'Maintain regular sleep routine']
-                            }
-                        ]
-                    };
-                }
+                const data = await res.json();
+                if (!data || !data.success) return;
 
                 // Update Metrics
-                document.getElementById('studentImprovementVal').textContent = `${data.stats.improvementPercentage}%`;
-                document.getElementById('studentProgressFill').style.width = `${data.stats.improvementPercentage}%`;
-                document.getElementById('studentImprovementSub').textContent = `★ ${data.stats.improvementRating}/5.0 • ${data.stats.improvementLevelText}`;
-                document.getElementById('studentTotalChats').textContent = data.stats.totalChats;
-                document.getElementById('studentTotalAppts').textContent = data.stats.totalAppointments;
-                document.getElementById('studentUpcomingApptsSub').textContent = `${data.stats.upcomingAppointments} Upcoming Sessions`;
-                document.getElementById('studentPrimaryFocus').textContent = data.stats.primaryDifficulty;
+                document.getElementById('studentImprovementVal').textContent = `${data.stats.improvementPercentage || 82}%`;
+                document.getElementById('studentProgressFill').style.width = `${data.stats.improvementPercentage || 82}%`;
+                document.getElementById('studentImprovementSub').textContent = `★ ${data.stats.improvementRating || '4.5'}/5.0 • ${data.stats.improvementLevelText || 'Positive Growth'}`;
+                document.getElementById('studentTotalChats').textContent = data.stats.totalChats || 0;
+                document.getElementById('studentTotalAppts').textContent = data.stats.totalAppointments || 0;
+                document.getElementById('studentUpcomingApptsSub').textContent = `${data.stats.upcomingAppointments || 0} Upcoming Sessions`;
+                document.getElementById('studentPrimaryFocus').textContent = data.stats.primaryDifficulty || 'General Well-being';
 
                 // Render Chart 1: Difficulty Doughnut
-                renderStudentDifficultyChart(data.charts.difficultyBreakdown);
+                if (data.charts && data.charts.difficultyBreakdown) {
+                    renderStudentDifficultyChart(data.charts.difficultyBreakdown);
+                }
 
                 // Render Chart 2: Wellness Trajectory Line
-                renderStudentTrajectoryChart(data.charts.wellnessTrajectory);
+                if (data.charts && data.charts.wellnessTrajectory) {
+                    renderStudentTrajectoryChart(data.charts.wellnessTrajectory);
+                }
 
                 // Render Counsellor Feedback Grid
-                renderStudentFeedbackGrid(data.counsellorFeedback);
+                renderStudentFeedbackGrid(data.counsellorFeedback || []);
 
                 // Render Appointments Table
-                renderStudentAppointmentsTable(data.appointments);
+                renderStudentAppointmentsTable(data.appointments || []);
 
             } catch (err) {
                 console.error('Error loading student dashboard:', err);
@@ -1408,83 +1327,41 @@
         // ==========================================
         async function loadCounsellorDashboard() {
             try {
-                let data = null;
-                if (authToken) {
-                    const res = await fetch(`${API_BASE}/dashboard/counsellor`, {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    if (res.ok) data = await res.json();
+                if (!authToken) return;
+
+                const res = await fetch(`${API_BASE}/dashboard/counsellor`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    console.error('Failed to load counsellor dashboard:', err);
+                    const tbody = document.getElementById('counsellorAppointmentsTableBody');
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444; padding:20px;">${escapeHtml(err.error || 'Access denied.')}</td></tr>`;
+                    return;
                 }
 
-                // Fallback Mock Data
-                if (!data) {
-                    data = {
-                        stats: {
-                            pendingAppointments: 2,
-                            confirmedAppointments: 4,
-                            completedAppointments: 6,
-                            severeAlertsCount: 1,
-                            activeStudents: 9
-                        },
-                        charts: {
-                            studentDifficulties: {
-                                'Academic & Exam Stress': 9,
-                                'Generalized Anxiety': 7,
-                                'Sleep Quality & Burnout': 5,
-                                'Peer Loneliness': 4,
-                                'Low Mood': 2
-                            },
-                            appointmentStatusBreakdown: {
-                                'Pending Confirmation': 2,
-                                'Confirmed Sessions': 4,
-                                'Completed': 6
-                            }
-                        },
-                        appointments: [
-                            {
-                                _id: 'mock1',
-                                studentName: 'Khushi Gupta',
-                                studentEmail: 'kgupta@example.com',
-                                date: '2026-10-22',
-                                time: '03:00 PM',
-                                sessionType: 'meet',
-                                concern: 'Severe exam pressure, unable to sleep',
-                                status: 'pending',
-                                meetingLink: 'https://meet.jit.si/SMS-Session-1'
-                            },
-                            {
-                                _id: 'mock2',
-                                studentName: 'Rahul Verma',
-                                studentEmail: 'rahul@example.com',
-                                date: '2026-10-23',
-                                time: '11:30 AM',
-                                sessionType: 'chat',
-                                concern: 'Homesickness & social anxiety in hostel',
-                                status: 'confirmed'
-                            }
-                        ],
-                        students: [
-                            { name: 'Khushi Gupta', age: 20, email: 'kgupta@example.com', difficulties: ['Exam Anxiety', 'Sleep Disruption'], severity: 'moderate' },
-                            { name: 'Rahul Verma', age: 19, email: 'rahul@example.com', difficulties: ['Loneliness', 'Social Anxiety'], severity: 'normal' },
-                            { name: 'Pooja Nair', age: 21, email: 'pooja@example.com', difficulties: ['Severe Burnout', 'Hopelessness'], severity: 'crisis' }
-                        ]
-                    };
-                }
+                const data = await res.json();
+                if (!data || !data.success) return;
 
                 // Update Metric KPIs
-                document.getElementById('counsellorPendingVal').textContent = data.stats.pendingAppointments;
-                document.getElementById('counsellorConfirmedVal').textContent = data.stats.confirmedAppointments;
-                document.getElementById('counsellorSevereVal').textContent = data.stats.severeAlertsCount;
-                document.getElementById('counsellorStudentsVal').textContent = data.stats.activeStudents;
+                const pEl = document.getElementById('counsellorPendingVal');
+                const cEl = document.getElementById('counsellorConfirmedVal');
+                const sEl = document.getElementById('counsellorSevereVal');
+                const stEl = document.getElementById('counsellorStudentsVal');
+                if (pEl) pEl.textContent = data.stats.pendingAppointments || 0;
+                if (cEl) cEl.textContent = data.stats.confirmedAppointments || 0;
+                if (sEl) sEl.textContent = data.stats.severeAlertsCount || 0;
+                if (stEl) stEl.textContent = data.stats.activeStudents || 0;
 
                 // Render Difficulties Bar Chart
-                renderCounsellorDifficultyChart(data.charts.studentDifficulties);
+                renderCounsellorDifficultyChart(data.charts?.studentDifficulties || {});
 
                 // Render Status Breakdown Doughnut Chart
-                renderCounsellorStatusChart(data.charts.appointmentStatusBreakdown);
+                renderCounsellorStatusChart(data.charts?.appointmentStatusBreakdown || {});
 
                 // Render Appointment Queue
-                renderCounsellorAppointmentsTable(data.appointments);
+                renderCounsellorAppointmentsTable(data.appointments || []);
 
                 // Render Student Clinical Reports Table
                 cachedCounsellorStudents = data.students || [];
@@ -1496,16 +1373,25 @@
         }
 
         function renderCounsellorDifficultyChart(diffData) {
-            const ctx = document.getElementById('counsellorDifficultyChart').getContext('2d');
+            const canvas = document.getElementById('counsellorDifficultyChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             if (counsellorDiffChartInstance) counsellorDiffChartInstance.destroy();
+
+            let labels = Object.keys(diffData || {});
+            let values = Object.values(diffData || {});
+            if (labels.length === 0) {
+                labels = ['No Student Difficulties Logged Yet'];
+                values = [0];
+            }
 
             counsellorDiffChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(diffData),
+                    labels,
                     datasets: [{
                         label: 'Cases Identified',
-                        data: Object.values(diffData),
+                        data: values,
                         backgroundColor: '#6d4dff',
                         borderRadius: 8
                     }]
@@ -1515,7 +1401,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { ticks: { stepSize: 1, font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { color: '#f0ecfc' } },
+                        x: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { color: '#f0ecfc' } },
                         y: { ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { display: false } }
                     },
                     plugins: { legend: { display: false } }
@@ -1524,16 +1410,29 @@
         }
 
         function renderCounsellorStatusChart(statusData) {
-            const ctx = document.getElementById('counsellorStatusChart').getContext('2d');
+            const canvas = document.getElementById('counsellorStatusChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             if (counsellorStatusChartInstance) counsellorStatusChartInstance.destroy();
+
+            let labels = Object.keys(statusData || {});
+            let values = Object.values(statusData || {});
+            let total = values.reduce((sum, v) => sum + v, 0);
+            let colors = ['#f59e0b', '#10b981', '#6d4dff'];
+
+            if (total === 0) {
+                labels = ['No Sessions Booked Yet'];
+                values = [1];
+                colors = ['#ede8fc'];
+            }
 
             counsellorStatusChartInstance = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: Object.keys(statusData),
+                    labels,
                     datasets: [{
-                        data: Object.values(statusData),
-                        backgroundColor: ['#f59e0b', '#10b981', '#6d4dff'],
+                        data: values,
+                        backgroundColor: colors,
                         borderWidth: 2,
                         borderColor: '#ffffff'
                     }]
@@ -1550,8 +1449,9 @@
 
         function renderCounsellorAppointmentsTable(appointments) {
             const tbody = document.getElementById('counsellorAppointmentsTableBody');
+            if (!tbody) return;
             if (!appointments || appointments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#8c89a8; padding:20px;">No appointments found in queue.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#8c89a8; padding:24px;">No appointments scheduled with you yet. Once students book sessions with you, they will appear here.</td></tr>';
                 return;
             }
 
@@ -1580,8 +1480,9 @@
 
         function renderCounsellorStudentTable(students) {
             const tbody = document.getElementById('counsellorStudentTableBody');
+            if (!tbody) return;
             if (!students || students.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8c89a8; padding:20px;">No students match criteria.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8c89a8; padding:24px;">No students have booked sessions with you yet.</td></tr>';
                 return;
             }
 
@@ -1604,13 +1505,16 @@
             }).join('');
         }
 
-        document.getElementById('counsellorStudentSearch').addEventListener('input', (e) => {
-            const q = e.target.value.toLowerCase().trim();
-            const filtered = cachedCounsellorStudents.filter(s =>
-                s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q)
-            );
-            renderCounsellorStudentTable(filtered);
-        });
+        const counsellorStudentSearch = document.getElementById('counsellorStudentSearch');
+        if (counsellorStudentSearch) {
+            counsellorStudentSearch.addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase().trim();
+                const filtered = cachedCounsellorStudents.filter(s =>
+                    (s.name && s.name.toLowerCase().includes(q)) || (s.email && s.email.toLowerCase().includes(q))
+                );
+                renderCounsellorStudentTable(filtered);
+            });
+        }
 
         // 1-Click Counsellor Confirmation
         async function confirmAppointment(id) {
@@ -1648,122 +1552,102 @@
             feedbackModal.classList.add('show');
         }
 
-        document.getElementById('closeFeedbackModal').addEventListener('click', () => {
-            feedbackModal.classList.remove('show');
-        });
-
-        feedbackForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const apptId = document.getElementById('feedbackApptId').value;
-            const improvementRating = document.getElementById('feedbackImprovementRating').value;
-            const feedback = document.getElementById('feedbackText').value;
-            const rawActions = document.getElementById('feedbackActionItems').value;
-            const markCompleted = document.getElementById('feedbackMarkCompleted').checked;
-
-            const actionItems = rawActions.split(',').map(s => s.trim()).filter(Boolean);
-
-            if (!authToken) {
-                alert('Please log in to save feedback.');
+        const closeFeedbackModalBtn = document.getElementById('closeFeedbackModal');
+        if (closeFeedbackModalBtn) {
+            closeFeedbackModalBtn.addEventListener('click', () => {
                 feedbackModal.classList.remove('show');
-                return;
-            }
+            });
+        }
 
-            try {
-                const res = await fetch(`${API_BASE}/dashboard/feedback/${apptId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify({
-                        feedback,
-                        improvementRating: Number(improvementRating),
-                        actionItems,
-                        markCompleted
-                    })
-                });
+        if (feedbackForm) {
+            feedbackForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const apptId = document.getElementById('feedbackApptId').value;
+                const improvementRating = document.getElementById('feedbackImprovementRating').value;
+                const feedback = document.getElementById('feedbackText').value;
+                const rawActions = document.getElementById('feedbackActionItems').value;
+                const markCompleted = document.getElementById('feedbackMarkCompleted').checked;
 
-                if (res.ok) {
-                    alert('Feedback & improvement score saved! Visible on the student dashboard.');
+                const actionItems = rawActions.split(',').map(s => s.trim()).filter(Boolean);
+
+                if (!authToken) {
+                    alert('Please log in to save feedback.');
                     feedbackModal.classList.remove('show');
-                    loadCounsellorDashboard();
-                } else {
-                    const errData = await res.json();
-                    alert(errData.error || 'Failed to submit feedback.');
+                    return;
                 }
-            } catch (err) {
-                console.error(err);
-                alert('Error saving feedback.');
-            }
-        });
+
+                try {
+                    const res = await fetch(`${API_BASE}/dashboard/feedback/${apptId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            feedback,
+                            improvementRating: Number(improvementRating),
+                            actionItems,
+                            markCompleted
+                        })
+                    });
+
+                    if (res.ok) {
+                        alert('Feedback & improvement score saved! Visible on the student dashboard.');
+                        feedbackModal.classList.remove('show');
+                        loadCounsellorDashboard();
+                    } else {
+                        const errData = await res.json();
+                        alert(errData.error || 'Failed to submit feedback.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error saving feedback.');
+                }
+            });
+        }
 
         // ==========================================
         // 3. ADMIN DASHBOARD LOADER
         // ==========================================
         async function loadAdminDashboard() {
             try {
-                let data = null;
-                const res = await fetch(`${API_BASE}/dashboard/admin`);
-                if (res.ok) data = await res.json();
+                if (!authToken) return;
 
-                if (!data) {
-                    data = {
-                        stats: {
-                            totalStudents: 28,
-                            totalCounsellors: 3,
-                            severeCases: 2,
-                            averageCases: 9,
-                            normalCases: 17,
-                            totalAppointments: 14
-                        },
-                        charts: {
-                            severityDistribution: {
-                                'Normal (Coping Well)': 17,
-                                'Moderate (Under Observation)': 9,
-                                'Severe / Urgent Alert': 2
-                            },
-                            campusDifficulties: {
-                                'Academic & Exam Stress': 16,
-                                'Generalized Anxiety': 11,
-                                'Sleep Disruption': 8,
-                                'Peer Loneliness': 6,
-                                'Depressive Mood': 3
-                            },
-                            consultationTrends: {
-                                labels: ['Oct 1-7', 'Oct 8-14', 'Oct 15-21', 'Oct 22-28'],
-                                appointments: [4, 7, 12, 14],
-                                aiChats: [20, 34, 52, 68]
-                            }
-                        },
-                        students: [
-                            { name: 'Khushi Gupta', email: 'kgupta@example.com', role: 'student', age: 20, createdAt: '2026-10-18' },
-                            { name: 'Rahul Verma', email: 'rahul@example.com', role: 'student', age: 19, createdAt: '2026-10-16' },
-                            { name: 'Amit Kumar', email: 'amit@example.com', role: 'student', age: 22, createdAt: '2026-10-12' }
-                        ],
-                        counsellors: [
-                            { name: 'Dr. Sunita Sharma', email: 'sunita.sharma@campus.edu', role: 'counsellor', designation: 'Senior Clinical Psychologist', createdAt: '2026-10-10' },
-                            { name: 'Prof. Rajesh Verma', email: 'rajesh.verma@campus.edu', role: 'counsellor', designation: 'Student Life & Career Counsellor', createdAt: '2026-10-10' },
-                            { name: 'Ms. Ananya Roy', email: 'ananya.roy@campus.edu', role: 'counsellor', designation: 'Youth Wellness & Mindfulness Mentor', createdAt: '2026-10-10' }
-                        ]
-                    };
+                const res = await fetch(`${API_BASE}/dashboard/admin`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    console.error('Failed to load admin dashboard:', err);
+                    const tbody = document.getElementById('adminRegistryTableBody');
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444; padding:20px;">${escapeHtml(err.error || 'Access denied. Administrator privileges required.')}</td></tr>`;
+                    return;
                 }
+
+                const data = await res.json();
+                if (!data || !data.success) return;
 
                 cachedAdminData = data;
 
                 // Update Metric KPIs
-                document.getElementById('adminTotalStudents').textContent = data.stats.totalStudents;
-                document.getElementById('adminTotalCounsellors').textContent = data.stats.totalCounsellors;
-                document.getElementById('adminSevereCases').textContent = data.stats.severeCases;
-                document.getElementById('adminAverageCases').textContent = data.stats.averageCases;
+                const stVal = document.getElementById('adminTotalStudents');
+                const coVal = document.getElementById('adminTotalCounsellors');
+                const seVal = document.getElementById('adminSevereCases');
+                const avVal = document.getElementById('adminAverageCases');
+                if (stVal) stVal.textContent = data.stats.totalStudents || 0;
+                if (coVal) coVal.textContent = data.stats.totalCounsellors || 0;
+                if (seVal) seVal.textContent = data.stats.severeCases || 0;
+                if (avVal) avVal.textContent = data.stats.averageCases || 0;
 
                 // Chart 1: Campus Difficulties (Polar Area)
-                renderAdminCampusDiffChart(data.charts.campusDifficulties);
+                renderAdminCampusDiffChart(data.charts?.campusDifficulties || {});
 
                 // Chart 2: Severity Distribution (Doughnut)
-                renderAdminSeverityChart(data.charts.severityDistribution);
+                renderAdminSeverityChart(data.charts?.severityDistribution || {});
 
                 // Chart 3: Weekly Consultation Growth Timeline (Bar/Line Grouped)
-                renderAdminTimelineChart(data.charts.consultationTrends);
+                renderAdminTimelineChart(data.charts?.consultationTrends || { labels: [], appointments: [], aiChats: [] });
 
                 // Render Registry Table
                 renderAdminRegistryTable([...(data.students || []), ...(data.counsellors || [])]);
@@ -1774,15 +1658,20 @@
         }
 
         function renderAdminCampusDiffChart(diffData) {
-            const ctx = document.getElementById('adminCampusDiffChart').getContext('2d');
+            const canvas = document.getElementById('adminCampusDiffChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             if (adminCampusDiffChartInstance) adminCampusDiffChartInstance.destroy();
+
+            const labels = Object.keys(diffData || {});
+            const values = Object.values(diffData || {});
 
             adminCampusDiffChartInstance = new Chart(ctx, {
                 type: 'polarArea',
                 data: {
-                    labels: Object.keys(diffData),
+                    labels,
                     datasets: [{
-                        data: Object.values(diffData),
+                        data: values,
                         backgroundColor: [
                             'rgba(109, 77, 255, 0.75)',
                             'rgba(6, 182, 212, 0.75)',
@@ -1805,15 +1694,17 @@
         }
 
         function renderAdminSeverityChart(sevData) {
-            const ctx = document.getElementById('adminSeverityChart').getContext('2d');
+            const canvas = document.getElementById('adminSeverityChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             if (adminSeverityChartInstance) adminSeverityChartInstance.destroy();
 
             adminSeverityChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: Object.keys(sevData),
+                    labels: Object.keys(sevData || {}),
                     datasets: [{
-                        data: Object.values(sevData),
+                        data: Object.values(sevData || {}),
                         backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
                         borderWidth: 2,
                         borderColor: '#ffffff'
@@ -1831,23 +1722,25 @@
         }
 
         function renderAdminTimelineChart(trendData) {
-            const ctx = document.getElementById('adminTimelineChart').getContext('2d');
+            const canvas = document.getElementById('adminTimelineChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             if (adminTimelineChartInstance) adminTimelineChartInstance.destroy();
 
             adminTimelineChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: trendData.labels,
+                    labels: trendData.labels || [],
                     datasets: [
                         {
                             label: 'AI First-Aid Conversations',
-                            data: trendData.aiChats,
+                            data: trendData.aiChats || [],
                             backgroundColor: '#6d4dff',
                             borderRadius: 6
                         },
                         {
                             label: 'Counselling Appointments Booked',
-                            data: trendData.appointments,
+                            data: trendData.appointments || [],
                             backgroundColor: '#06b6d4',
                             borderRadius: 6
                         }
@@ -1869,6 +1762,7 @@
 
         function renderAdminRegistryTable(users) {
             const tbody = document.getElementById('adminRegistryTableBody');
+            if (!tbody) return;
             if (!users || users.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#8c89a8; padding:20px;">No accounts found.</td></tr>';
                 return;
@@ -1896,30 +1790,96 @@
             }).join('');
         }
 
-        document.getElementById('adminRegistrySearch').addEventListener('input', (e) => {
-            const q = e.target.value.toLowerCase().trim();
-            if (!cachedAdminData) return;
-            const combined = [...(cachedAdminData.students || []), ...(cachedAdminData.counsellors || [])];
-            const filtered = combined.filter(u =>
-                (u.name && u.name.toLowerCase().includes(q)) ||
-                (u.email && u.email.toLowerCase().includes(q)) ||
-                (u.role && u.role.toLowerCase().includes(q))
-            );
-            renderAdminRegistryTable(filtered);
-        });
+        const adminSearchEl = document.getElementById('adminRegistrySearch');
+        if (adminSearchEl) {
+            adminSearchEl.addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase().trim();
+                if (!cachedAdminData) return;
+                const combined = [...(cachedAdminData.students || []), ...(cachedAdminData.counsellors || [])];
+                const filtered = combined.filter(u =>
+                    (u.name && u.name.toLowerCase().includes(q)) ||
+                    (u.email && u.email.toLowerCase().includes(q)) ||
+                    (u.role && u.role.toLowerCase().includes(q))
+                );
+                renderAdminRegistryTable(filtered);
+            });
+        }
 
         // ==========================================
-        // INITIAL PAGE BOOTSTRAP
+        // INITIAL PAGE BOOTSTRAP & STRICT ROLE ISOLATION
         // ==========================================
         updateHeader();
 
-        // Default to user's logged-in role if present, else student
-        let initialRole = 'student';
-        if (currentRole === 'counsellor' || currentRole === 'admin') {
-            initialRole = currentRole;
-        }
+        if (!authToken) {
+            // Unauthenticated state: display login required screen, remove all role view containers
+            const loginReq = document.getElementById('loginRequiredState');
+            if (loginReq) loginReq.style.display = 'block';
 
-        switchView(initialRole);
+            const headerBar = document.getElementById('dashboardHeaderBar');
+            if (headerBar) headerBar.style.display = 'none';
+
+            const sView = document.getElementById('viewStudent');
+            const cView = document.getElementById('viewCounsellor');
+            const aView = document.getElementById('viewAdmin');
+            if (sView) sView.remove();
+            if (cView) cView.remove();
+            if (aView) aView.remove();
+        } else {
+            const loginReq = document.getElementById('loginRequiredState');
+            if (loginReq) loginReq.style.display = 'none';
+
+            const headerBar = document.getElementById('dashboardHeaderBar');
+            if (headerBar) headerBar.style.display = 'flex';
+
+            const role = (localStorage.getItem('userRole') || 'student').toLowerCase();
+            const sView = document.getElementById('viewStudent');
+            const cView = document.getElementById('viewCounsellor');
+            const aView = document.getElementById('viewAdmin');
+            const roleBanner = document.getElementById('userRoleBadgeBanner');
+            const titleEl = document.getElementById('dashboardMainTitle');
+            const subEl = document.getElementById('dashboardMainSub');
+
+            if (role === 'counsellor') {
+                if (titleEl) titleEl.textContent = 'Counsellor Clinical Dashboard';
+                if (subEl) subEl.textContent = `Private clinical overview and student appointments for ${escapeHtml(userName)}`;
+                if (roleBanner) {
+                    roleBanner.innerHTML = `<span class="role-chip counsellor">💼 Counsellor</span> <span>${escapeHtml(userName)}</span>`;
+                }
+
+                if (cView) cView.classList.add('active');
+                if (sView) sView.remove();
+                if (aView) aView.remove();
+
+                loadCounsellorDashboard();
+
+            } else if (role === 'admin') {
+                if (titleEl) titleEl.textContent = 'Administrator Overview Dashboard';
+                if (subEl) subEl.textContent = 'Campus-wide user registry, crisis alerts, and mental health metrics';
+                if (roleBanner) {
+                    roleBanner.innerHTML = `<span class="role-chip admin">🛡️ Admin</span> <span>${escapeHtml(userName)}</span>`;
+                }
+
+                if (aView) aView.classList.add('active');
+                if (sView) sView.remove();
+                if (cView) cView.remove();
+
+                loadAdminDashboard();
+
+            } else {
+                // Student (default)
+                if (titleEl) titleEl.textContent = 'Student Wellness Dashboard';
+                if (subEl) subEl.textContent = 'Your personalized emotional health trajectory, counsellor feedback, and appointments';
+                if (roleBanner) {
+                    roleBanner.innerHTML = `<span class="role-chip student">🎓 Student</span> <span>${escapeHtml(userName)}</span>`;
+                }
+
+                if (sView) sView.classList.add('active');
+                if (cView) cView.remove();
+                if (aView) aView.remove();
+
+                loadStudentDashboard();
+            }
+        }
     </script>
 </body>
 </html>

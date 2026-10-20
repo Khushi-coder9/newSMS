@@ -1942,7 +1942,13 @@
                     loginForm.reset();
                     updateAuthUI();
 
-                    if (data.user.role === 'admin') {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectUrl = urlParams.get('redirect');
+
+                    if (redirectUrl) {
+                        alert(`Login successful! Welcome back, ${data.user.name || ''}`);
+                        window.location.href = redirectUrl;
+                    } else if (data.user.role === 'admin') {
                         alert(`Login successful! Welcome back, Administrator ${data.user.name || ''}`);
                         loadMonitoringDashboard();
                     } else if (data.user.role === 'counsellor') {
@@ -2152,6 +2158,19 @@
 
         // Initialize UI
         updateAuthUI();
+
+        // Check if redirected from dashboard or other page requesting login
+        const initialParams = new URLSearchParams(window.location.search);
+        const loginRoleParam = initialParams.get('loginRole');
+        if (loginRoleParam && !authToken) {
+            setLoginRole(loginRoleParam);
+            const lModal = document.getElementById('loginModal');
+            if (lModal) {
+                lModal.classList.add('show');
+                const emailInput = document.getElementById('loginEmail');
+                if (emailInput) emailInput.focus();
+            }
+        }
     </script>
 </body>
 </html>
