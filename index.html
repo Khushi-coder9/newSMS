@@ -585,6 +585,221 @@
             transform: scaleX(-1);
         }
 
+        /* Mobile Menu Toggle Button */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            background: #ffffff;
+            border: 1.5px solid #dcd4fa;
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 8px;
+            gap: 5px;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+        .mobile-menu-btn:hover {
+            background: #f4f0ff;
+            border-color: var(--purple);
+        }
+        .mobile-menu-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #241c63;
+            border-radius: 2px;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        .mobile-menu-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .mobile-menu-btn.active span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        .mobile-menu-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* Mobile Slide-down Drawer */
+        .mobile-nav-drawer {
+            display: none;
+            position: fixed;
+            top: 74px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(28, 24, 72, 0.45);
+            backdrop-filter: blur(6px);
+            z-index: 99;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .mobile-nav-drawer.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mobile-nav-content {
+            background: #ffffff;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            padding: 18px 20px 24px;
+            box-shadow: 0 20px 40px rgba(28, 24, 72, 0.16);
+            transform: translateY(-15px);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .mobile-nav-drawer.open .mobile-nav-content {
+            transform: translateY(0);
+        }
+        .mobile-nav-user-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #f4efff;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+        .mobile-user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--purple);
+            color: #fff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 16px;
+        }
+        .mobile-user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .mobile-user-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--heading);
+        }
+        .mobile-user-role {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .mobile-nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: #2b2756;
+            font-size: 14.5px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .mobile-nav-item:hover, .mobile-nav-item.active {
+            background: #f4efff;
+            color: var(--purple);
+        }
+        .mobile-nav-item .m-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+        .mobile-nav-item .m-badge {
+            margin-left: auto;
+            font-size: 10.5px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #ede8ff;
+            color: var(--purple);
+            font-weight: 800;
+        }
+        .mobile-nav-auth-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1.5px solid #f0ecfa;
+        }
+        .mobile-btn-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            background: #ffffff;
+            color: var(--purple);
+            border: 1.5px solid #dcd4fa;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .mobile-btn-signup {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            background: var(--purple);
+            color: #ffffff;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Mobile Quick Feature Pills Bar */
+        .mobile-quick-features {
+            display: none;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px 0 16px;
+            gap: 8px;
+            scrollbar-width: none;
+            margin-top: 14px;
+        }
+        .mobile-quick-features::-webkit-scrollbar { display: none; }
+        .quick-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(28, 24, 72, 0.05);
+            border: 1.2px solid transparent;
+            transition: transform 0.15s ease;
+        }
+        .quick-pill:active { transform: scale(0.96); }
+        .qp-ai { background: #e7f4fb; color: #0284c7; border-color: #bae6fd; }
+        .qp-book { background: #e4f6ec; color: #16a34a; border-color: #bbf7d0; }
+        .qp-dash { background: #f3f0ff; color: #6d4dff; border-color: #ddd6fe; }
+        .qp-res { background: #fff3de; color: #d97706; border-color: #fde68a; }
+        .qp-peer { background: #fce7f3; color: #db2777; border-color: #fbcfe8; }
+
         @media (max-width: 1100px) {
             .hero h1 { font-size: 38px; }
             .nav-links { gap: 14px; font-size: 13px; }
@@ -593,17 +808,111 @@
         }
 
         @media (max-width: 860px) {
+            .mobile-menu-btn { display: flex; }
+            .mobile-nav-drawer { display: block; }
             .nav-links { display: none; }
-            .hero-grid { grid-template-columns: 1fr; }
-            .hero-art {
-                grid-template-columns: 1fr 100px;
-                min-height: 320px;
+            #userBadge { display: none !important; }
+            .nav-actions { gap: 8px; }
+            .btn-login { padding: 6px 12px; font-size: 12.5px; }
+            .btn-signup { display: none; }
+            .hero-grid {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 20px;
+                min-height: auto;
+                padding-bottom: 20px;
             }
-            .hero-art img { height: 320px; }
-            .cards { grid-template-columns: 1fr; }
-            .trust { grid-template-columns: 1fr 1fr; }
-            .trust-item { border-right: none; padding: 10px; }
-            .footer-row { flex-direction: column; gap: 8px; text-align: center; }
+            .hero { padding: 16px 0 0; }
+            .pill { margin: 0 auto 12px; }
+            .hero h1 {
+                font-size: 32px;
+                line-height: 1.15;
+                margin-bottom: 12px;
+            }
+            .hero-copy {
+                font-size: 14px;
+                margin: 0 auto 18px;
+                max-width: 100%;
+            }
+            .hero-ctas {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .hero-art {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-height: auto;
+                width: 100%;
+                margin-top: 6px;
+            }
+            .hero-art img {
+                width: 100%;
+                max-width: 280px;
+                height: auto;
+                margin: 0 auto;
+            }
+            .notes {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+                padding-bottom: 8px;
+                margin-top: -10px;
+            }
+            .sticky {
+                font-size: 16px;
+                padding: 6px 12px;
+                transform: none !important;
+                margin: 0 !important;
+            }
+            .tiny-heart { display: none; }
+            .mobile-quick-features { display: flex; }
+            .cards {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .card {
+                min-height: auto;
+                padding: 20px 18px;
+            }
+            .trust {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 4px;
+            }
+            .trust-item {
+                border-right: none;
+                border-bottom: 1px solid #eef2f6;
+                padding: 10px 8px;
+            }
+            .trust-item:last-child { border-bottom: none; }
+            .footer-row {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .wrap { width: calc(100% - 24px); padding: 0 4px; }
+            .brand-name { font-size: 14.5px; }
+            .brand-tag { font-size: 10px; }
+            .brand-mark { width: 34px; height: 30px; }
+            .hero h1 { font-size: 27px; }
+            .modal {
+                width: 95vw !important;
+                padding: 20px 16px !important;
+            }
+            .modal input, .modal select, .modal textarea {
+                font-size: 16px !important;
+            }
         }
     </style>
 </head>
@@ -666,6 +975,58 @@
                     </div>
                 </div>
                 <button class="btn-signup" id="signupBtn">Sign Up</button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Slide Drawer -->
+        <div class="mobile-nav-drawer" id="mobileNavDrawer">
+            <div class="mobile-nav-content">
+                <div class="mobile-nav-user-bar" id="mobileNavUserBar" style="display: none;">
+                    <div class="mobile-user-avatar">👤</div>
+                    <div class="mobile-user-details">
+                        <span class="mobile-user-name" id="mobileUserName">Hi, Student</span>
+                        <span class="mobile-user-role" id="mobileUserRole">STUDENT</span>
+                    </div>
+                </div>
+
+                <nav class="mobile-nav-list">
+                    <a href="index.html" class="mobile-nav-item active">
+                        <span class="m-icon">🏠</span>
+                        <span class="m-text">Home</span>
+                    </a>
+                    <a href="chat.html" class="mobile-nav-item" id="mobileChatLink">
+                        <span class="m-icon">💬</span>
+                        <span class="m-text">AI First-Aid Chat</span>
+                        <span class="m-badge">24/7 AI</span>
+                    </a>
+                    <a href="book.html" class="mobile-nav-item">
+                        <span class="m-icon">📅</span>
+                        <span class="m-text">Book Appointment</span>
+                        <span class="m-badge">Meet / Chat</span>
+                    </a>
+                    <a href="dashboard.html" class="mobile-nav-item">
+                        <span class="m-icon">📊</span>
+                        <span class="m-text">Wellness Dashboard</span>
+                        <span class="m-badge" style="background:#e0f7fa; color:#0e7490;">Personalized</span>
+                    </a>
+                    <a href="#resources" class="mobile-nav-item">
+                        <span class="m-icon">📚</span>
+                        <span class="m-text">Resource Hub</span>
+                    </a>
+                    <a href="#peer" class="mobile-nav-item">
+                        <span class="m-icon">🤝</span>
+                        <span class="m-text">Peer Support</span>
+                    </a>
+                </nav>
+
+                <div class="mobile-nav-auth-section" id="mobileNavAuthSection">
+                    <!-- Populated dynamically: Login buttons or Logout -->
+                </div>
             </div>
         </div>
     </header>
@@ -692,6 +1053,15 @@
                         </svg>
                         Learn More
                     </button>
+                </div>
+
+                <!-- Quick Mobile Feature Carousel / Pills -->
+                <div class="mobile-quick-features">
+                    <a href="chat.html" class="quick-pill qp-ai">💬 AI Chat</a>
+                    <a href="book.html" class="quick-pill qp-book">📅 Book Session</a>
+                    <a href="dashboard.html" class="quick-pill qp-dash">📊 Dashboard</a>
+                    <a href="#resources" class="quick-pill qp-res">📚 Resources</a>
+                    <a href="#peer" class="quick-pill qp-peer">🤝 Peer Forum</a>
                 </div>
             </div>
 
@@ -1641,7 +2011,7 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // Check if user is logged in & update header UI
+        // Check if user is logged in & update header & mobile drawer UI
         function updateAuthUI() {
             const loginBtn = document.getElementById('loginBtn');
             const loginBtnText = document.getElementById('loginBtnText');
@@ -1650,6 +2020,11 @@
             const signupBtn = document.getElementById('signupBtn');
             const chatLink = document.getElementById('chatLink');
             const userBadge = document.getElementById('userBadge');
+            const mobileUserBar = document.getElementById('mobileNavUserBar');
+            const mobileUserName = document.getElementById('mobileUserName');
+            const mobileUserRole = document.getElementById('mobileUserRole');
+            const mobileNavAuth = document.getElementById('mobileNavAuthSection');
+            const mobileChatLink = document.getElementById('mobileChatLink');
 
             if (authToken) {
                 const userName = localStorage.getItem('userName') || 'User';
@@ -1667,6 +2042,31 @@
                     userBadge.style.display = 'inline-flex';
                     userBadge.innerHTML = `<span>Hi, ${escapeHtml(userName)}</span><span class="user-role-tag">${escapeHtml(userRole)}</span>`;
                 }
+
+                if (mobileUserBar) {
+                    mobileUserBar.style.display = 'flex';
+                    if (mobileUserName) mobileUserName.textContent = `Hi, ${escapeHtml(userName)}`;
+                    if (mobileUserRole) mobileUserRole.textContent = userRole.toUpperCase();
+                }
+                if (mobileChatLink) {
+                    mobileChatLink.style.opacity = '1';
+                    mobileChatLink.style.pointerEvents = 'auto';
+                }
+                if (mobileNavAuth) {
+                    mobileNavAuth.innerHTML = `
+                        <button type="button" class="mobile-btn-login" id="mobileLogoutBtn" style="color:#dc2626; border-color:#fecaca;">
+                            <span>🚪</span> Logout
+                        </button>
+                    `;
+                    document.getElementById('mobileLogoutBtn')?.addEventListener('click', () => {
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('userEmail');
+                        localStorage.removeItem('userName');
+                        localStorage.removeItem('userRole');
+                        alert('Logged out successfully');
+                        window.location.reload();
+                    });
+                }
             } else {
                 if (loginBtnText) loginBtnText.textContent = 'Login';
                 if (loginBtnCaret) loginBtnCaret.style.display = 'inline-block';
@@ -1679,6 +2079,32 @@
                 if (userBadge) {
                     userBadge.style.display = 'none';
                     userBadge.innerHTML = '';
+                }
+
+                if (mobileUserBar) mobileUserBar.style.display = 'none';
+                if (mobileChatLink) {
+                    mobileChatLink.style.opacity = '0.5';
+                    mobileChatLink.style.pointerEvents = 'none';
+                }
+                if (mobileNavAuth) {
+                    mobileNavAuth.innerHTML = `
+                        <button type="button" class="mobile-btn-login" id="mobileOpenLoginBtn">
+                            <span>🔑</span> Login (Student / Counsellor / Admin)
+                        </button>
+                        <button type="button" class="mobile-btn-signup" id="mobileOpenSignupBtn">
+                            <span>✨</span> Create Free Account
+                        </button>
+                    `;
+                    document.getElementById('mobileOpenLoginBtn')?.addEventListener('click', () => {
+                        closeMobileMenu();
+                        setLoginRole('student');
+                        loginModal.classList.add('show');
+                    });
+                    document.getElementById('mobileOpenSignupBtn')?.addEventListener('click', () => {
+                        closeMobileMenu();
+                        setSignupRole('student');
+                        signupModal.classList.add('show');
+                    });
                 }
             }
         }
@@ -2154,6 +2580,43 @@
             if (currentMonitoringData) {
                 renderStudentTable(currentMonitoringData.students || []);
             }
+        });
+
+        // Mobile Drawer Controller
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+
+        function toggleMobileMenu() {
+            if (!mobileMenuBtn || !mobileNavDrawer) return;
+            const isOpen = mobileMenuBtn.classList.toggle('active');
+            mobileNavDrawer.classList.toggle('open', isOpen);
+            mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        }
+
+        function closeMobileMenu() {
+            if (mobileMenuBtn) {
+                mobileMenuBtn.classList.remove('active');
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            }
+            if (mobileNavDrawer) {
+                mobileNavDrawer.classList.remove('open');
+            }
+            document.body.style.overflow = '';
+        }
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        }
+
+        if (mobileNavDrawer) {
+            mobileNavDrawer.addEventListener('click', (e) => {
+                if (e.target === mobileNavDrawer) closeMobileMenu();
+            });
+        }
+
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.addEventListener('click', () => closeMobileMenu());
         });
 
         // Initialize UI

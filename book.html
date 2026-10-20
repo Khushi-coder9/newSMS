@@ -904,10 +904,143 @@
             justify-content: space-between;
         }
 
+        /* Mobile Menu Toggle Button */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            background: #ffffff;
+            border: 1.5px solid #dcd4fa;
+            border-radius: 10px;
+            cursor: pointer;
+            padding: 8px;
+            gap: 5px;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+        .mobile-menu-btn:hover { background: #f4f0ff; border-color: var(--purple); }
+        .mobile-menu-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #241c63;
+            border-radius: 2px;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+        .mobile-menu-btn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .mobile-menu-btn.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .mobile-menu-btn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* Mobile Drawer */
+        .mobile-nav-drawer {
+            display: none;
+            position: fixed;
+            top: 74px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(28, 24, 72, 0.45);
+            backdrop-filter: blur(6px);
+            z-index: 99;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .mobile-nav-drawer.open { opacity: 1; pointer-events: auto; }
+        .mobile-nav-content {
+            background: #ffffff;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            padding: 18px 20px 24px;
+            box-shadow: 0 20px 40px rgba(28, 24, 72, 0.16);
+            transform: translateY(-15px);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .mobile-nav-drawer.open .mobile-nav-content { transform: translateY(0); }
+        .mobile-nav-list { display: flex; flex-direction: column; gap: 6px; }
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            color: #2b2756;
+            font-size: 14.5px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .mobile-nav-item:hover, .mobile-nav-item.active { background: #f4efff; color: var(--purple); }
+        .mobile-nav-item .m-icon { font-size: 18px; width: 24px; text-align: center; }
+
+        .mobile-nav-user-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #f4efff;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+        .mobile-user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--purple);
+            color: #fff;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 16px;
+        }
+        .mobile-user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .mobile-user-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--heading);
+        }
+        .mobile-user-role {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
         @media (max-width: 860px) {
-            .booking-grid { grid-template-columns: 1fr; }
+            .mobile-menu-btn { display: flex; }
+            .mobile-nav-drawer { display: block; }
+            .nav-links { display: none; }
+            #userBadge { display: none !important; }
+            .nav-actions { gap: 8px; }
+            .btn-login { padding: 6px 14px; font-size: 13px; }
+            .booking-grid { grid-template-columns: 1fr; gap: 20px; }
+            .counsellors-grid { grid-template-columns: 1fr; }
             .modes-grid { grid-template-columns: 1fr; }
             .summary-card { position: static; }
+            .booking-card { padding: 20px 16px; border-radius: 18px; }
+            .my-appointments-grid { grid-template-columns: 1fr; }
+            .page-hero h1 { font-size: 26px; }
+        }
+
+        @media (max-width: 520px) {
+            .wrap { width: calc(100% - 20px); }
+            .brand-name { font-size: 14px; }
+            .brand-tag { font-size: 9.5px; }
+            .brand-mark { width: 32px; height: 28px; }
+            .page-hero { padding: 24px 0 20px; }
+            .step-header { gap: 10px; }
+            .step-title h2 { font-size: 16px; }
+            .slots-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+            .custom-date-input { max-width: 100%; }
         }
     </style>
 </head>
@@ -937,6 +1070,46 @@
             <div class="nav-actions">
                 <div id="userBadge" class="user-greeting-badge" style="display: none;"></div>
                 <button class="btn-login" id="authBtn">Login</button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Slide Drawer -->
+        <div class="mobile-nav-drawer" id="mobileNavDrawer">
+            <div class="mobile-nav-content">
+                <div class="mobile-nav-user-bar" id="mobileNavUserBar" style="display: none;">
+                    <div class="mobile-user-avatar">👤</div>
+                    <div class="mobile-user-details">
+                        <span class="mobile-user-name" id="mobileUserName">Hi, User</span>
+                        <span class="mobile-user-role" id="mobileUserRole">STUDENT</span>
+                    </div>
+                </div>
+                <nav class="mobile-nav-list">
+                    <a href="index.html" class="mobile-nav-item">
+                        <span class="m-icon">🏠</span>
+                        <span class="m-text">Home</span>
+                    </a>
+                    <a href="chat.html" class="mobile-nav-item">
+                        <span class="m-icon">💬</span>
+                        <span class="m-text">AI First-Aid Chat</span>
+                    </a>
+                    <a href="book.html" class="mobile-nav-item active">
+                        <span class="m-icon">📅</span>
+                        <span class="m-text">Book Appointment</span>
+                    </a>
+                    <a href="dashboard.html" class="mobile-nav-item">
+                        <span class="m-icon">📊</span>
+                        <span class="m-text">Wellness Dashboard</span>
+                    </a>
+                    <a href="index.html#resources" class="mobile-nav-item">
+                        <span class="m-icon">📚</span>
+                        <span class="m-text">Resource Hub</span>
+                    </a>
+                </nav>
             </div>
         </div>
     </header>
@@ -1173,6 +1346,9 @@
         function updateAuthUI() {
             const authBtn = document.getElementById('authBtn');
             const userBadge = document.getElementById('userBadge');
+            const mobileNavUserBar = document.getElementById('mobileNavUserBar');
+            const mobileUserName = document.getElementById('mobileUserName');
+            const mobileUserRole = document.getElementById('mobileUserRole');
             authToken = localStorage.getItem('authToken');
 
             if (authToken) {
@@ -1184,6 +1360,11 @@
                     userBadge.style.display = 'inline-flex';
                     userBadge.innerHTML = `<span>Hi, ${escapeHtml(userName)}</span><span class="user-role-tag">${escapeHtml(userRole)}</span>`;
                 }
+                if (mobileNavUserBar) {
+                    mobileNavUserBar.style.display = 'flex';
+                    if (mobileUserName) mobileUserName.textContent = `Hi, ${escapeHtml(userName)}`;
+                    if (mobileUserRole) mobileUserRole.textContent = userRole.toUpperCase();
+                }
                 loadMyAppointments();
             } else {
                 authBtn.textContent = 'Login';
@@ -1191,6 +1372,7 @@
                     userBadge.style.display = 'none';
                     userBadge.innerHTML = '';
                 }
+                if (mobileNavUserBar) mobileNavUserBar.style.display = 'none';
                 document.getElementById('myAppointmentsGrid').innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; color: #8a87a8; padding: 24px; background: #fff; border-radius: 16px; border: 1.5px solid #ece8fc;">
                         Please <a href="index.html" style="color: var(--purple); font-weight: 700;">Log In</a> to view your booked appointments.
@@ -1674,6 +1856,39 @@
         initConnectionModes();
         loadCounsellors();
         updateAuthUI();
+
+        // Mobile Drawer Controller
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+
+        function toggleMobileMenu() {
+            if (!mobileMenuBtn || !mobileNavDrawer) return;
+            const isOpen = mobileMenuBtn.classList.toggle('active');
+            mobileNavDrawer.classList.toggle('open', isOpen);
+            mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        }
+
+        function closeMobileMenu() {
+            if (mobileMenuBtn) {
+                mobileMenuBtn.classList.remove('active');
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            }
+            if (mobileNavDrawer) {
+                mobileNavDrawer.classList.remove('open');
+            }
+            document.body.style.overflow = '';
+        }
+
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        if (mobileNavDrawer) {
+            mobileNavDrawer.addEventListener('click', (e) => {
+                if (e.target === mobileNavDrawer) closeMobileMenu();
+            });
+        }
+        document.querySelectorAll('.mobile-nav-item').forEach(item => {
+            item.addEventListener('click', () => closeMobileMenu());
+        });
     </script>
 </body>
 </html>
