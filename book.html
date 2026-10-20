@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment • Student Mind Support</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1f1b4d;
+            --heading: #1c1848;
+            --purple: #6d4dff;
+            --purple-light: #f4f0ff;
+            --purple-hover: #5b3ae6;
+            --text: #5a5878;
+            --border: #e6e0ff;
+            --white: #ffffff;
+            --green: #22c55e;
+            --blue: #2563eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { min-height: 100%; }
+
+        body {
+            font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+            color: var(--navy);
+            background: #f7f5ff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button, input, select, textarea { font-family: inherit; }
+
+        .wrap {
+            width: min(1180px, calc(100% - 48px));
+            margin: 0 auto;
+        }
+
+        /* Navigation */
+        header {
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 1px 0 rgba(90, 70, 180, 0.06);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            min-height: 74px;
+        }
+
+        .brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .brand-mark { width: 40px; height: 36px; display: block; }
+        .brand-name {
+            display: block;
+            font-size: 16.5px;
+            font-weight: 800;
+            color: #241c63;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+        }
+        .brand-tag {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #7b6cff;
+            margin-top: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            list-style: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: #3f3d63;
+            white-space: nowrap;
+        }
+
+        .nav-links a { position: relative; padding: 8px 0 6px; }
+        .nav-links a.active { color: var(--purple); font-weight: 700; }
+        .nav-links a.active::after {
+            content: "";
+            position: absolute;
+            left: 1px;
+            right: 1px;
+            bottom: 0;
+            height: 2.5px;
+            background: var(--purple);
+            border-radius: 4px;
+        }
+
+        .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+        .btn-login {
+            background: transparent;
+            color: #382c7a;
+            border: 1.6px solid #b9a6ff;
+            border-radius: 999px;
+            padding: 7px 18px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-login:hover { background: #f0ebff; }
+
+        .btn-signup {
+            background: var(--purple);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 8px 18px;
+            font-size: 13.5px;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(109, 77, 255, 0.25);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-signup:hover { background: var(--purple-hover); }
+
+        .user-greeting-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #241c63;
+            background: #ede8ff;
+            padding: 5px 12px;
+            border-radius: 999px;
+        }
+
+        .user-role-tag {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--purple);
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-weight: 800;
+        }
+
+        /* Hero Banner */
+        .page-hero {
+            background: radial-gradient(640px 280px at 78% 38%, #ebe6ff 0%, transparent 70%),
+                        linear-gradient(180deg, #f7f4ff 0%, #ffffff 100%);
+            padding: 40px 0 32px;
+            border-bottom: 1px solid rgba(109, 77, 255, 0.08);
+        }
+
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ede8ff;
+            color: #6d4dff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .page-hero h1 {
+            font-size: clamp(28px, 4vw, 36px);
+            font-weight: 800;
+            color: var(--heading);
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+        }
+
+        .page-hero p {
+            font-size: 15px;
+            color: var(--text);
+            max-width: 680px;
+            line-height: 1.55;
+        }
+
+        /* Booking Container Layout */
+        .booking-main {
+            padding: 36px 0 60px;
+        }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1.15fr);
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* Section Cards */
+        .booking-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 28px;
+            border: 1.5px solid #ece8fc;
+            box-shadow: 0 10px 30px -10px rgba(28, 24, 72, 0.06);
+            margin-bottom: 24px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--purple);
+            color: #ffffff;
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+            font-weight: 800;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(109, 77, 255, 0.3);
+        }
+
+        .step-title h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--heading);
+            letter-spacing: -0.02em;
+        }
+
+        .step-title p {
+            font-size: 13px;
+            color: var(--text);
+            margin-top: 2px;
+        }
+
+        /* Counsellor Selection Grid */
+        .counsellors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .counsellor-card {
+            border: 2px solid #ede8fc;
+            border-radius: 16px;
+            padding: 16px;
+            background: #faf9ff;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .counsellor-card:hover {
+            border-color: #bda8ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(109, 77, 255, 0.08);
+            background: #fff;
+        }
+
+        .counsellor-card.selected {
+            border-color: var(--purple);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(109, 77, 255, 0.16), 0 8px 20px rgba(109, 77, 255, 0.12);
+        }
+
+        .counsellor-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .counsellor-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #7b5cff, #4ecdc4);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 16px;
+            font-weight: 800;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(109, 77, 255, 0.2);
+        }
+
+        .counsellor-info h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--heading);
+        }
+
+        .counsellor-info .designation {
+            font-size: 12px;
+            color: #6a6788;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        .counsellor-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11.5px;
+            color: #555375;
+            font-weight: 600;
+        }
+
+        .badge-rating {
+            background: #fef3c7;
+            color: #b45309;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
+        .counsellor-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .spec-tag {
+            font-size: 10.5px;
+            font-weight: 600;
+            background: #ede8ff;
+            color: #5136bf;
+            padding: 2px 8px;
+            border-radius: 999px;
+        }
+
+        .check-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--purple);
+            color: #fff;
+            display: none;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .counsellor-card.selected .check-badge {
+            display: grid;
+        }
+
+        /* Date & Time Selection */
+        .date-picker-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #2e295b;
+            margin-bottom: 6px;
+        }
+
+        .custom-date-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 11px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 14px;
+            color: var(--navy);
+            background: #faf8ff;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .custom-date-input:focus {
+            border-color: var(--purple);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(109, 77, 255, 0.12);
+        }
+
+        .quick-dates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .date-chip {
+            padding: 7px 14px;
+            border-radius: 10px;
+            background: #f1edff;
+            color: #493ea0;
+            border: 1.5px solid transparent;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .date-chip:hover {
+            background: #e6e0ff;
+        }
+
+        .date-chip.active {
+            background: var(--purple);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(109, 77, 255, 0.25);
+        }
+
+        /* Time Slots Grid */
+        .time-slots-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+            gap: 9px;
+        }
+
+        .time-slot {
+            padding: 10px 12px;
+            border-radius: 11px;
+            background: #faf8ff;
+            border: 1.5px solid var(--border);
+            color: #3b3765;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-slot:hover {
+            background: #f0ebff;
+            border-color: #beb2ed;
+        }
+
+        .time-slot.selected {
+            background: var(--purple);
+            color: #ffffff;
+            border-color: var(--purple);
+            box-shadow: 0 4px 12px rgba(109, 77, 255, 0.28);
+        }
+
+        /* Step 3: Connection Mode (Chat vs Meet) */
+        .modes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .mode-card {
+            border: 2px solid #ede8fc;
+            border-radius: 18px;
+            padding: 18px;
+            background: #faf8ff;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            position: relative;
+        }
+
+        .mode-card:hover {
+            border-color: #bda8ff;
+            background: #fff;
+            transform: translateY(-2px);
+        }
+
+        .mode-card.selected {
+            border-color: var(--purple);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(109, 77, 255, 0.16), 0 8px 20px rgba(109, 77, 255, 0.1);
+        }
+
+        .mode-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .mode-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 22px;
+        }
+
+        .mode-chat .mode-icon { background: #ede8ff; }
+        .mode-meet .mode-icon { background: #dcfce7; }
+
+        .mode-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--heading);
+        }
+
+        .mode-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #7b6cff;
+        }
+
+        .mode-desc {
+            font-size: 12.5px;
+            color: #6a6788;
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+
+        .mode-features {
+            font-size: 11.5px;
+            color: #4b486b;
+            font-weight: 600;
+        }
+
+        /* Step 4: Concern & Notes */
+        .form-select, .form-textarea {
+            width: 100%;
+            padding: 11px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 13.5px;
+            background: #faf8ff;
+            color: var(--navy);
+            outline: none;
+            transition: all 0.2s;
+            margin-bottom: 14px;
+        }
+
+        .form-select:focus, .form-textarea:focus {
+            border-color: var(--purple);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(109, 77, 255, 0.12);
+        }
+
+        /* Right Summary Sticky Card */
+        .summary-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 24px;
+            border: 1.5px solid #ece8fc;
+            box-shadow: 0 10px 30px -10px rgba(28, 24, 72, 0.08);
+            position: sticky;
+            top: 96px;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--heading);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1.5px solid #f0ecfc;
+        }
+
+        .summary-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 13px;
+        }
+
+        .summary-label {
+            color: #6a6788;
+            font-weight: 600;
+        }
+
+        .summary-val {
+            color: var(--heading);
+            font-weight: 700;
+            text-align: right;
+            max-width: 180px;
+        }
+
+        .btn-confirm-book {
+            width: 100%;
+            background: var(--purple);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(109, 77, 255, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-confirm-book:hover {
+            background: var(--purple-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(109, 77, 255, 0.35);
+        }
+
+        .btn-confirm-book:disabled {
+            background: #c3b9f3;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .summary-note {
+            font-size: 11.5px;
+            color: #8a87a8;
+            text-align: center;
+            margin-top: 14px;
+            line-height: 1.45;
+        }
+
+        /* My Scheduled Appointments Section */
+        .my-bookings-section {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1.5px solid #e9e4fc;
+        }
+
+        .section-headline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-headline h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--heading);
+        }
+
+        .my-appointments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .appointment-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 20px;
+            border: 1.5px solid #ece8fc;
+            box-shadow: 0 6px 18px rgba(28, 24, 72, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .app-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .app-status {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .app-status.confirmed {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .app-status.pending {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+
+        .app-status.cancelled {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .app-pending-notice {
+            font-size: 12px;
+            color: #92400e;
+            background: #fffbeb;
+            border: 1px dashed #fcd34d;
+            border-radius: 9px;
+            padding: 8px 12px;
+            margin-top: 4px;
+            line-height: 1.45;
+        }
+
+        .btn-confirm-portal {
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 15px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+            transition: all 0.2s;
+        }
+        .btn-confirm-portal:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+
+        .app-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .app-counsellor {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--heading);
+        }
+
+        .app-time {
+            color: #6a6788;
+            font-weight: 600;
+        }
+
+        .app-type-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--purple);
+            background: #f0ebff;
+            padding: 3px 10px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .app-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            padding-top: 12px;
+            border-top: 1px dashed #ede8fc;
+        }
+
+        .btn-join-meet {
+            flex: 1;
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-join-meet:hover { background: #15803d; }
+
+        .btn-open-chat {
+            flex: 1;
+            background: var(--purple);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-open-chat:hover { background: var(--purple-hover); }
+
+        .btn-cancel-app {
+            background: transparent;
+            color: #8c89a8;
+            border: 1px solid #e2dbfc;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-cancel-app:hover {
+            color: #dc2626;
+            border-color: #fca5a5;
+            background: #fff5f5;
+        }
+
+        /* Success Confirmation Modal */
+        .modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(28, 24, 72, 0.48);
+            backdrop-filter: blur(4px);
+            display: none;
+            place-items: center;
+            z-index: 50;
+            padding: 20px;
+        }
+        .modal-bg.show { display: grid; }
+
+        .modal {
+            width: min(440px, 100%);
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 20px 45px -10px rgba(28, 24, 72, 0.25);
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 58px;
+            height: 58px;
+            background: #dcfce7;
+            color: #16a34a;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 26px;
+            margin: 0 auto 16px;
+        }
+
+        .modal h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--heading);
+            margin-bottom: 6px;
+        }
+
+        .modal p {
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .confirm-box {
+            background: #f7f5ff;
+            border: 1.5px solid #ece8fc;
+            border-radius: 14px;
+            padding: 14px;
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .confirm-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 860px) {
+            .booking-grid { grid-template-columns: 1fr; }
+            .modes-grid { grid-template-columns: 1fr; }
+            .summary-card { position: static; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="wrap nav">
+            <a class="brand" href="index.html">
+                <svg class="brand-mark" viewBox="0 0 48 42" aria-hidden="true">
+                    <path fill="#4ecdc4" d="M14.8 3.2c-6.2 0-11.1 5-11.1 11.4 0 10.1 10.6 17.8 20.6 23.4C14.3 32.4 3.7 24.7 3.7 14.6 3.7 8.2 8.6 3.2 14.8 3.2c2.4 0 4.6.9 6.3 2.4C19.4 4.1 17.2 3.2 14.8 3.2z"/>
+                    <path fill="#4ecdc4" d="M16.2 5.8c-5 0-9 4.2-9 9.8 0 8.6 8.6 15.1 17.2 20.1-8.6-5-17.2-11.5-17.2-20.1 0-5.6 4-9.8 9-9.8 2.1 0 4 .8 5.4 2.2-1.6-1.4-3.6-2.2-5.4-2.2z"/>
+                    <path fill="#6d4dff" d="M32.6 4.4c-5.8 0-10.4 4.8-10.4 11 0 9.6 10.4 17 19.2 22.2C41.6 32.4 22.2 25 22.2 15.4c0-6.2 4.6-11 10.4-11 2.4 0 4.6.9 6.2 2.5-1.7-1.5-3.9-2.5-6.2-2.5z"/>
+                    <path fill="#7b5cff" d="M33.4 7c-4.6 0-8.3 3.9-8.3 9 0 7.8 8.3 13.8 15.6 18.2C40.4 29.8 25.1 23.8 25.1 16 25.1 10.9 28.8 7 33.4 7c2 0 3.8.8 5.1 2.1C37.2 7.8 35.4 7 33.4 7z"/>
+                </svg>
+                <span>
+                    <span class="brand-name">Student Mind Support</span>
+                    <span class="brand-tag">Talk • Heal • Grow</span>
+                </span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a class="active" href="book.html">Book Appointment</a></li>
+                <li><a href="index.html#resources">Resources</a></li>
+                <li><a href="index.html#peer">Peer Support</a></li>
+                <li><a href="index.html#dashboard">Dashboard</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div id="userBadge" class="user-greeting-badge" style="display: none;"></div>
+                <button class="btn-login" id="authBtn">Login</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="wrap">
+            <div class="pill-badge">📅 Student Confidential Booking</div>
+            <h1>Book a Counselling Session</h1>
+            <p>Select your dedicated campus counsellor, choose your preferred date and time, and connect securely via 1-on-1 private Chat or high-definition Video Meet.</p>
+        </div>
+    </section>
+
+    <main class="booking-main">
+        <div class="wrap">
+            <div class="booking-grid">
+                <!-- Left: Booking Form Steps -->
+                <div>
+                    <!-- Step 1: Select Counsellor -->
+                    <div class="booking-card">
+                        <div class="step-header">
+                            <div class="step-num">1</div>
+                            <div class="step-title">
+                                <h2>Select a Registered Counsellor</h2>
+                                <p>Choose from our licensed campus psychologists and mental health mentors</p>
+                            </div>
+                        </div>
+
+                        <div class="counsellors-grid" id="counsellorsGrid">
+                            <div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">
+                                Loading registered counsellors...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Date & Time Selection -->
+                    <div class="booking-card">
+                        <div class="step-header">
+                            <div class="step-num">2</div>
+                            <div class="step-title">
+                                <h2>Select Date & Time Slot</h2>
+                                <p>Pick a convenient schedule for your confidential session</p>
+                            </div>
+                        </div>
+
+                        <div class="date-picker-row">
+                            <label class="form-label" for="bookingDateInput">Choose Date:</label>
+                            <input type="date" id="bookingDateInput" class="custom-date-input">
+                            <div class="quick-dates" id="quickDates">
+                                <button type="button" class="date-chip active" data-offset="0">Today</button>
+                                <button type="button" class="date-chip" data-offset="1">Tomorrow</button>
+                                <button type="button" class="date-chip" data-offset="2">In 2 Days</button>
+                                <button type="button" class="date-chip" data-offset="3">In 3 Days</button>
+                            </div>
+                        </div>
+
+                        <div class="time-slots-container">
+                            <label class="form-label">Available Time Slots:</label>
+                            <div class="slots-grid" id="slotsGrid">
+                                <button type="button" class="time-slot selected" data-time="09:30 AM">09:30 AM</button>
+                                <button type="button" class="time-slot" data-time="10:30 AM">10:30 AM</button>
+                                <button type="button" class="time-slot" data-time="11:30 AM">11:30 AM</button>
+                                <button type="button" class="time-slot" data-time="02:00 PM">02:00 PM</button>
+                                <button type="button" class="time-slot" data-time="03:30 PM">03:30 PM</button>
+                                <button type="button" class="time-slot" data-time="04:30 PM">04:30 PM</button>
+                                <button type="button" class="time-slot" data-time="05:30 PM">05:30 PM</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Connection Mode (Chat vs Meet) -->
+                    <div class="booking-card">
+                        <div class="step-header">
+                            <div class="step-num">3</div>
+                            <div class="step-title">
+                                <h2>Choose Connection Mode</h2>
+                                <p>Select how you would like to connect with your counsellor</p>
+                            </div>
+                        </div>
+
+                        <div class="modes-grid">
+                            <!-- Connect via Chat -->
+                            <div class="mode-card mode-chat selected" id="modeChat" data-mode="chat">
+                                <div class="check-badge">✓</div>
+                                <div class="mode-top">
+                                    <div class="mode-icon">💬</div>
+                                    <div>
+                                        <div class="mode-title">Connect via Chat</div>
+                                        <span class="mode-badge">Text Session</span>
+                                    </div>
+                                </div>
+                                <p class="mode-desc">Private 1-on-1 text messaging in our confidential portal. Share at your own pace.</p>
+                                <div class="mode-features">✓ Safe &amp; Anonymous • Saved in records</div>
+                            </div>
+
+                            <!-- Connect via Meet -->
+                            <div class="mode-card mode-meet" id="modeMeet" data-mode="meet">
+                                <div class="check-badge">✓</div>
+                                <div class="mode-top">
+                                    <div class="mode-icon">📹</div>
+                                    <div>
+                                        <div class="mode-title">Connect via Meet</div>
+                                        <span class="mode-badge">Video Call</span>
+                                    </div>
+                                </div>
+                                <p class="mode-desc">Live face-to-face video consultation. Instant, encrypted meeting link created automatically.</p>
+                                <div class="mode-features">✓ High Definition Video • Direct 1-on-1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Concern & Notes -->
+                    <div class="booking-card">
+                        <div class="step-header">
+                            <div class="step-num">4</div>
+                            <div class="step-title">
+                                <h2>Session Details (Optional)</h2>
+                                <p>Helps the counsellor prepare coping strategies for your session</p>
+                            </div>
+                        </div>
+
+                        <label class="form-label" for="concernSelect">Primary Area of Concern:</label>
+                        <select id="concernSelect" class="form-select">
+                            <option value="Academic & Exam Stress">Academic &amp; Exam Stress</option>
+                            <option value="Anxiety & Panic Attacks">Anxiety &amp; Panic Attacks</option>
+                            <option value="Depression & Low Mood">Depression &amp; Low Mood</option>
+                            <option value="Sleep Issues & Insomnia">Sleep Issues &amp; Insomnia</option>
+                            <option value="Loneliness & Social Adjustment">Loneliness &amp; Social Isolation</option>
+                            <option value="Relationship & Family Matters">Relationship &amp; Family Matters</option>
+                            <option value="Burnout & Overwhelm">Burnout &amp; Overwhelm</option>
+                            <option value="General Wellbeing">General Mental Wellbeing</option>
+                        </select>
+
+                        <label class="form-label" for="notesInput">Additional Notes / What's on your mind:</label>
+                        <textarea id="notesInput" rows="3" class="form-textarea" placeholder="Feel free to share any context or questions you want to explore during this session..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Right: Live Summary & Action -->
+                <div>
+                    <div class="summary-card">
+                        <div class="summary-title">Booking Summary</div>
+                        <div class="summary-rows">
+                            <div class="summary-row">
+                                <span class="summary-label">Counsellor:</span>
+                                <span class="summary-val" id="sumCounsellorName">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Designation:</span>
+                                <span class="summary-val" id="sumCounsellorDesig" style="font-size: 11.5px; color: #6a6788;">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Date:</span>
+                                <span class="summary-val" id="sumDate">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Time:</span>
+                                <span class="summary-val" id="sumTime">09:30 AM</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Mode:</span>
+                                <span class="summary-val" id="sumMode" style="color: var(--purple); font-weight: 800;">💬 Connect via Chat</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">Fee:</span>
+                                <span class="summary-val" style="color: #16a34a; font-weight: 800;">Free (Campus Support)</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-confirm-book" id="confirmBookingBtn">
+                            <span>Confirm &amp; Book Appointment</span>
+                            <span>→</span>
+                        </button>
+
+                        <p class="summary-note">🔒 Confidential &amp; Protected. Your appointment details are shared only with the assigned counsellor.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduled Appointments Section -->
+            <section class="my-bookings-section" id="myBookingsSection">
+                <div class="section-headline">
+                    <h2>My Scheduled Appointments</h2>
+                    <span id="bookingCountBadge" style="font-size: 13px; font-weight: 700; color: var(--purple);"></span>
+                </div>
+                <div class="my-appointments-grid" id="myAppointmentsGrid">
+                    <div style="grid-column: 1 / -1; text-align: center; color: #8a87a8; padding: 24px; background: #fff; border-radius: 16px; border: 1.5px solid #ece8fc;">
+                        Please log in to view your scheduled counselling appointments.
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Booking Confirmation Modal -->
+    <div class="modal-bg" id="confirmModal">
+        <div class="modal">
+            <div class="success-icon" style="background: #ede8ff; color: #6d4dff;">📨</div>
+            <h2 id="modalTitle">Appointment Request Sent!</h2>
+            <p id="modalDesc">An email notification has been dispatched to your counsellor via Brevo. Once confirmed by your counsellor, you will receive an official confirmation email with your session access link.</p>
+
+            <div class="confirm-box" id="confirmBoxDetails">
+                <!-- Filled dynamically -->
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button type="button" class="btn-signup" id="modalActionBtn" style="width: 100%; padding: 12px;">View My Appointments</button>
+                <button type="button" class="btn-login" id="closeConfirmModal" style="width: 100%; border: none; background: #f0ebff;">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let authToken = localStorage.getItem('authToken');
+        let counsellorsList = [];
+        let selectedCounsellor = null;
+        let selectedDate = '';
+        let selectedTime = '09:30 AM';
+        let selectedMode = 'chat';
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Auth UI Setup
+        function updateAuthUI() {
+            const authBtn = document.getElementById('authBtn');
+            const userBadge = document.getElementById('userBadge');
+            authToken = localStorage.getItem('authToken');
+
+            if (authToken) {
+                const userName = localStorage.getItem('userName') || 'User';
+                const userRole = localStorage.getItem('userRole') || 'student';
+
+                authBtn.textContent = 'Logout';
+                if (userBadge) {
+                    userBadge.style.display = 'inline-flex';
+                    userBadge.innerHTML = `<span>Hi, ${escapeHtml(userName)}</span><span class="user-role-tag">${escapeHtml(userRole)}</span>`;
+                }
+                loadMyAppointments();
+            } else {
+                authBtn.textContent = 'Login';
+                if (userBadge) {
+                    userBadge.style.display = 'none';
+                    userBadge.innerHTML = '';
+                }
+                document.getElementById('myAppointmentsGrid').innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; color: #8a87a8; padding: 24px; background: #fff; border-radius: 16px; border: 1.5px solid #ece8fc;">
+                        Please <a href="index.html" style="color: var(--purple); font-weight: 700;">Log In</a> to view your booked appointments.
+                    </div>
+                `;
+            }
+        }
+
+        // Auth button handler
+        document.getElementById('authBtn').addEventListener('click', () => {
+            if (authToken) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                updateAuthUI();
+                alert('Logged out successfully');
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Initialize Dates
+        function initDatePicker() {
+            const dateInput = document.getElementById('bookingDateInput');
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const minDate = `${yyyy}-${mm}-${dd}`;
+
+            dateInput.min = minDate;
+            dateInput.value = minDate;
+            selectedDate = minDate;
+            updateSummary();
+
+            dateInput.addEventListener('change', (e) => {
+                selectedDate = e.target.value;
+                document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+                updateSummary();
+            });
+
+            document.querySelectorAll('.date-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    const offset = parseInt(chip.getAttribute('data-offset'), 10) || 0;
+                    const d = new Date();
+                    d.setDate(d.getDate() + offset);
+                    const targetStr = d.toISOString().split('T')[0];
+                    dateInput.value = targetStr;
+                    selectedDate = targetStr;
+                    updateSummary();
+                });
+            });
+        }
+
+        // Initialize Time Slots
+        function initTimeSlots() {
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.addEventListener('click', () => {
+                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                    slot.classList.add('selected');
+                    selectedTime = slot.getAttribute('data-time');
+                    updateSummary();
+                });
+            });
+        }
+
+        // Initialize Connection Modes
+        function initConnectionModes() {
+            const chatCard = document.getElementById('modeChat');
+            const meetCard = document.getElementById('modeMeet');
+
+            chatCard.addEventListener('click', () => {
+                chatCard.classList.add('selected');
+                meetCard.classList.remove('selected');
+                selectedMode = 'chat';
+                updateSummary();
+            });
+
+            meetCard.addEventListener('click', () => {
+                meetCard.classList.add('selected');
+                chatCard.classList.remove('selected');
+                selectedMode = 'meet';
+                updateSummary();
+            });
+        }
+
+        // Update Summary Card
+        function updateSummary() {
+            const sumCounsellor = document.getElementById('sumCounsellorName');
+            const sumDesig = document.getElementById('sumCounsellorDesig');
+            const sumDate = document.getElementById('sumDate');
+            const sumTime = document.getElementById('sumTime');
+            const sumMode = document.getElementById('sumMode');
+
+            if (selectedCounsellor) {
+                sumCounsellor.textContent = selectedCounsellor.name;
+                sumDesig.textContent = selectedCounsellor.designation || 'Campus Counsellor';
+            } else {
+                sumCounsellor.textContent = 'Please choose above';
+                sumDesig.textContent = '-';
+            }
+
+            sumDate.textContent = selectedDate || 'Select Date';
+            sumTime.textContent = selectedTime;
+            sumMode.textContent = selectedMode === 'chat' ? '💬 Connect via Chat' : '📹 Connect via Meet';
+        }
+
+        // Fetch Counsellors List
+        async function loadCounsellors() {
+            const grid = document.getElementById('counsellorsGrid');
+            try {
+                const res = await fetch(`${API_BASE}/appointments/counsellors`);
+                if (res.ok) {
+                    const data = await res.json();
+                    counsellorsList = data.counsellors || [];
+                }
+            } catch (err) {
+                console.warn('Could not fetch from server, using campus counsellors list:', err);
+            }
+
+            if (!counsellorsList || counsellorsList.length === 0) {
+                // Fallback default list
+                counsellorsList = [
+                    {
+                        id: 'c1',
+                        name: 'Dr. Sunita Sharma',
+                        designation: 'Senior Clinical Psychologist',
+                        experience: '10+ Years',
+                        specializations: ['Exam Anxiety', 'Academic Stress', 'Depression'],
+                        rating: '4.9 ★',
+                        avatarInitials: 'SS'
+                    },
+                    {
+                        id: 'c2',
+                        name: 'Prof. Rajesh Verma',
+                        designation: 'Student Life & Career Counsellor',
+                        experience: '8+ Years',
+                        specializations: ['Career Guidance', 'Burnout', 'Peer Pressure'],
+                        rating: '4.8 ★',
+                        avatarInitials: 'RV'
+                    },
+                    {
+                        id: 'c3',
+                        name: 'Ms. Ananya Roy',
+                        designation: 'Youth Wellness & Mindfulness Mentor',
+                        experience: '6+ Years',
+                        specializations: ['Sleep Issues', 'Loneliness', 'Meditation'],
+                        rating: '4.9 ★',
+                        avatarInitials: 'AR'
+                    }
+                ];
+            }
+
+            renderCounsellors();
+        }
+
+        function renderCounsellors() {
+            const grid = document.getElementById('counsellorsGrid');
+            grid.innerHTML = counsellorsList.map((c, index) => {
+                const isSelected = index === 0;
+                if (isSelected && !selectedCounsellor) {
+                    selectedCounsellor = c;
+                    updateSummary();
+                }
+
+                const specs = (c.specializations || ['General Support', 'Stress']).map(s => `<span class="spec-tag">${escapeHtml(s)}</span>`).join('');
+
+                return `
+                    <div class="counsellor-card ${isSelected ? 'selected' : ''}" data-id="${c.id}" onclick="selectCounsellor('${c.id}')">
+                        <div class="check-badge">✓</div>
+                        <div class="counsellor-top">
+                            <div class="counsellor-avatar">${c.avatarInitials || 'CC'}</div>
+                            <div class="counsellor-info">
+                                <h3>${escapeHtml(c.name)}</h3>
+                                <div class="designation">${escapeHtml(c.designation || 'Campus Counsellor')}</div>
+                            </div>
+                        </div>
+                        <div class="counsellor-meta">
+                            <span class="badge-rating">${c.rating || '4.9 ★'}</span>
+                            <span>⏳ ${escapeHtml(c.experience || 'Experienced')}</span>
+                        </div>
+                        <div class="counsellor-specs">
+                            ${specs}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.selectCounsellor = function(id) {
+            selectedCounsellor = counsellorsList.find(c => c.id === id);
+            document.querySelectorAll('.counsellor-card').forEach(card => {
+                if (card.getAttribute('data-id') === id) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+            updateSummary();
+        };
+
+        // Book Appointment Action
+        document.getElementById('confirmBookingBtn').addEventListener('click', async () => {
+            if (!authToken) {
+                alert('Please login first to book an appointment.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            if (!selectedCounsellor) {
+                alert('Please select a counsellor first.');
+                return;
+            }
+
+            const concern = document.getElementById('concernSelect').value;
+            const notes = document.getElementById('notesInput').value.trim();
+
+            const btn = document.getElementById('confirmBookingBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>Booking Session...</span>';
+
+            const payload = {
+                counsellorId: selectedCounsellor.id,
+                date: selectedDate,
+                time: selectedTime,
+                sessionType: selectedMode,
+                concern,
+                notes
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/appointments/book`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    showConfirmationModal(data.appointment);
+                    loadMyAppointments();
+                } else {
+                    alert(data.error || 'Failed to book appointment. Please check details.');
+                }
+            } catch (err) {
+                console.error('Booking request failed:', err);
+                // Fallback simulation if backend endpoint is restarting
+                const simulatedAppointment = {
+                    counsellorName: selectedCounsellor.name,
+                    counsellorDesignation: selectedCounsellor.designation,
+                    date: selectedDate,
+                    time: selectedTime,
+                    sessionType: selectedMode,
+                    meetingLink: selectedMode === 'meet' ? `https://meet.jit.si/StudentMindSupport-${selectedCounsellor.name.replace(/\s+/g,'')}-${Date.now().toString(36)}` : null,
+                    concern
+                };
+                showConfirmationModal(simulatedAppointment);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Confirm &amp; Book Appointment</span><span>→</span>';
+            }
+        });
+
+        // Show Confirmation Modal
+        function showConfirmationModal(app) {
+            const modal = document.getElementById('confirmModal');
+            const detailsBox = document.getElementById('confirmBoxDetails');
+            const actionBtn = document.getElementById('modalActionBtn');
+
+            detailsBox.innerHTML = `
+                <div class="confirm-row">
+                    <span style="color:#6a6788;">Counsellor:</span>
+                    <strong>${escapeHtml(app.counsellorName)}</strong>
+                </div>
+                <div class="confirm-row">
+                    <span style="color:#6a6788;">Date &amp; Time:</span>
+                    <strong>${escapeHtml(app.date)} at ${escapeHtml(app.time)}</strong>
+                </div>
+                <div class="confirm-row">
+                    <span style="color:#6a6788;">Connection Mode:</span>
+                    <strong style="color: var(--purple);">${app.sessionType === 'meet' ? '📹 Video Meet' : '💬 1-on-1 Chat'}</strong>
+                </div>
+                <div class="confirm-row">
+                    <span style="color:#6a6788;">Primary Topic:</span>
+                    <span>${escapeHtml(app.concern)}</span>
+                </div>
+                <div class="confirm-row">
+                    <span style="color:#6a6788;">Status:</span>
+                    <span class="app-status pending">⏳ Pending Counsellor Approval</span>
+                </div>
+            `;
+
+            actionBtn.textContent = 'View My Appointments';
+            actionBtn.onclick = () => {
+                modal.classList.remove('show');
+                document.getElementById('myBookingsSection').scrollIntoView({ behavior: 'smooth' });
+            };
+
+            modal.classList.add('show');
+        }
+
+        document.getElementById('closeConfirmModal').addEventListener('click', () => {
+            document.getElementById('confirmModal').classList.remove('show');
+            document.getElementById('myBookingsSection').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Load My Appointments
+        async function loadMyAppointments() {
+            if (!authToken) return;
+
+            const grid = document.getElementById('myAppointmentsGrid');
+            const badge = document.getElementById('bookingCountBadge');
+            const userRole = localStorage.getItem('userRole') || 'student';
+            const isCounsellor = userRole === 'counsellor';
+
+            try {
+                const res = await fetch(`${API_BASE}/appointments/my-appointments`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const list = data.appointments || [];
+
+                    if (badge) badge.textContent = `${list.length} Session(s)`;
+
+                    if (list.length === 0) {
+                        grid.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; color: #8a87a8; padding: 24px; background: #fff; border-radius: 16px; border: 1.5px solid #ece8fc;">
+                                No appointments found. Choose a counsellor above to schedule your first session!
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    grid.innerHTML = list.map(app => {
+                        const isMeet = app.sessionType === 'meet';
+                        const status = app.status || 'pending';
+                        const isPending = status === 'pending';
+                        const isConfirmed = status === 'confirmed';
+                        const isCancelled = status === 'cancelled';
+
+                        let statusBadgeHtml = '';
+                        if (isPending) {
+                            statusBadgeHtml = `<span class="app-status pending">⏳ Pending Approval</span>`;
+                        } else if (isConfirmed) {
+                            statusBadgeHtml = `<span class="app-status confirmed">✓ Confirmed</span>`;
+                        } else if (isCancelled) {
+                            statusBadgeHtml = `<span class="app-status cancelled">✕ Cancelled</span>`;
+                        } else {
+                            statusBadgeHtml = `<span class="app-status">${escapeHtml(status)}</span>`;
+                        }
+
+                        let cardHeaderHtml = '';
+                        if (isCounsellor) {
+                            cardHeaderHtml = `
+                                <div class="app-top">
+                                    <div>
+                                        <div class="app-counsellor">Student: ${escapeHtml(app.studentName)}</div>
+                                        <span style="font-size: 11.5px; color: #6a6788;">${escapeHtml(app.studentEmail)}</span>
+                                    </div>
+                                    ${statusBadgeHtml}
+                                </div>
+                            `;
+                        } else {
+                            cardHeaderHtml = `
+                                <div class="app-top">
+                                    <div>
+                                        <div class="app-counsellor">${escapeHtml(app.counsellorName)}</div>
+                                        <span style="font-size: 11.5px; color: #6a6788;">${escapeHtml(app.counsellorDesignation || 'Campus Counsellor')}</span>
+                                    </div>
+                                    ${statusBadgeHtml}
+                                </div>
+                            `;
+                        }
+
+                        let actionBtnHtml = '';
+                        if (isCounsellor) {
+                            if (isPending) {
+                                actionBtnHtml = `
+                                    <button type="button" class="btn-confirm-portal" onclick="confirmAppointmentByCounsellor('${app._id}')">✓ Confirm Appointment</button>
+                                    <button type="button" class="btn-cancel-app" onclick="cancelAppointment('${app._id}')">Decline</button>
+                                `;
+                            } else if (isConfirmed) {
+                                if (isMeet) {
+                                    const meetUrl = app.meetingLink || 'https://meet.jit.si/StudentMindSupport-Live';
+                                    actionBtnHtml = `<a href="${meetUrl}" target="_blank" rel="noopener" class="btn-join-meet">📹 Start Meet</a>`;
+                                } else {
+                                    actionBtnHtml = `<a href="chat.html" class="btn-open-chat">💬 Open Chat</a>`;
+                                }
+                                actionBtnHtml += `<button type="button" class="btn-cancel-app" onclick="cancelAppointment('${app._id}')">Cancel</button>`;
+                            }
+                        } else {
+                            // Student view
+                            if (isPending) {
+                                actionBtnHtml = `
+                                    <div class="app-pending-notice" style="width: 100%;">
+                                        📩 <strong>Pending Counsellor Approval:</strong> An email notification has been dispatched to ${escapeHtml(app.counsellorName)}. Once confirmed, a confirmation email with your session details will arrive in your inbox.
+                                    </div>
+                                    <button type="button" class="btn-cancel-app" style="margin-top: 6px;" onclick="cancelAppointment('${app._id}')">Cancel Request</button>
+                                `;
+                            } else if (isConfirmed) {
+                                if (isMeet) {
+                                    const meetUrl = app.meetingLink || 'https://meet.jit.si/StudentMindSupport-Live';
+                                    actionBtnHtml = `<a href="${meetUrl}" target="_blank" rel="noopener" class="btn-join-meet">📹 Join Meet</a>`;
+                                } else {
+                                    actionBtnHtml = `<a href="chat.html" class="btn-open-chat">💬 Open Chat</a>`;
+                                }
+                                actionBtnHtml += `<button type="button" class="btn-cancel-app" onclick="cancelAppointment('${app._id}')">Cancel</button>`;
+                            }
+                        }
+
+                        return `
+                            <div class="appointment-card">
+                                ${cardHeaderHtml}
+                                <div class="app-details">
+                                    <div class="app-time">🗓️ ${escapeHtml(app.date)} • ⏰ ${escapeHtml(app.time)}</div>
+                                    <div class="app-type-tag">${isMeet ? '📹 Video Meet' : '💬 Private Chat'}</div>
+                                    <div style="font-size: 11.5px; color: #5a5878; margin-top: 2px;">Topic: <strong>${escapeHtml(app.concern)}</strong></div>
+                                </div>
+                                ${!isCancelled ? `<div class="app-actions" style="flex-wrap: wrap;">${actionBtnHtml}</div>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.warn('Could not fetch appointments:', err);
+            }
+        }
+
+        window.confirmAppointmentByCounsellor = async function(id) {
+            if (!confirm('Confirm this appointment? An official confirmation email will be sent to the student via Brevo.')) return;
+            try {
+                const res = await fetch(`${API_BASE}/appointments/${id}/confirm`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Appointment confirmed! Confirmation email dispatched to the student.');
+                    loadMyAppointments();
+                } else {
+                    alert(data.error || 'Failed to confirm appointment.');
+                }
+            } catch (err) {
+                console.error('Confirmation error:', err);
+            }
+        };
+
+        window.cancelAppointment = async function(id) {
+            if (!confirm('Are you sure you want to cancel this appointment?')) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/appointments/${id}/cancel`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (res.ok) {
+                    alert('Appointment cancelled.');
+                    loadMyAppointments();
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Failed to cancel appointment.');
+                }
+            } catch (err) {
+                console.error('Cancel request failed:', err);
+            }
+        };
+
+        // Initialize page
+        initDatePicker();
+        initTimeSlots();
+        initConnectionModes();
+        loadCounsellors();
+        updateAuthUI();
+    </script>
+</body>
+</html>

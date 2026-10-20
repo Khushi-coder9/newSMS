@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
   email: {
     type: String,
     required: true,
@@ -13,6 +18,21 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6
   },
+  role: {
+    type: String,
+    enum: ['student', 'counsellor', 'admin'],
+    default: 'student',
+    required: true
+  },
+  age: {
+    type: Number,
+    min: 1,
+    max: 120
+  },
+  designation: {
+    type: String,
+    trim: true
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -20,3 +40,4 @@ const userSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('User', userSchema);
+

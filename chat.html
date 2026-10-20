@@ -404,6 +404,87 @@
 
         .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
+        .difficulty-monitor-box {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 14px;
+            border: 1.5px solid #ece8fc;
+            box-shadow: 0 4px 12px rgba(109, 77, 255, 0.05);
+        }
+
+        .monitor-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1c1848;
+            margin-bottom: 4px;
+        }
+
+        .monitor-badge {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 800;
+            background: #ede8ff;
+            color: #6d4dff;
+            padding: 2px 7px;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+        }
+
+        .monitor-desc {
+            font-size: 11.5px;
+            color: #6a6788;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .difficulty-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .diff-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 7px;
+            background: #f1edff;
+            color: #4b3bb2;
+            border: 1px solid #ded5fa;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .diff-tag.crisis {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+        }
+
+        .keywords-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding-top: 6px;
+            border-top: 1px dashed #e9e5f5;
+        }
+
+        .kw-chip {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 5px;
+            background: #f4f1ff;
+            color: #5a5878;
+        }
+
         @media (max-width: 860px) {
             .nav-links { display: none; }
             .page { grid-template-columns: 1fr; }
@@ -430,14 +511,13 @@
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a class="active" href="chat.html">Chat</a></li>
-                <li><a href="index.html#book">Book Appointment</a></li>
+                <li><a href="book.html">Book Appointment</a></li>
                 <li><a href="index.html#resources">Resources</a></li>
                 <li><a href="index.html#peer">Peer Support</a></li>
                 <li><a href="index.html#dashboard">Dashboard</a></li>
             </ul>
             <div class="nav-actions">
-                <button class="btn-login">Login</button>
-                <button class="btn-signup">Sign Up</button>
+                <button class="btn-login" id="authBtn">Login</button>
             </div>
         </div>
     </header>
@@ -459,6 +539,17 @@
                 India: KIRAN 1800-599-0019<br>
                 iCall: 9152987821<br>
                 US: 988 Suicide &amp; Crisis Lifeline
+            </div>
+
+            <!-- Student Difficulty Monitoring Box -->
+            <div class="difficulty-monitor-box" id="difficultyMonitorBox" style="display: none;">
+                <div class="monitor-title">
+                    <span>📊 Monitored Difficulties</span>
+                    <span class="monitor-badge" id="monitorStatusBadge">Active</span>
+                </div>
+                <p class="monitor-desc">Topics identified from keywords you share:</p>
+                <div class="difficulty-tags" id="difficultyTags"></div>
+                <div class="keywords-list" id="keywordsList"></div>
             </div>
         </aside>
 
@@ -511,6 +602,18 @@
         </div>
     </div>
 
+    <!-- Login Required Modal -->
+    <div class="modal-bg" id="loginRequiredModal">
+        <div class="modal">
+            <h2>Login Required</h2>
+            <p>You need to be logged in to use the chat feature.</p>
+            <div class="modal-actions">
+                <button class="icon-btn" id="cancelLoginRequired" type="button">Cancel</button>
+                <button class="btn-signup" id="goToLogin" type="button">Go to Login</button>
+            </div>
+        </div>
+    </div>
+
     <script src="config.js"></script>
     <script>
         const STORAGE_KEY = "sms_gemini_api_key";
@@ -543,16 +646,42 @@ Safety:
         const keyInput = document.getElementById("keyInput");
         const soundBtn = document.getElementById("soundBtn");
         const micBtn = document.getElementById("micBtn");
+        const authBtn = document.getElementById("authBtn");
+        const loginRequiredModal = document.getElementById("loginRequiredModal");
 
         let history = [];
         let soundEnabled = localStorage.getItem("sms_sound_enabled") === "true";
         let currentUtterance = null;
         let recognition = null;
         let isRecording = false;
+        let authToken = localStorage.getItem('authToken');
 
         function getKey() {
             const fromConfig = window.SMS_CONFIG && window.SMS_CONFIG.GEMINI_API_KEY;
             return (localStorage.getItem(STORAGE_KEY) || fromConfig || "").trim();
+        }
+
+        function checkAuth() {
+            authToken = localStorage.getItem('authToken');
+            if (authToken) {
+                authBtn.textContent = 'Logout';
+                return true;
+            } else {
+                authBtn.textContent = 'Login';
+                return false;
+            }
+        }
+
+        function restrictChatAccess() {
+            if (!checkAuth()) {
+                loginRequiredModal.classList.add('show');
+                form.style.pointerEvents = 'none';
+                form.style.opacity = '0.5';
+                return false;
+            }
+            form.style.pointerEvents = 'auto';
+            form.style.opacity = '1';
+            return true;
         }
 
         function showKeyModal() {
@@ -795,6 +924,132 @@ Safety:
             throw new Error(lastError);
         }
 
+        const API_BASE = 'http://localhost:5000/api';
+        let userDifficultiesSet = new Set();
+        let userKeywordsSet = new Set();
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        async function saveChatToDatabase(userText, botReply) {
+            authToken = localStorage.getItem('authToken');
+            if (!authToken) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/chat/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        userMessage: userText,
+                        botReply: botReply
+                    })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.analysis) {
+                        updateDifficultyMonitor(data.analysis);
+                    }
+                }
+            } catch (err) {
+                console.warn('Failed to save chat to database:', err);
+            }
+        }
+
+        function updateDifficultyMonitor(analysis) {
+            if (analysis.detectedDifficulties && analysis.detectedDifficulties.length > 0) {
+                analysis.detectedDifficulties.forEach(d => userDifficultiesSet.add(d));
+                if (analysis.detectedKeywords) {
+                    analysis.detectedKeywords.forEach(k => userKeywordsSet.add(k));
+                }
+                renderMonitorBox();
+            }
+        }
+
+        function renderMonitorBox() {
+            const box = document.getElementById('difficultyMonitorBox');
+            const tagsEl = document.getElementById('difficultyTags');
+            const kwEl = document.getElementById('keywordsList');
+            if (!box || !tagsEl || !kwEl) return;
+
+            if (userDifficultiesSet.size === 0) {
+                box.style.display = 'none';
+                return;
+            }
+
+            box.style.display = 'block';
+            tagsEl.innerHTML = Array.from(userDifficultiesSet).map(d => {
+                const isCrisis = d.toLowerCase().includes('crisis') || d.toLowerCase().includes('harm');
+                return `<span class="diff-tag ${isCrisis ? 'crisis' : ''}">🏷️ ${escapeHtml(d)}</span>`;
+            }).join('');
+
+            if (userKeywordsSet.size > 0) {
+                kwEl.innerHTML = Array.from(userKeywordsSet).slice(0, 12).map(k => {
+                    return `<span class="kw-chip">#${escapeHtml(k)}</span>`;
+                }).join('');
+            }
+        }
+
+        async function loadUserChatHistory() {
+            authToken = localStorage.getItem('authToken');
+            if (!authToken) return;
+
+            try {
+                // Fetch saved messages
+                const res = await fetch(`${API_BASE}/chat/history`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.messages && data.messages.length > 0) {
+                        messagesEl.innerHTML = "";
+                        history = [];
+
+                        addBubble("bot", "Welcome back! Here is your conversation history. What is on your mind today?");
+
+                        data.messages.forEach(msg => {
+                            const isCrisis = msg.severity === 'crisis';
+                            addBubble(msg.sender === 'user' ? 'user' : 'bot', msg.message, isCrisis ? 'crisis' : '');
+                            history.push({
+                                role: msg.sender === 'user' ? 'user' : 'model',
+                                text: msg.message
+                            });
+                        });
+                        messagesEl.scrollTop = messagesEl.scrollHeight;
+                    }
+                }
+
+                // Fetch monitored difficulties summary
+                const diffRes = await fetch(`${API_BASE}/chat/my-difficulties`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (diffRes.ok) {
+                    const diffData = await diffRes.json();
+                    if (diffData.difficultyCounts) {
+                        Object.keys(diffData.difficultyCounts).forEach(d => userDifficultiesSet.add(d));
+                    }
+                    if (diffData.topKeywords) {
+                        diffData.topKeywords.forEach(k => userKeywordsSet.add(k.keyword));
+                    }
+                    renderMonitorBox();
+                }
+            } catch (err) {
+                console.warn('Could not load chat history:', err);
+            }
+        }
+
         async function sendMessage(text) {
             const userText = (text || "").trim();
             if (!userText) return;
@@ -810,8 +1065,11 @@ Safety:
             input.value = "";
             sendBtn.disabled = true;
             addTyping();
+            let finalReply = "";
+
             try {
                 const reply = await callGemini();
+                finalReply = reply;
                 removeTyping();
                 setStatus("● Online • Gemini");
                 addBubble("bot", reply);
@@ -821,6 +1079,7 @@ Safety:
                 removeTyping();
                 const quota = err && (err.status === 429 || /quota|rate[- ]limit|resource_exhausted/i.test(err.message || ""));
                 const reply = offlineReply(userText);
+                finalReply = reply;
                 setStatus("● Online • offline first-aid");
                 addBubble("bot", reply);
                 history.push({ role: "model", text: reply });
@@ -834,6 +1093,10 @@ Safety:
             } finally {
                 sendBtn.disabled = false;
                 input.focus();
+                // Save chat to database with difficulty keyword detection
+                if (finalReply) {
+                    saveChatToDatabase(userText, finalReply);
+                }
             }
         }
 
@@ -868,9 +1131,49 @@ Safety:
             if (e.target === keyModal) hideKeyModal();
         });
 
+        // Auth button handler
+        authBtn.addEventListener("click", () => {
+            if (authToken) {
+                // Logout
+                authToken = null;
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                checkAuth();
+                restrictChatAccess();
+                alert('Logged out successfully');
+                window.location.href = 'index.html';
+            } else {
+                // Go to login page
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Login required modal handlers
+        document.getElementById("cancelLoginRequired").addEventListener("click", () => {
+            loginRequiredModal.classList.remove('show');
+            window.location.href = 'index.html';
+        });
+
+        document.getElementById("goToLogin").addEventListener("click", () => {
+            loginRequiredModal.classList.remove('show');
+            window.location.href = 'index.html';
+        });
+
+        loginRequiredModal.addEventListener("click", (e) => {
+            if (e.target === loginRequiredModal) loginRequiredModal.classList.remove('show');
+        });
+
         recognition = initSpeechRecognition();
         updateSoundButton();
-        welcome();
+        const hasLoggedIn = checkAuth();
+        restrictChatAccess();
+        if (hasLoggedIn) {
+            loadUserChatHistory();
+        } else {
+            welcome();
+        }
         if (!getKey()) setStatus("● Online • offline first-aid");
     </script>
 </body>

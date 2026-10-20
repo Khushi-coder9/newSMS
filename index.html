@@ -515,14 +515,15 @@
 
             <ul class="nav-links">
                 <li><a class="active" href="index.html">Home</a></li>
-                <li><a href="chat.html">Chat</a></li>
-                <li><a href="#book">Book Appointment</a></li>
+                <li><a href="chat.html" id="chatLink">Chat</a></li>
+                <li><a href="book.html">Book Appointment</a></li>
                 <li><a href="#resources">Resources</a></li>
                 <li><a href="#peer">Peer Support</a></li>
                 <li><a href="#dashboard">Dashboard</a></li>
             </ul>
 
             <div class="nav-actions">
+                <div id="userBadge" class="user-greeting-badge" style="display: none;"></div>
                 <button class="btn-login" id="loginBtn">Login</button>
                 <button class="btn-signup" id="signupBtn">Sign Up</button>
             </div>
@@ -616,7 +617,7 @@
                     </div>
                     <h3>Confidential Booking System</h3>
                     <p>Book an appointment with on-campus counsellors or mental health helplines — quick, easy and private.</p>
-                    <button class="card-btn btn-book">Book Appointment <span>→</span></button>
+                    <button class="card-btn btn-book" onclick="window.location.href='book.html'">Book Appointment <span>→</span></button>
                 </article>
 
                 <article class="card card-res" id="resources">
@@ -675,7 +676,7 @@
                     </div>
                     <h3>Admin Dashboard</h3>
                     <p>Anonymous data analytics help authorities identify trends and plan timely interventions for better support.</p>
-                    <button class="card-btn btn-admin">View Insights <span>→</span></button>
+                    <button class="card-btn btn-admin" id="viewInsightsBtn">View Insights <span>→</span></button>
                 </article>
             </div>
         </div>
@@ -754,35 +755,172 @@
 
     <!-- Signup Modal -->
     <div class="modal-bg" id="signupModal">
-        <div class="modal">
+        <div class="modal modal-signup">
             <h2>Sign Up</h2>
-            <p>Create your account to get started</p>
+            <p id="signupSubtitle">Choose your role to get started</p>
+
+            <!-- Role Selector: 3 Options -->
+            <div class="role-selector" role="tablist" aria-label="Sign up as">
+                <button type="button" class="role-tab active" data-role="student" id="roleTabStudent">
+                    <span class="role-icon">🎓</span>
+                    <span>Student</span>
+                </button>
+                <button type="button" class="role-tab" data-role="counsellor" id="roleTabCounsellor">
+                    <span class="role-icon">💼</span>
+                    <span>Counsellor</span>
+                </button>
+                <button type="button" class="role-tab" data-role="admin" id="roleTabAdmin">
+                    <span class="role-icon">🛡️</span>
+                    <span>Admin</span>
+                </button>
+            </div>
+
             <form id="signupForm">
-                <input type="email" id="signupEmail" placeholder="Email address" required>
-                <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" required minlength="6">
+                <input type="hidden" id="signupRole" value="student">
+
+                <!-- Full Name (for all roles) -->
+                <div class="form-group">
+                    <label for="signupName" class="form-label">Full Name</label>
+                    <input type="text" id="signupName" placeholder="Enter your full name" required autocomplete="name">
+                </div>
+
+                <!-- Email (for all roles) -->
+                <div class="form-group">
+                    <label for="signupEmail" class="form-label">Email Address</label>
+                    <input type="email" id="signupEmail" placeholder="name@example.com" required autocomplete="email">
+                </div>
+
+                <!-- Password (for all roles) -->
+                <div class="form-group">
+                    <label for="signupPassword" class="form-label">Password</label>
+                    <input type="password" id="signupPassword" placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password">
+                </div>
+
+                <!-- Student Only: Age -->
+                <div class="form-group" id="studentAgeGroup">
+                    <label for="signupAge" class="form-label">Age</label>
+                    <input type="number" id="signupAge" placeholder="Enter your age (e.g. 20)" min="1" max="120" required>
+                </div>
+
+                <!-- Counsellor Only: Designation -->
+                <div class="form-group" id="counsellorDesignationGroup" style="display: none;">
+                    <label for="signupDesignation" class="form-label">Designation</label>
+                    <input type="text" id="signupDesignation" placeholder="e.g. Campus Counsellor, Clinical Psychologist">
+                </div>
+
+                <!-- Admin: asks only Name, Email, Password (no extra fields needed) -->
+
                 <div class="modal-actions">
                     <button type="button" class="icon-btn" id="cancelSignup">Cancel</button>
-                    <button type="submit" class="btn-signup">Sign Up</button>
+                    <button type="submit" class="btn-signup" id="signupSubmitBtn">Sign Up as Student</button>
                 </div>
             </form>
+
+            <div class="modal-footer-hint">
+                Already have an account? <a href="#" id="switchToLogin">Login</a>
+            </div>
+
             <p id="signupError" class="error-message"></p>
         </div>
     </div>
 
-    <!-- Login Modal -->
+    <!-- Login Modal: strictly asks for email and password only -->
     <div class="modal-bg" id="loginModal">
         <div class="modal">
             <h2>Login</h2>
-            <p>Welcome back! Enter your credentials</p>
+            <p>Welcome back! Enter your email and password to log in.</p>
             <form id="loginForm">
-                <input type="email" id="loginEmail" placeholder="Email address" required>
-                <input type="password" id="loginPassword" placeholder="Password" required>
+                <div class="form-group">
+                    <label for="loginEmail" class="form-label">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="name@example.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword" class="form-label">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
+                </div>
                 <div class="modal-actions">
                     <button type="button" class="icon-btn" id="cancelLogin">Cancel</button>
                     <button type="submit" class="btn-signup">Login</button>
                 </div>
             </form>
+            <div class="modal-footer-hint">
+                Don't have an account? <a href="#" id="switchToSignup">Sign Up</a>
+            </div>
             <p id="loginError" class="error-message"></p>
+        </div>
+    </div>
+
+    <!-- Student Difficulty Monitoring Modal -->
+    <div class="modal-bg" id="monitoringModal">
+        <div class="modal modal-monitoring">
+            <div class="monitoring-header">
+                <div>
+                    <h2>Student Difficulty Monitoring Dashboard</h2>
+                    <p>Real-time AI analysis of student difficulties identified through chat keywords</p>
+                </div>
+                <button type="button" class="close-x-btn" id="closeMonitoring" title="Close">✕</button>
+            </div>
+
+            <!-- Stats Overview Grid -->
+            <div class="monitor-stats-grid">
+                <div class="stat-card">
+                    <span class="stat-num" id="statTotalChats">0</span>
+                    <span class="stat-label">Total Chats Monitored</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num" id="statTotalStudents">0</span>
+                    <span class="stat-label">Students Monitored</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num stat-highlight" id="statPrimaryDiff">-</span>
+                    <span class="stat-label">Top Difficulty Area</span>
+                </div>
+                <div class="stat-card alert-card">
+                    <span class="stat-num alert-num" id="statCrisisAlerts">0</span>
+                    <span class="stat-label">Urgent Alerts</span>
+                </div>
+            </div>
+
+            <!-- Breakdown: Difficulty Distribution & Keywords Cloud -->
+            <div class="monitor-breakdown-row">
+                <div class="breakdown-col">
+                    <h4 class="monitor-section-title">📊 Difficulties Identified by AI</h4>
+                    <div id="diffPrevalenceList" class="diff-bars-list">
+                        <div class="empty-state-hint">Loading difficulty data...</div>
+                    </div>
+                </div>
+                <div class="keywords-col">
+                    <h4 class="monitor-section-title">🏷️ Top Keywords Triggering Monitoring</h4>
+                    <div id="monitoredKeywordsCloud" class="keywords-cloud">
+                        <div class="empty-state-hint">Loading keywords...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Monitoring Table -->
+            <div class="monitor-table-section">
+                <div class="table-header-row">
+                    <h4 class="monitor-section-title">👥 Individual Student Difficulty Log</h4>
+                    <input type="text" id="searchStudentInput" placeholder="Filter by student, keyword, difficulty..." class="table-search">
+                </div>
+                <div class="table-container">
+                    <table class="monitor-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Age / Role</th>
+                                <th>Identified Difficulties</th>
+                                <th>Keywords Detected</th>
+                                <th>Status</th>
+                                <th>Last Active</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentMonitoringTableBody">
+                            <tr><td colspan="6" class="empty-state-hint">Loading student logs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -790,7 +928,8 @@
         .modal-bg {
             position: fixed;
             inset: 0;
-            background: rgba(28, 24, 72, 0.45);
+            background: rgba(28, 24, 72, 0.48);
+            backdrop-filter: blur(4px);
             display: none;
             place-items: center;
             z-index: 50;
@@ -800,59 +939,649 @@
         .modal-bg.show { display: grid; }
 
         .modal {
-            width: min(400px, 100%);
-            background: #fff;
+            width: min(440px, 100%);
+            background: #ffffff;
             border-radius: 20px;
-            padding: 22px;
+            padding: 26px 24px;
+            box-shadow: 0 20px 45px -10px rgba(28, 24, 72, 0.28);
+            box-sizing: border-box;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .modal h2 { font-size: 20px; margin-bottom: 8px; }
-        .modal p { font-size: 13.5px; color: var(--text); margin-bottom: 14px; line-height: 1.55; }
+        @keyframes modalPopIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1c1848;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .modal p {
+            font-size: 13.5px;
+            color: var(--text);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* 3-Option Role Selector Segmented Control */
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            background: #f1edff;
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 18px;
+        }
+
+        .role-tab {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 6px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #5a5878;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .role-tab:hover {
+            color: #1f1b4d;
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        .role-tab.active {
+            background: #6d4dff;
+            color: #ffffff;
+            box-shadow: 0 3px 10px rgba(109, 77, 255, 0.32);
+        }
+
+        .role-icon {
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #3f3d63;
+            margin-bottom: 5px;
+            letter-spacing: -0.01em;
+        }
+
         .modal input {
             width: 100%;
             border: 1.5px solid #e6e0ff;
             border-radius: 12px;
-            padding: 12px;
+            padding: 10.5px 14px;
+            font-size: 13.5px;
+            font-family: inherit;
+            margin-bottom: 0;
+            box-sizing: border-box;
+            outline: none;
+            background: #faf8ff;
+            color: #1f1b4d;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        }
+
+        .modal input:focus {
+            border-color: #6d4dff;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(109, 77, 255, 0.15);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: 1.5px solid #d8d0f5;
+            color: #5a5878;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: #f4f0ff;
+            color: #1f1b4d;
+            border-color: #beb2ed;
+        }
+
+        .modal .btn-signup {
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .modal .btn-signup:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 16px rgba(109, 77, 255, 0.32);
+        }
+
+        .modal .btn-signup:active {
+            transform: translateY(0);
+        }
+
+        .modal-footer-hint {
+            margin-top: 16px;
+            font-size: 13px;
+            color: #5a5878;
+            text-align: center;
+            padding-top: 12px;
+            border-top: 1px solid #f0ecfc;
+        }
+
+        .modal-footer-hint a {
+            color: #6d4dff;
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+        .modal-footer-hint a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 12.5px;
+            font-weight: 600;
+            margin-top: 12px;
+            display: none;
+            padding: 8px 12px;
+            background: #fee2e2;
+            border-radius: 8px;
+            border-left: 3px solid #dc2626;
+        }
+
+        .error-message.show { display: block; }
+
+        .user-greeting-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #241c63;
+            background: #ede8ff;
+            padding: 5px 12px;
+            border-radius: 999px;
+        }
+
+        .user-role-tag {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #6d4dff;
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-weight: 800;
+        }
+
+        /* Student Difficulty Monitoring Modal Styles */
+        .modal.modal-monitoring {
+            width: min(880px, 96vw);
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 26px;
+        }
+
+        .monitoring-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1.5px solid #f0ecfc;
+            padding-bottom: 14px;
+        }
+
+        .monitoring-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1c1848;
+            margin-bottom: 4px;
+        }
+
+        .monitoring-header p {
+            margin-bottom: 0;
+            font-size: 13px;
+            color: #5a5878;
+        }
+
+        .close-x-btn {
+            background: #f4f1ff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             font-size: 14px;
+            font-weight: 800;
+            color: #5a5878;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s;
+        }
+
+        .close-x-btn:hover {
+            background: #e6e0ff;
+            color: #1c1848;
+        }
+
+        .monitor-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: #f8f6ff;
+            border: 1.5px solid #ece8fc;
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1c1848;
+        }
+
+        .stat-highlight {
+            color: #6d4dff;
+            font-size: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-card.alert-card {
+            background: #fff5f5;
+            border-color: #fed7d7;
+        }
+
+        .stat-num.alert-num {
+            color: #c53030;
+        }
+
+        .stat-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #6a6788;
+        }
+
+        .monitor-breakdown-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .monitor-section-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #1c1848;
             margin-bottom: 12px;
+        }
+
+        .diff-bars-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .diff-bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .diff-bar-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3f3d63;
+        }
+
+        .diff-bar-track {
+            height: 8px;
+            background: #eeeaf8;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .diff-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6d4dff, #9175ff);
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+
+        .diff-bar-fill.crisis {
+            background: linear-gradient(90deg, #e53e3e, #f56565);
+        }
+
+        .keywords-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #faf8ff;
+            border: 1.5px solid #ece8fc;
+            border-radius: 14px;
+            padding: 12px;
+            min-height: 120px;
+            align-content: flex-start;
+        }
+
+        .kw-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #ffffff;
+            border: 1px solid #d8d0f5;
+            padding: 4px 9px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #4b3bb2;
+            box-shadow: 0 1px 3px rgba(109, 77, 255, 0.06);
+        }
+
+        .kw-badge .kw-count {
+            background: #ede8ff;
+            color: #6d4dff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 999px;
+        }
+
+        .monitor-table-section {
+            margin-top: 10px;
+        }
+
+        .table-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .table-search {
+            width: 260px;
+            padding: 8px 12px;
+            font-size: 12.5px;
+            border-radius: 10px;
+            border: 1.5px solid #e2dbfc;
+            background: #ffffff;
+            outline: none;
             box-sizing: border-box;
         }
 
-        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
-        .error-message {
-            color: #dc2626;
-            font-size: 13px;
-            margin-top: 10px;
-            display: none;
+        .table-search:focus {
+            border-color: #6d4dff;
+            box-shadow: 0 0 0 3px rgba(109, 77, 255, 0.12);
         }
-        .error-message.show { display: block; }
+
+        .table-container {
+            border: 1.5px solid #ece8fc;
+            border-radius: 14px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(28, 24, 72, 0.04);
+        }
+
+        .monitor-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            text-align: left;
+        }
+
+        .monitor-table th {
+            background: #f6f3ff;
+            color: #3f3d63;
+            font-weight: 700;
+            padding: 10px 14px;
+            border-bottom: 1px solid #e4dcfc;
+            white-space: nowrap;
+        }
+
+        .monitor-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid #f2effc;
+            color: #241c63;
+            vertical-align: middle;
+        }
+
+        .monitor-table tr:hover td {
+            background: #fbfaff;
+        }
+
+        .diff-pill {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: #ede8ff;
+            color: #553bb2;
+            margin: 2px;
+        }
+
+        .diff-pill.crisis {
+            background: #fee2e2;
+            color: #c53030;
+        }
+
+        .kw-tag-small {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: #f4f1ff;
+            color: #6a6788;
+            margin: 1px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .status-badge.normal {
+            background: #e6fffa;
+            color: #234e52;
+        }
+
+        .status-badge.moderate {
+            background: #fefcbf;
+            color: #744210;
+        }
+
+        .status-badge.crisis {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+
+        .empty-state-hint {
+            color: #8c89a8;
+            font-size: 12.5px;
+            text-align: center;
+            padding: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .monitor-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .monitor-breakdown-row { grid-template-columns: 1fr; }
+            .table-header-row { flex-direction: column; align-items: stretch; }
+            .table-search { width: 100%; }
+        }
     </style>
 
     <script>
         const API_BASE = 'http://localhost:5000/api';
         let authToken = localStorage.getItem('authToken');
+        let currentSignupRole = 'student';
 
-        // Check if user is logged in
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Check if user is logged in & update header UI
         function updateAuthUI() {
             const loginBtn = document.getElementById('loginBtn');
             const signupBtn = document.getElementById('signupBtn');
+            const chatLink = document.getElementById('chatLink');
+            const userBadge = document.getElementById('userBadge');
 
             if (authToken) {
+                const userName = localStorage.getItem('userName') || 'User';
+                const userRole = localStorage.getItem('userRole') || 'student';
+
                 loginBtn.textContent = 'Logout';
                 signupBtn.style.display = 'none';
+                chatLink.style.pointerEvents = 'auto';
+                chatLink.style.opacity = '1';
+
+                if (userBadge) {
+                    userBadge.style.display = 'inline-flex';
+                    userBadge.innerHTML = `<span>Hi, ${escapeHtml(userName)}</span><span class="user-role-tag">${escapeHtml(userRole)}</span>`;
+                }
             } else {
                 loginBtn.textContent = 'Login';
                 signupBtn.style.display = 'block';
+                chatLink.style.pointerEvents = 'none';
+                chatLink.style.opacity = '0.5';
+
+                if (userBadge) {
+                    userBadge.style.display = 'none';
+                    userBadge.innerHTML = '';
+                }
             }
         }
 
-        // Signup Modal
+        // Signup Role Switcher: Student | Counsellor | Admin
+        function setSignupRole(role) {
+            currentSignupRole = role;
+            document.getElementById('signupRole').value = role;
+
+            // Update active role tabs
+            document.querySelectorAll('.role-tab').forEach(tab => {
+                if (tab.dataset.role === role) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            const studentAgeGroup = document.getElementById('studentAgeGroup');
+            const counsellorDesignationGroup = document.getElementById('counsellorDesignationGroup');
+            const ageInput = document.getElementById('signupAge');
+            const designationInput = document.getElementById('signupDesignation');
+            const submitBtn = document.getElementById('signupSubmitBtn');
+            const subtitle = document.getElementById('signupSubtitle');
+
+            if (role === 'student') {
+                // Student: Name, Email, Password, Age
+                studentAgeGroup.style.display = 'block';
+                counsellorDesignationGroup.style.display = 'none';
+                ageInput.required = true;
+                designationInput.required = false;
+                designationInput.value = '';
+                submitBtn.textContent = 'Sign Up as Student';
+                subtitle.textContent = 'Create your student account to access peer & mental health support';
+            } else if (role === 'counsellor') {
+                // Counsellor: Name, Email, Password, Designation
+                studentAgeGroup.style.display = 'none';
+                counsellorDesignationGroup.style.display = 'block';
+                ageInput.required = false;
+                ageInput.value = '';
+                designationInput.required = true;
+                submitBtn.textContent = 'Sign Up as Counsellor';
+                subtitle.textContent = 'Join as a counsellor to provide guidance and schedule sessions';
+            } else if (role === 'admin') {
+                // Admin: Name, Email, Password (no extra fields)
+                studentAgeGroup.style.display = 'none';
+                counsellorDesignationGroup.style.display = 'none';
+                ageInput.required = false;
+                ageInput.value = '';
+                designationInput.required = false;
+                designationInput.value = '';
+                submitBtn.textContent = 'Sign Up as Admin';
+                subtitle.textContent = 'Create an administrator account for platform management';
+            }
+        }
+
+        // Role tab click handlers
+        document.querySelectorAll('.role-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const role = tab.getAttribute('data-role');
+                setSignupRole(role);
+            });
+        });
+
+        // Signup Modal Elements & Handlers
         const signupModal = document.getElementById('signupModal');
         const signupForm = document.getElementById('signupForm');
         const signupError = document.getElementById('signupError');
 
         document.getElementById('signupBtn').addEventListener('click', () => {
+            setSignupRole('student');
             signupModal.classList.add('show');
+            document.getElementById('signupName').focus();
         });
 
         document.getElementById('cancelSignup').addEventListener('click', () => {
@@ -863,14 +1592,44 @@
 
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('signupEmail').value;
+            signupError.classList.remove('show');
+            signupError.textContent = '';
+
+            const role = currentSignupRole;
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
+            const ageVal = document.getElementById('signupAge').value;
+            const designationVal = document.getElementById('signupDesignation').value.trim();
+
+            const payload = {
+                name,
+                email,
+                password,
+                role
+            };
+
+            if (role === 'student') {
+                if (!ageVal || isNaN(Number(ageVal)) || Number(ageVal) < 1) {
+                    signupError.textContent = 'Please enter a valid age.';
+                    signupError.classList.add('show');
+                    return;
+                }
+                payload.age = Number(ageVal);
+            } else if (role === 'counsellor') {
+                if (!designationVal) {
+                    signupError.textContent = 'Please enter your counsellor designation.';
+                    signupError.classList.add('show');
+                    return;
+                }
+                payload.designation = designationVal;
+            }
 
             try {
                 const response = await fetch(`${API_BASE}/auth/signup`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await response.json();
@@ -879,21 +1638,27 @@
                     authToken = data.token;
                     localStorage.setItem('authToken', authToken);
                     localStorage.setItem('userEmail', data.user.email);
+                    localStorage.setItem('userName', data.user.name || '');
+                    localStorage.setItem('userRole', data.user.role || 'student');
                     signupModal.classList.remove('show');
                     signupForm.reset();
+                    setSignupRole('student');
                     updateAuthUI();
-                    alert('Account created successfully!');
+                    alert(`Account created successfully as ${data.user.role.toUpperCase()}!`);
+                    // Redirect to chat page
+                    window.location.href = 'chat.html';
                 } else {
                     signupError.textContent = data.error || 'Signup failed';
                     signupError.classList.add('show');
                 }
             } catch (error) {
+                console.error('Signup error:', error);
                 signupError.textContent = 'Network error. Please try again.';
                 signupError.classList.add('show');
             }
         });
 
-        // Login Modal
+        // Login Modal Elements & Handlers (only asks email and password)
         const loginModal = document.getElementById('loginModal');
         const loginForm = document.getElementById('loginForm');
         const loginError = document.getElementById('loginError');
@@ -904,10 +1669,13 @@
                 authToken = null;
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
                 updateAuthUI();
                 alert('Logged out successfully');
             } else {
                 loginModal.classList.add('show');
+                document.getElementById('loginEmail').focus();
             }
         });
 
@@ -919,7 +1687,10 @@
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
+            loginError.classList.remove('show');
+            loginError.textContent = '';
+
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
             try {
@@ -935,18 +1706,43 @@
                     authToken = data.token;
                     localStorage.setItem('authToken', authToken);
                     localStorage.setItem('userEmail', data.user.email);
+                    localStorage.setItem('userName', data.user.name || '');
+                    localStorage.setItem('userRole', data.user.role || 'student');
                     loginModal.classList.remove('show');
                     loginForm.reset();
                     updateAuthUI();
-                    alert('Login successful!');
+                    alert(`Login successful! Welcome back, ${data.user.name || 'User'}`);
+                    // Redirect to chat page
+                    window.location.href = 'chat.html';
                 } else {
                     loginError.textContent = data.error || 'Login failed';
                     loginError.classList.add('show');
                 }
             } catch (error) {
+                console.error('Login error:', error);
                 loginError.textContent = 'Network error. Please try again.';
                 loginError.classList.add('show');
             }
+        });
+
+        // Quick switcher between Login and Signup modals
+        document.getElementById('switchToLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            signupModal.classList.remove('show');
+            signupForm.reset();
+            signupError.classList.remove('show');
+            loginModal.classList.add('show');
+            document.getElementById('loginEmail').focus();
+        });
+
+        document.getElementById('switchToSignup').addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.classList.remove('show');
+            loginForm.reset();
+            loginError.classList.remove('show');
+            setSignupRole('student');
+            signupModal.classList.add('show');
+            document.getElementById('signupName').focus();
         });
 
         // Close modals on background click
@@ -956,6 +1752,163 @@
 
         loginModal.addEventListener('click', (e) => {
             if (e.target === loginModal) loginModal.classList.remove('show');
+        });
+
+        // Chat link handler - prevent access if not logged in
+        document.getElementById('chatLink').addEventListener('click', (e) => {
+            if (!authToken) {
+                e.preventDefault();
+                alert('Please login first to access the chat feature');
+                loginModal.classList.add('show');
+            }
+        });
+
+        // Student Difficulty Monitoring Dashboard
+        const monitoringModal = document.getElementById('monitoringModal');
+        const viewInsightsBtn = document.getElementById('viewInsightsBtn');
+        const closeMonitoring = document.getElementById('closeMonitoring');
+        const searchStudentInput = document.getElementById('searchStudentInput');
+        let currentMonitoringData = null;
+
+        async function loadMonitoringDashboard() {
+            monitoringModal.classList.add('show');
+            try {
+                const res = await fetch(`${API_BASE}/chat/monitoring`);
+                if (!res.ok) throw new Error('Failed to fetch data');
+                const data = await res.json();
+                currentMonitoringData = data;
+                renderMonitoringData(data);
+            } catch (err) {
+                console.error('Error loading monitoring dashboard:', err);
+                document.getElementById('diffPrevalenceList').innerHTML = '<div class="empty-state-hint">Failed to load monitoring data. Ensure backend is running.</div>';
+            }
+        }
+
+        function renderMonitoringData(data) {
+            document.getElementById('statTotalChats').textContent = data.totalMonitoredMessages || 0;
+            document.getElementById('statTotalStudents').textContent = data.totalMonitoredStudents || 0;
+            document.getElementById('statCrisisAlerts').textContent = (data.crisisAlerts && data.crisisAlerts.length) || 0;
+
+            // Find top difficulty
+            const diffEntries = Object.entries(data.difficultyDistribution || {});
+            diffEntries.sort((a, b) => b[1] - a[1]);
+            const topDiff = diffEntries.length > 0 ? diffEntries[0][0] : 'None detected';
+            document.getElementById('statPrimaryDiff').textContent = topDiff;
+
+            // Render Difficulty Prevalence Bars
+            const diffListEl = document.getElementById('diffPrevalenceList');
+            if (diffEntries.length === 0) {
+                diffListEl.innerHTML = '<div class="empty-state-hint">No student difficulties identified yet. Start chatting in the Chat room to see live analysis!</div>';
+            } else {
+                const maxVal = diffEntries[0][1] || 1;
+                diffListEl.innerHTML = diffEntries.map(([category, count]) => {
+                    const percent = Math.min(100, Math.round((count / maxVal) * 100));
+                    const isCrisis = category.toLowerCase().includes('crisis') || category.toLowerCase().includes('harm');
+                    return `
+                        <div class="diff-bar-item">
+                            <div class="diff-bar-meta">
+                                <span>${escapeHtml(category)}</span>
+                                <span><strong>${count}</strong> occurrences</span>
+                            </div>
+                            <div class="diff-bar-track">
+                                <div class="diff-bar-fill ${isCrisis ? 'crisis' : ''}" style="width: ${percent}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Render Keywords Cloud
+            const keywordsCloudEl = document.getElementById('monitoredKeywordsCloud');
+            if (!data.topKeywordsOverall || data.topKeywordsOverall.length === 0) {
+                keywordsCloudEl.innerHTML = '<div class="empty-state-hint">No keywords extracted yet.</div>';
+            } else {
+                keywordsCloudEl.innerHTML = data.topKeywordsOverall.map(item => `
+                    <span class="kw-badge">
+                        <span>#${escapeHtml(item.keyword)}</span>
+                        <span class="kw-count">${item.count}</span>
+                    </span>
+                `).join('');
+            }
+
+            // Render Table
+            renderStudentTable(data.students || []);
+        }
+
+        function renderStudentTable(students) {
+            const tbody = document.getElementById('studentMonitoringTableBody');
+            const query = (searchStudentInput.value || '').toLowerCase().trim();
+
+            const filtered = students.filter(s => {
+                if (!query) return true;
+                const matchName = (s.name || '').toLowerCase().includes(query);
+                const matchEmail = (s.email || '').toLowerCase().includes(query);
+                const matchDiff = (s.topDifficulties || []).some(d => d.category.toLowerCase().includes(query));
+                const matchKw = (s.topKeywords || []).some(k => k.toLowerCase().includes(query));
+                return matchName || matchEmail || matchDiff || matchKw;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state-hint">No students match your filter criteria.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(s => {
+                const diffBadges = (s.topDifficulties || []).map(d => {
+                    const isCrisis = d.category.toLowerCase().includes('crisis');
+                    return `<span class="diff-pill ${isCrisis ? 'crisis' : ''}">${escapeHtml(d.category)} (${d.count})</span>`;
+                }).join('');
+
+                const kwTags = (s.topKeywords || []).map(k => `<span class="kw-tag-small">#${escapeHtml(k)}</span>`).join('');
+
+                const severity = s.highestSeverity || 'normal';
+                const severityLabel = severity === 'crisis' ? '🚨 High Alert' : (severity === 'moderate' ? '⚠️ Monitored' : '✓ Normal');
+
+                const dateStr = s.lastActive ? new Date(s.lastActive).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently';
+
+                return `
+                    <tr>
+                        <td>
+                            <strong>${escapeHtml(s.name || 'Anonymous')}</strong>
+                            <div style="font-size: 11px; color: #767396;">${escapeHtml(s.email || '')}</div>
+                        </td>
+                        <td>
+                            <span style="font-weight: 600;">${escapeHtml(s.role || 'student')}</span>
+                            ${s.age ? `<div style="font-size: 11px; color: #767396;">Age: ${s.age}</div>` : ''}
+                        </td>
+                        <td>${diffBadges || '<span style="color:#a09cb8;">None tagged</span>'}</td>
+                        <td>${kwTags || '<span style="color:#a09cb8;">None</span>'}</td>
+                        <td><span class="status-badge ${severity}">${severityLabel}</span></td>
+                        <td style="font-size: 11.5px; color: #767396;">${dateStr}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        if (viewInsightsBtn) {
+            viewInsightsBtn.addEventListener('click', loadMonitoringDashboard);
+        }
+
+        const navDash = document.querySelector('a[href="#dashboard"]');
+        if (navDash) {
+            navDash.addEventListener('click', (e) => {
+                e.preventDefault();
+                loadMonitoringDashboard();
+            });
+        }
+
+        closeMonitoring.addEventListener('click', () => {
+            monitoringModal.classList.remove('show');
+        });
+
+        monitoringModal.addEventListener('click', (e) => {
+            if (e.target === monitoringModal) monitoringModal.classList.remove('show');
+        });
+
+        searchStudentInput.addEventListener('input', () => {
+            if (currentMonitoringData) {
+                renderStudentTable(currentMonitoringData.students || []);
+            }
         });
 
         // Initialize UI
