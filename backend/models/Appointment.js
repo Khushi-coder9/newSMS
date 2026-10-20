@@ -73,6 +73,23 @@ const appointmentSchema = new mongoose.Schema({
     default: 'pending',
     index: true
   },
+  counsellorFeedback: {
+    type: String,
+    trim: true
+  },
+  improvementRating: {
+    type: Number,
+    min: 1,
+    max: 5,
+    default: null
+  },
+  feedbackDate: {
+    type: Date
+  },
+  actionItems: [{
+    type: String,
+    trim: true
+  }],
   confirmationToken: {
     type: String,
     index: true

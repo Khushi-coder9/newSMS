@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness & Clinical Dashboard • Student Mind Support</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for interactive analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --navy: #1f1b4d;
+            --heading: #1c1848;
+            --purple: #6d4dff;
+            --purple-light: #f4f0ff;
+            --purple-hover: #5b3ae6;
+            --text: #5a5878;
+            --border: #e6e0ff;
+            --white: #ffffff;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --cyan: #06b6d4;
+            --blue: #3b82f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { min-height: 100%; }
+
+        body {
+            font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+            color: var(--navy);
+            background: #f7f5ff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button, input, select, textarea { font-family: inherit; }
+
+        .wrap {
+            width: min(1200px, calc(100% - 48px));
+            margin: 0 auto;
+        }
+
+        /* Navigation Header */
+        header {
+            background: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 1px 0 rgba(90, 70, 180, 0.06);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            min-height: 74px;
+        }
+
+        .brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .brand-mark { width: 34px; height: 34px; flex-shrink: 0; }
+        .brand-name {
+            display: block;
+            font-weight: 800;
+            font-size: 16px;
+            line-height: 1.15;
+            color: var(--heading);
+            letter-spacing: -0.02em;
+        }
+        .brand-tag {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #8c8aa8;
+            letter-spacing: 0.04em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            list-style: none;
+        }
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--purple);
+            font-weight: 700;
+        }
+        .nav-links a.active::after {
+            content: "";
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 2.5px;
+            background: var(--purple);
+            border-radius: 4px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .user-greeting-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0ebff;
+            color: var(--navy);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #dfd7ff;
+        }
+
+        .user-role-tag {
+            background: var(--purple);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-auth {
+            background: #ffffff;
+            color: var(--purple);
+            border: 1.6px solid #b9a6ff;
+            border-radius: 999px;
+            padding: 7px 18px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-auth:hover {
+            background: #f8f6ff;
+            border-color: var(--purple);
+        }
+
+        /* Dashboard Top Segmented Control (Role Switcher) */
+        .dashboard-header-bar {
+            padding: 24px 0 16px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .dash-title-group h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--heading);
+            letter-spacing: -0.02em;
+        }
+        .dash-title-group p {
+            font-size: 13.5px;
+            color: var(--text);
+            margin-top: 3px;
+        }
+
+        .role-switcher-tabs {
+            display: inline-flex;
+            background: #ffffff;
+            padding: 5px;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(109, 77, 255, 0.07);
+            border: 1px solid var(--border);
+            gap: 4px;
+        }
+
+        .role-switch-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .role-switch-btn:hover {
+            color: var(--navy);
+            background: #faf8ff;
+        }
+        .role-switch-btn.active {
+            background: var(--purple);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(109, 77, 255, 0.25);
+        }
+
+        /* Metric KPI Cards Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px -4px rgba(28, 24, 72, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -4px rgba(28, 24, 72, 0.09);
+        }
+        .metric-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--purple);
+        }
+        .metric-card.green::before { background: var(--green); }
+        .metric-card.amber::before { background: var(--amber); }
+        .metric-card.red::before { background: var(--red); }
+        .metric-card.cyan::before { background: var(--cyan); }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .metric-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #797699;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .metric-icon-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+            background: var(--purple-light);
+        }
+        .metric-val {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--heading);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        .metric-sub {
+            font-size: 12px;
+            color: #8c89a8;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+        .metric-progress {
+            margin-top: 10px;
+            height: 6px;
+            border-radius: 999px;
+            background: #ede8fc;
+            overflow: hidden;
+        }
+        .metric-progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--purple), #a855f7);
+            width: 75%;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Two-column Chart Section */
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px -4px rgba(28, 24, 72, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--heading);
+        }
+        .chart-desc {
+            font-size: 12.5px;
+            color: var(--text);
+            margin-top: 2px;
+        }
+        .chart-canvas-wrap {
+            position: relative;
+            flex-grow: 1;
+            min-height: 260px;
+            display: grid;
+            place-items: center;
+        }
+
+        /* Tables & Content Cards */
+        .content-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px -4px rgba(28, 24, 72, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .card-header-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .dash-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13.5px;
+        }
+        .dash-table th {
+            text-align: left;
+            padding: 12px 14px;
+            background: #faf8ff;
+            color: #635f85;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 1.5px solid var(--border);
+        }
+        .dash-table th:first-child { border-top-left-radius: 12px; }
+        .dash-table th:last-child { border-top-right-radius: 12px; }
+        .dash-table td {
+            padding: 14px;
+            border-bottom: 1px solid #f0ecfa;
+            color: var(--navy);
+            vertical-align: middle;
+        }
+        .dash-table tr:hover td {
+            background: #faf8ff;
+        }
+
+        /* Status & Difficulty Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+        .badge.pending { background: #fef3c7; color: #b45309; }
+        .badge.confirmed { background: #dcfce7; color: #15803d; }
+        .badge.completed { background: #e0e7ff; color: #4338ca; }
+        .badge.cancelled { background: #fee2e2; color: #b91c1c; }
+        .badge.crisis { background: #fee2e2; color: #b91c1c; font-weight: 800; }
+        .badge.moderate { background: #fef3c7; color: #b45309; }
+        .badge.normal { background: #dcfce7; color: #15803d; }
+
+        .tag-pill {
+            display: inline-block;
+            background: #f3f0ff;
+            color: #553bb8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+            margin: 2px;
+        }
+
+        /* Feedback Cards (Student & Counsellor) */
+        .feedback-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+        }
+
+        .feedback-item-card {
+            background: #faf9ff;
+            border: 1.5px solid #ebe5ff;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .feedback-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .counsellor-meta strong {
+            font-size: 14px;
+            color: var(--heading);
+            display: block;
+        }
+        .counsellor-meta span {
+            font-size: 11.5px;
+            color: #7d7a9c;
+        }
+        .star-rating {
+            color: #f59e0b;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        .feedback-body {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #4b4868;
+            margin-bottom: 12px;
+            background: #ffffff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #efeaff;
+        }
+        .action-items-list {
+            margin-top: 8px;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .action-items-list li {
+            font-size: 12px;
+            color: #594e82;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .action-items-list li::before {
+            content: "✓";
+            color: var(--green);
+            font-weight: 800;
+        }
+
+        /* Action Buttons */
+        .btn-action-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+        .btn-primary-sm {
+            background: var(--purple);
+            color: #ffffff;
+        }
+        .btn-primary-sm:hover {
+            background: var(--purple-hover);
+        }
+        .btn-green-sm {
+            background: #10b981;
+            color: #ffffff;
+        }
+        .btn-green-sm:hover {
+            background: #059669;
+        }
+        .btn-outline-sm {
+            background: #ffffff;
+            border: 1.5px solid #dcd4fa;
+            color: var(--purple);
+        }
+        .btn-outline-sm:hover {
+            background: #f5f2ff;
+        }
+
+        /* Modal for Counsellor Feedback */
+        .modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(28, 24, 72, 0.48);
+            backdrop-filter: blur(4px);
+            display: none;
+            place-items: center;
+            z-index: 100;
+            padding: 20px;
+        }
+        .modal-bg.show { display: grid; }
+        .modal {
+            width: min(520px, 100%);
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 26px 24px;
+            box-shadow: 0 20px 45px -10px rgba(28, 24, 72, 0.28);
+            box-sizing: border-box;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h2 { font-size: 20px; font-weight: 800; color: var(--heading); margin-bottom: 6px; }
+        .modal p { font-size: 13px; color: var(--text); margin-bottom: 18px; }
+
+        .form-group { margin-bottom: 14px; text-align: left; }
+        .form-label { display: block; font-size: 12px; font-weight: 700; color: #3f3d63; margin-bottom: 5px; }
+        .modal input, .modal select, .modal textarea {
+            width: 100%;
+            border: 1.5px solid #e6e0ff;
+            border-radius: 12px;
+            padding: 10.5px 14px;
+            font-size: 13.5px;
+            outline: none;
+            background: #faf8ff;
+            color: #1f1b4d;
+        }
+        .modal textarea { min-height: 80px; resize: vertical; }
+        .modal input:focus, .modal select:focus, .modal textarea:focus {
+            border-color: var(--purple);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(109, 77, 255, 0.15);
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        /* Search input in table header */
+        .table-search-input {
+            border: 1.5px solid #dfd7ff;
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 12.5px;
+            outline: none;
+            background: #faf8ff;
+            color: var(--navy);
+            width: 220px;
+        }
+        .table-search-input:focus {
+            border-color: var(--purple);
+            background: #ffffff;
+        }
+
+        /* View visibility containers */
+        .role-view { display: none; }
+        .role-view.active { display: block; }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .chart-row { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .metrics-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .dashboard-header-bar { flex-direction: column; align-items: stretch; }
+            .role-switcher-tabs { width: 100%; justify-content: space-around; }
+            .role-switch-btn { padding: 8px 10px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="wrap nav">
+            <a class="brand" href="index.html">
+                <svg class="brand-mark" viewBox="0 0 48 42" aria-hidden="true">
+                    <path fill="#4ecdc4" d="M14.8 3.2c-6.2 0-11.1 5-11.1 11.4 0 10.1 10.6 17.8 20.6 23.4C14.3 32.4 3.7 24.7 3.7 14.6 3.7 8.2 8.6 3.2 14.8 3.2c2.4 0 4.6.9 6.3 2.4C19.4 4.1 17.2 3.2 14.8 3.2z"/>
+                    <path fill="#4ecdc4" d="M16.2 5.8c-5 0-9 4.2-9 9.8 0 8.6 8.6 15.1 17.2 20.1-8.6-5-17.2-11.5-17.2-20.1 0-5.6 4-9.8 9-9.8 2.1 0 4 .8 5.4 2.2-1.6-1.4-3.6-2.2-5.4-2.2z"/>
+                    <path fill="#6d4dff" d="M32.6 4.4c-5.8 0-10.4 4.8-10.4 11 0 9.6 10.4 17 19.2 22.2C41.6 32.4 22.2 25 22.2 15.4c0-6.2 4.6-11 10.4-11 2.4 0 4.6.9 6.2 2.5-1.7-1.5-3.9-2.5-6.2-2.5z"/>
+                    <path fill="#7b5cff" d="M33.4 7c-4.6 0-8.3 3.9-8.3 9 0 7.8 8.3 13.8 15.6 18.2C40.4 29.8 25.1 23.8 25.1 16 25.1 10.9 28.8 7 33.4 7c2 0 3.8.8 5.1 2.1C37.2 7.8 35.4 7 33.4 7z"/>
+                </svg>
+                <span>
+                    <span class="brand-name">Student Mind Support</span>
+                    <span class="brand-tag">Talk • Heal • Grow</span>
+                </span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a href="book.html">Book Appointment</a></li>
+                <li><a href="index.html#resources">Resources</a></li>
+                <li><a class="active" href="dashboard.html">Dashboard</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <div id="userBadge" class="user-greeting-badge" style="display: none;"></div>
+                <button class="btn-auth" id="authBtn">Login</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="wrap" style="flex: 1; padding-bottom: 40px;">
+        <!-- Top Title Bar & Role Selector -->
+        <div class="dashboard-header-bar">
+            <div class="dash-title-group">
+                <h1 id="dashboardMainTitle">Student Wellness Dashboard</h1>
+                <p id="dashboardMainSub">Interactive insights from your AI assistant chats, counsellor feedback, and appointments</p>
+            </div>
+
+            <!-- Role Selector Control -->
+            <div class="role-switcher-tabs" role="tablist">
+                <button type="button" class="role-switch-btn active" data-target="student" id="tabStudent">
+                    <span>🎓</span> Student View
+                </button>
+                <button type="button" class="role-switch-btn" data-target="counsellor" id="tabCounsellor">
+                    <span>💼</span> Counsellor View
+                </button>
+                <button type="button" class="role-switch-btn" data-target="admin" id="tabAdmin">
+                    <span>🛡️</span> Admin View
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 1. STUDENT DASHBOARD VIEW -->
+        <!-- ========================================== -->
+        <section class="role-view active" id="viewStudent">
+            <!-- 4 Metric Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Improvement Index</span>
+                        <div class="metric-icon-wrap" style="background:#f0ebff; color:#6d4dff;">📈</div>
+                    </div>
+                    <div class="metric-val" id="studentImprovementVal">82%</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-fill" id="studentProgressFill" style="width: 82%;"></div>
+                    </div>
+                    <div class="metric-sub" id="studentImprovementSub">★ 4.5/5.0 Positive Trajectory</div>
+                </div>
+
+                <div class="metric-card cyan">
+                    <div class="metric-header">
+                        <span class="metric-label">AI First-Aid Chats</span>
+                        <div class="metric-icon-wrap" style="background:#e0f7fa; color:#06b6d4;">💬</div>
+                    </div>
+                    <div class="metric-val" id="studentTotalChats">12</div>
+                    <div class="metric-sub">Emotional support interactions</div>
+                </div>
+
+                <div class="metric-card green">
+                    <div class="metric-header">
+                        <span class="metric-label">Sessions Booked</span>
+                        <div class="metric-icon-wrap" style="background:#e8f5e9; color:#10b981;">📅</div>
+                    </div>
+                    <div class="metric-val" id="studentTotalAppts">2</div>
+                    <div class="metric-sub" id="studentUpcomingApptsSub">1 Upcoming Session</div>
+                </div>
+
+                <div class="metric-card amber">
+                    <div class="metric-header">
+                        <span class="metric-label">Primary Focus Area</span>
+                        <div class="metric-icon-wrap" style="background:#fffbeb; color:#f59e0b;">🏷️</div>
+                    </div>
+                    <div class="metric-val" style="font-size: 20px; line-height: 1.3;" id="studentPrimaryFocus">Exam Stress</div>
+                    <div class="metric-sub">Identified by MindMate AI</div>
+                </div>
+            </div>
+
+            <!-- Two Interactive Charts -->
+            <div class="chart-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Emotional & Difficulty Breakdown</div>
+                            <div class="chart-desc">Proportion of topics discussed in your AI assistant chats</div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="studentDifficultyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Wellness & Mood Trajectory</div>
+                            <div class="chart-desc">Recovery and emotional balance progression over time</div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="studentTrajectoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Counsellor Feedback & Prescriptions -->
+            <div class="content-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: var(--heading);">Counsellor Feedback & Coping Recommendations</h2>
+                        <p style="font-size: 13px; color: var(--text);">Direct clinical guidance and exercises assigned by your campus counsellor</p>
+                    </div>
+                    <button class="btn-action-sm btn-outline-sm" onclick="window.location.href='book.html'">+ Book New Slot</button>
+                </div>
+                <div class="feedback-grid" id="studentFeedbackGrid">
+                    <!-- Populated dynamically -->
+                    <div class="feedback-item-card">
+                        <div class="feedback-top">
+                            <div class="counsellor-meta">
+                                <strong>Dr. Sunita Sharma</strong>
+                                <span>Senior Clinical Psychologist • Oct 18</span>
+                            </div>
+                            <div class="star-rating">★★★★★</div>
+                        </div>
+                        <div class="feedback-body">
+                            "Great emotional recovery during our session. We worked on breathing exercises (4-7-8 method) to alleviate exam anxiety. Keep continuing the daily 10-minute quiet walk."
+                        </div>
+                        <ul class="action-items-list">
+                            <li>Practice 4-7-8 breathing before study sessions</li>
+                            <li>Take 5-minute eye breaks every 45 minutes</li>
+                            <li>Drink at least 2 liters of water daily</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Appointments Table -->
+            <div class="content-card">
+                <div class="card-header-flex">
+                    <h2 style="font-size: 18px; font-weight: 800; color: var(--heading);">My Appointments & Sessions</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>Counsellor</th>
+                                <th>Date & Time</th>
+                                <th>Session Type</th>
+                                <th>Status</th>
+                                <th>Counsellor Feedback</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentAppointmentsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #8c89a8; padding: 20px;">Loading appointments...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 2. COUNSELLOR DASHBOARD VIEW -->
+        <!-- ========================================== -->
+        <section class="role-view" id="viewCounsellor">
+            <!-- 4 Metric Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card amber">
+                    <div class="metric-header">
+                        <span class="metric-label">Pending Requests</span>
+                        <div class="metric-icon-wrap" style="background:#fffbeb; color:#f59e0b;">⏳</div>
+                    </div>
+                    <div class="metric-val" id="counsellorPendingVal">2</div>
+                    <div class="metric-sub">Need confirmation via email/UI</div>
+                </div>
+
+                <div class="metric-card green">
+                    <div class="metric-header">
+                        <span class="metric-label">Confirmed Sessions</span>
+                        <div class="metric-icon-wrap" style="background:#e8f5e9; color:#10b981;">✓</div>
+                    </div>
+                    <div class="metric-val" id="counsellorConfirmedVal">4</div>
+                    <div class="metric-sub">Ready to connect (Chat / Meet)</div>
+                </div>
+
+                <div class="metric-card red">
+                    <div class="metric-header">
+                        <span class="metric-label">Severe / Crisis Alerts</span>
+                        <div class="metric-icon-wrap" style="background:#fee2e2; color:#ef4444;">🚨</div>
+                    </div>
+                    <div class="metric-val" id="counsellorSevereVal">1</div>
+                    <div class="metric-sub">Immediate attention flagged by AI</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Students Guided</span>
+                        <div class="metric-icon-wrap" style="background:#f0ebff; color:#6d4dff;">👥</div>
+                    </div>
+                    <div class="metric-val" id="counsellorStudentsVal">8</div>
+                    <div class="metric-sub">Average rating: 4.8 ★</div>
+                </div>
+            </div>
+
+            <!-- Two Interactive Charts -->
+            <div class="chart-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Student Difficulty Distribution</div>
+                            <div class="chart-desc">Clinical categories identified across assigned student cases</div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="counsellorDifficultyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Appointment Status Breakdown</div>
+                            <div class="chart-desc">Pending vs Confirmed vs Completed sessions</div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="counsellorStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Counsellor's Active Appointments Queue -->
+            <div class="content-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: var(--heading);">Active Appointment Queue & Management</h2>
+                        <p style="font-size: 13px; color: var(--text);">Confirm appointments, join Jitsi meets, or submit session feedback</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Date & Slot</th>
+                                <th>Type</th>
+                                <th>Concern / Notes</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="counsellorAppointmentsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #8c89a8; padding: 20px;">Loading student appointments...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Student Clinical Reports & Monitoring -->
+            <div class="content-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: var(--heading);">Student Clinical Difficulty & Keyword Reports</h2>
+                        <p style="font-size: 13px; color: var(--text);">AI monitored keywords & risk analysis</p>
+                    </div>
+                    <input type="text" id="counsellorStudentSearch" placeholder="Filter student reports..." class="table-search-input">
+                </div>
+                <div class="table-responsive">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Age</th>
+                                <th>Identified Difficulties</th>
+                                <th>Status / Alert</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="counsellorStudentTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #8c89a8; padding: 20px;">Loading student reports...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 3. ADMIN DASHBOARD VIEW -->
+        <!-- ========================================== -->
+        <section class="role-view" id="viewAdmin">
+            <!-- 4 Metric Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Registered Students</span>
+                        <div class="metric-icon-wrap" style="background:#f0ebff; color:#6d4dff;">🎓</div>
+                    </div>
+                    <div class="metric-val" id="adminTotalStudents">24</div>
+                    <div class="metric-sub">Active platform users</div>
+                </div>
+
+                <div class="metric-card cyan">
+                    <div class="metric-header">
+                        <span class="metric-label">Campus Counsellors</span>
+                        <div class="metric-icon-wrap" style="background:#e0f7fa; color:#06b6d4;">💼</div>
+                    </div>
+                    <div class="metric-val" id="adminTotalCounsellors">3</div>
+                    <div class="metric-sub">Registered medical specialists</div>
+                </div>
+
+                <div class="metric-card red">
+                    <div class="metric-header">
+                        <span class="metric-label">Severe / Crisis Cases</span>
+                        <div class="metric-icon-wrap" style="background:#fee2e2; color:#ef4444;">🚨</div>
+                    </div>
+                    <div class="metric-val" id="adminSevereCases">2</div>
+                    <div class="metric-sub">High priority emergency flags</div>
+                </div>
+
+                <div class="metric-card amber">
+                    <div class="metric-header">
+                        <span class="metric-label">Average / Monitored Cases</span>
+                        <div class="metric-icon-wrap" style="background:#fffbeb; color:#f59e0b;">📊</div>
+                    </div>
+                    <div class="metric-val" id="adminAverageCases">8</div>
+                    <div class="metric-sub">Receiving first-aid coping guidance</div>
+                </div>
+            </div>
+
+            <!-- Two Interactive Charts -->
+            <div class="chart-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Campus-Wide Difficulty Distribution</div>
+                            <div class="chart-desc">Prevalence of mental health challenges across all students</div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="adminCampusDiffChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Severity Breakdown (Cases Tracked)</div>
+                            <div class="chart-desc">Distribution of Normal vs Moderate vs Crisis flags</div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="adminSeverityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Width Monthly Consultation Trend Chart -->
+            <div class="content-card">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Platform Engagement & Consultation Timeline</div>
+                        <div class="chart-desc">Weekly growth of AI First-Aid chats versus Counsellor Appointments</div>
+                    </div>
+                </div>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="adminTimelineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Platform Registry Table -->
+            <div class="content-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: var(--heading);">Student & Counsellor Platform Registry</h2>
+                        <p style="font-size: 13px; color: var(--text);">Complete directory of registered campus accounts</p>
+                    </div>
+                    <input type="text" id="adminRegistrySearch" placeholder="Search by name, email, role..." class="table-search-input">
+                </div>
+                <div class="table-responsive">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Age / Designation</th>
+                                <th>Registered Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminRegistryTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #8c89a8; padding: 20px;">Loading registry data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: Counsellor Adds Feedback and Improvement Level -->
+    <div class="modal-bg" id="feedbackModal">
+        <div class="modal">
+            <h2>Add Counsellor Feedback</h2>
+            <p>Write clinical notes and record improvement rating for this student session.</p>
+            <form id="feedbackForm">
+                <input type="hidden" id="feedbackApptId">
+
+                <div class="form-group">
+                    <label class="form-label">Student Name</label>
+                    <input type="text" id="feedbackStudentName" readonly style="background:#f3f0ff; font-weight:700;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="feedbackImprovementRating">Improvement Level</label>
+                    <select id="feedbackImprovementRating" required>
+                        <option value="5">★★★★★ 5 - Excellent (Noticeable Breakthrough & Recovery)</option>
+                        <option value="4" selected>★★★★☆ 4 - Steady Progress (Positive Coping Adoption)</option>
+                        <option value="3">★★★☆☆ 3 - Moderate (Needs Continued Follow-up)</option>
+                        <option value="2">★★☆☆☆ 2 - Initial Stage (High Distress Persisting)</option>
+                        <option value="1">★☆☆☆☆ 1 - Critical / Severe (Urgent Intervention Needed)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="feedbackText">Session Notes & Advice</label>
+                    <textarea id="feedbackText" placeholder="Enter constructive feedback, breathing techniques, or coping strategies for the student..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="feedbackActionItems">Action Items (comma-separated)</label>
+                    <input type="text" id="feedbackActionItems" placeholder="e.g. 4-7-8 breathing, 20min screen-free walk, sleep diary">
+                </div>
+
+                <div class="form-group" style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+                    <input type="checkbox" id="feedbackMarkCompleted" checked style="width:18px; height:18px;">
+                    <label for="feedbackMarkCompleted" style="font-size:13px; font-weight:600; cursor:pointer;">Mark appointment status as "Completed"</label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-action-sm btn-outline-sm" id="closeFeedbackModal">Cancel</button>
+                    <button type="submit" class="btn-action-sm btn-primary-sm" style="padding: 9px 18px; font-size:13px;">Save Feedback</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '80' && window.location.port !== ''
+            ? 'http://localhost:5000/api'
+            : '/api';
+
+        let authToken = localStorage.getItem('authToken');
+        let currentRole = localStorage.getItem('userRole') || 'student';
+        const userName = localStorage.getItem('userName') || 'User';
+
+        // Chart Instances Storage
+        let studentDiffChartInstance = null;
+        let studentTrajChartInstance = null;
+        let counsellorDiffChartInstance = null;
+        let counsellorStatusChartInstance = null;
+        let adminCampusDiffChartInstance = null;
+        let adminSeverityChartInstance = null;
+        let adminTimelineChartInstance = null;
+
+        // Cache for filtering
+        let cachedAdminData = null;
+        let cachedCounsellorStudents = [];
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        // Initialize Header UI
+        function updateHeader() {
+            const authBtn = document.getElementById('authBtn');
+            const userBadge = document.getElementById('userBadge');
+
+            if (authToken) {
+                authBtn.textContent = 'Logout';
+                if (userBadge) {
+                    userBadge.style.display = 'inline-flex';
+                    userBadge.innerHTML = `<span>Hi, ${escapeHtml(userName)}</span><span class="user-role-tag">${escapeHtml(currentRole)}</span>`;
+                }
+            } else {
+                authBtn.textContent = 'Login';
+                if (userBadge) userBadge.style.display = 'none';
+            }
+        }
+
+        authBtn.addEventListener('click', () => {
+            if (authToken) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                alert('Logged out successfully');
+                window.location.href = 'index.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Tab Switching
+        const roleTabs = document.querySelectorAll('.role-switch-btn');
+        const roleViews = document.querySelectorAll('.role-view');
+
+        function switchView(targetRole) {
+            roleTabs.forEach(t => t.classList.toggle('active', t.dataset.target === targetRole));
+            roleViews.forEach(v => v.classList.toggle('active', v.id === `view${targetRole.charAt(0).toUpperCase() + targetRole.slice(1)}`));
+
+            const titleEl = document.getElementById('dashboardMainTitle');
+            const subEl = document.getElementById('dashboardMainSub');
+
+            if (targetRole === 'student') {
+                titleEl.textContent = 'Student Wellness Dashboard';
+                subEl.textContent = 'Interactive insights from your AI assistant chats, counsellor feedback, and appointments';
+                loadStudentDashboard();
+            } else if (targetRole === 'counsellor') {
+                titleEl.textContent = 'Counsellor Clinical Dashboard';
+                subEl.textContent = 'Monitor student difficulty analytics, confirm sessions, and submit clinical evaluations';
+                loadCounsellorDashboard();
+            } else if (targetRole === 'admin') {
+                titleEl.textContent = 'Platform Administrator Dashboard';
+                subEl.textContent = 'Track student and counsellor registrations, severe vs moderate cases, and campus health trends';
+                loadAdminDashboard();
+            }
+        }
+
+        roleTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchView(tab.dataset.target);
+            });
+        });
+
+        // ==========================================
+        // 1. STUDENT DASHBOARD LOADER
+        // ==========================================
+        async function loadStudentDashboard() {
+            try {
+                let data = null;
+                if (authToken) {
+                    const res = await fetch(`${API_BASE}/dashboard/student`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    if (res.ok) data = await res.json();
+                }
+
+                // Fallback Mock Data if logged out or demo
+                if (!data) {
+                    data = {
+                        stats: {
+                            totalChats: 14,
+                            totalAppointments: 2,
+                            upcomingAppointments: 1,
+                            primaryDifficulty: 'Academic & Exam Stress',
+                            improvementRating: '4.5',
+                            improvementPercentage: 82,
+                            improvementLevelText: 'Positive Growth'
+                        },
+                        charts: {
+                            difficultyBreakdown: {
+                                'Academic Stress': 6,
+                                'Exam Anxiety': 4,
+                                'Sleep Quality': 3,
+                                'Loneliness & Social': 2,
+                                'Low Mood': 1
+                            },
+                            wellnessTrajectory: {
+                                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'This Week'],
+                                scores: [62, 68, 74, 80, 88]
+                            }
+                        },
+                        appointments: [
+                            {
+                                counsellorName: 'Dr. Sunita Sharma',
+                                date: '2026-10-24',
+                                time: '02:30 PM',
+                                sessionType: 'meet',
+                                status: 'confirmed',
+                                meetingLink: 'https://meet.jit.si/SMS-DrSunitaSharma-20261024',
+                                counsellorFeedback: 'Consistent coping habits observed. Recommended 10min daily breathwork.'
+                            },
+                            {
+                                counsellorName: 'Ms. Ananya Roy',
+                                date: '2026-10-14',
+                                time: '11:00 AM',
+                                sessionType: 'chat',
+                                status: 'completed',
+                                counsellorFeedback: 'Addressed study burnout and sleep routine. Patient responded well to grounding exercises.'
+                            }
+                        ],
+                        counsellorFeedback: [
+                            {
+                                counsellorName: 'Dr. Sunita Sharma',
+                                counsellorDesignation: 'Senior Clinical Psychologist',
+                                date: 'Oct 20, 2026',
+                                improvementRating: 5,
+                                feedback: 'Great emotional recovery during our session. We practiced the 4-7-8 breathing method to alleviate exam anxiety. Keep continuing the daily quiet walks.',
+                                actionItems: ['Practice 4-7-8 breathing before exams', 'Take 5min screen breaks every 45min', 'Maintain regular sleep routine']
+                            }
+                        ]
+                    };
+                }
+
+                // Update Metrics
+                document.getElementById('studentImprovementVal').textContent = `${data.stats.improvementPercentage}%`;
+                document.getElementById('studentProgressFill').style.width = `${data.stats.improvementPercentage}%`;
+                document.getElementById('studentImprovementSub').textContent = `★ ${data.stats.improvementRating}/5.0 • ${data.stats.improvementLevelText}`;
+                document.getElementById('studentTotalChats').textContent = data.stats.totalChats;
+                document.getElementById('studentTotalAppts').textContent = data.stats.totalAppointments;
+                document.getElementById('studentUpcomingApptsSub').textContent = `${data.stats.upcomingAppointments} Upcoming Sessions`;
+                document.getElementById('studentPrimaryFocus').textContent = data.stats.primaryDifficulty;
+
+                // Render Chart 1: Difficulty Doughnut
+                renderStudentDifficultyChart(data.charts.difficultyBreakdown);
+
+                // Render Chart 2: Wellness Trajectory Line
+                renderStudentTrajectoryChart(data.charts.wellnessTrajectory);
+
+                // Render Counsellor Feedback Grid
+                renderStudentFeedbackGrid(data.counsellorFeedback);
+
+                // Render Appointments Table
+                renderStudentAppointmentsTable(data.appointments);
+
+            } catch (err) {
+                console.error('Error loading student dashboard:', err);
+            }
+        }
+
+        function renderStudentDifficultyChart(diffData) {
+            const ctx = document.getElementById('studentDifficultyChart').getContext('2d');
+            if (studentDiffChartInstance) studentDiffChartInstance.destroy();
+
+            const labels = Object.keys(diffData);
+            const values = Object.values(diffData);
+
+            studentDiffChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#6d4dff', '#06b6d4', '#f59e0b', '#ec4899', '#10b981', '#3b82f6'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    },
+                    cutout: '68%'
+                }
+            });
+        }
+
+        function renderStudentTrajectoryChart(trajData) {
+            const ctx = document.getElementById('studentTrajectoryChart').getContext('2d');
+            if (studentTrajChartInstance) studentTrajChartInstance.destroy();
+
+            studentTrajChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trajData.labels,
+                    datasets: [{
+                        label: 'Wellness & Coping Score (%)',
+                        data: trajData.scores,
+                        borderColor: '#6d4dff',
+                        backgroundColor: 'rgba(109, 77, 255, 0.12)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#6d4dff',
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.35
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 30,
+                            max: 100,
+                            ticks: { callback: v => `${v}%`, font: { family: 'Plus Jakarta Sans', size: 11 } },
+                            grid: { color: '#f0ecfc' }
+                        },
+                        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function renderStudentFeedbackGrid(feedbackList) {
+            const grid = document.getElementById('studentFeedbackGrid');
+            if (!feedbackList || feedbackList.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #8c89a8; padding: 24px;">No counsellor session feedback yet. Book a session to receive personalized feedback and coping exercises!</div>';
+                return;
+            }
+
+            grid.innerHTML = feedbackList.map(item => {
+                const stars = '★'.repeat(item.improvementRating || 4) + '☆'.repeat(5 - (item.improvementRating || 4));
+                const actionHtml = (item.actionItems || []).map(a => `<li>${escapeHtml(a)}</li>`).join('');
+
+                return `
+                    <div class="feedback-item-card">
+                        <div class="feedback-top">
+                            <div class="counsellor-meta">
+                                <strong>${escapeHtml(item.counsellorName)}</strong>
+                                <span>${escapeHtml(item.counsellorDesignation || 'Counsellor')} • ${new Date(item.feedbackDate).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
+                            </div>
+                            <div class="star-rating">${stars}</div>
+                        </div>
+                        <div class="feedback-body">
+                            "${escapeHtml(item.feedback)}"
+                        </div>
+                        ${actionHtml ? `<ul class="action-items-list">${actionHtml}</ul>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderStudentAppointmentsTable(appointments) {
+            const tbody = document.getElementById('studentAppointmentsTableBody');
+            if (!appointments || appointments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#8c89a8; padding:20px;">No appointments found. Use "Book Appointment" to schedule a session.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = appointments.map(a => {
+                let statusBadge = `<span class="badge ${a.status}">${escapeHtml(a.status)}</span>`;
+                let actionBtn = '';
+                if (a.sessionType === 'meet' && a.meetingLink && a.status === 'confirmed') {
+                    actionBtn = `<a href="${a.meetingLink}" target="_blank" class="btn-action-sm btn-green-sm">🎥 Join Meet</a>`;
+                } else if (a.sessionType === 'chat' && a.status === 'confirmed') {
+                    actionBtn = `<a href="chat.html" class="btn-action-sm btn-primary-sm">💬 Open Chat</a>`;
+                } else if (a.status === 'pending') {
+                    actionBtn = `<span style="font-size:12px; color:#b45309; font-weight:600;">Awaiting confirmation</span>`;
+                } else {
+                    actionBtn = `<span style="font-size:12px; color:#8c89a8;">Completed</span>`;
+                }
+
+                const feedbackSnippet = a.counsellorFeedback ? `<strong>Rating ${a.improvementRating || 5}/5:</strong> "${escapeHtml(a.counsellorFeedback.slice(0, 45))}..."` : '<span style="color:#a5a2bf;">Pending evaluation</span>';
+
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(a.counsellorName)}</strong></td>
+                        <td>${escapeHtml(a.date)} &bull; ${escapeHtml(a.time)}</td>
+                        <td><span class="tag-pill">${a.sessionType === 'meet' ? '🎥 Video Meet' : '💬 1-on-1 Chat'}</span></td>
+                        <td>${statusBadge}</td>
+                        <td style="font-size:12.5px;">${feedbackSnippet}</td>
+                        <td>${actionBtn}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // 2. COUNSELLOR DASHBOARD LOADER
+        // ==========================================
+        async function loadCounsellorDashboard() {
+            try {
+                let data = null;
+                if (authToken) {
+                    const res = await fetch(`${API_BASE}/dashboard/counsellor`, {
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    if (res.ok) data = await res.json();
+                }
+
+                // Fallback Mock Data
+                if (!data) {
+                    data = {
+                        stats: {
+                            pendingAppointments: 2,
+                            confirmedAppointments: 4,
+                            completedAppointments: 6,
+                            severeAlertsCount: 1,
+                            activeStudents: 9
+                        },
+                        charts: {
+                            studentDifficulties: {
+                                'Academic & Exam Stress': 9,
+                                'Generalized Anxiety': 7,
+                                'Sleep Quality & Burnout': 5,
+                                'Peer Loneliness': 4,
+                                'Low Mood': 2
+                            },
+                            appointmentStatusBreakdown: {
+                                'Pending Confirmation': 2,
+                                'Confirmed Sessions': 4,
+                                'Completed': 6
+                            }
+                        },
+                        appointments: [
+                            {
+                                _id: 'mock1',
+                                studentName: 'Khushi Gupta',
+                                studentEmail: 'kgupta@example.com',
+                                date: '2026-10-22',
+                                time: '03:00 PM',
+                                sessionType: 'meet',
+                                concern: 'Severe exam pressure, unable to sleep',
+                                status: 'pending',
+                                meetingLink: 'https://meet.jit.si/SMS-Session-1'
+                            },
+                            {
+                                _id: 'mock2',
+                                studentName: 'Rahul Verma',
+                                studentEmail: 'rahul@example.com',
+                                date: '2026-10-23',
+                                time: '11:30 AM',
+                                sessionType: 'chat',
+                                concern: 'Homesickness & social anxiety in hostel',
+                                status: 'confirmed'
+                            }
+                        ],
+                        students: [
+                            { name: 'Khushi Gupta', age: 20, email: 'kgupta@example.com', difficulties: ['Exam Anxiety', 'Sleep Disruption'], severity: 'moderate' },
+                            { name: 'Rahul Verma', age: 19, email: 'rahul@example.com', difficulties: ['Loneliness', 'Social Anxiety'], severity: 'normal' },
+                            { name: 'Pooja Nair', age: 21, email: 'pooja@example.com', difficulties: ['Severe Burnout', 'Hopelessness'], severity: 'crisis' }
+                        ]
+                    };
+                }
+
+                // Update Metric KPIs
+                document.getElementById('counsellorPendingVal').textContent = data.stats.pendingAppointments;
+                document.getElementById('counsellorConfirmedVal').textContent = data.stats.confirmedAppointments;
+                document.getElementById('counsellorSevereVal').textContent = data.stats.severeAlertsCount;
+                document.getElementById('counsellorStudentsVal').textContent = data.stats.activeStudents;
+
+                // Render Difficulties Bar Chart
+                renderCounsellorDifficultyChart(data.charts.studentDifficulties);
+
+                // Render Status Breakdown Doughnut Chart
+                renderCounsellorStatusChart(data.charts.appointmentStatusBreakdown);
+
+                // Render Appointment Queue
+                renderCounsellorAppointmentsTable(data.appointments);
+
+                // Render Student Clinical Reports Table
+                cachedCounsellorStudents = data.students || [];
+                renderCounsellorStudentTable(cachedCounsellorStudents);
+
+            } catch (err) {
+                console.error('Error loading counsellor dashboard:', err);
+            }
+        }
+
+        function renderCounsellorDifficultyChart(diffData) {
+            const ctx = document.getElementById('counsellorDifficultyChart').getContext('2d');
+            if (counsellorDiffChartInstance) counsellorDiffChartInstance.destroy();
+
+            counsellorDiffChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(diffData),
+                    datasets: [{
+                        label: 'Cases Identified',
+                        data: Object.values(diffData),
+                        backgroundColor: '#6d4dff',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { stepSize: 1, font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { color: '#f0ecfc' } },
+                        y: { ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderCounsellorStatusChart(statusData) {
+            const ctx = document.getElementById('counsellorStatusChart').getContext('2d');
+            if (counsellorStatusChartInstance) counsellorStatusChartInstance.destroy();
+
+            counsellorStatusChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(statusData),
+                    datasets: [{
+                        data: Object.values(statusData),
+                        backgroundColor: ['#f59e0b', '#10b981', '#6d4dff'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function renderCounsellorAppointmentsTable(appointments) {
+            const tbody = document.getElementById('counsellorAppointmentsTableBody');
+            if (!appointments || appointments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#8c89a8; padding:20px;">No appointments found in queue.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = appointments.map(a => {
+                let actions = '';
+                if (a.status === 'pending') {
+                    actions += `<button class="btn-action-sm btn-green-sm" onclick="confirmAppointment('${a._id}')">✓ Confirm</button> `;
+                }
+                if (a.sessionType === 'meet' && a.meetingLink && a.status === 'confirmed') {
+                    actions += `<a href="${a.meetingLink}" target="_blank" class="btn-action-sm btn-outline-sm">🎥 Meet</a> `;
+                }
+                actions += `<button class="btn-action-sm btn-primary-sm" onclick="openFeedbackModal('${a._id}', '${escapeHtml(a.studentName)}')">📝 Add Feedback</button>`;
+
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(a.studentName)}</strong><div style="font-size:11px; color:#8c89a8;">${escapeHtml(a.studentEmail)}</div></td>
+                        <td>${escapeHtml(a.date)} &bull; ${escapeHtml(a.time)}</td>
+                        <td><span class="tag-pill">${a.sessionType === 'meet' ? '🎥 Video Meet' : '💬 Chat'}</span></td>
+                        <td style="font-size:12.5px; max-width:220px;">${escapeHtml(a.concern || a.notes || 'Mental Wellness Support')}</td>
+                        <td><span class="badge ${a.status}">${escapeHtml(a.status)}</span></td>
+                        <td>${actions}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderCounsellorStudentTable(students) {
+            const tbody = document.getElementById('counsellorStudentTableBody');
+            if (!students || students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8c89a8; padding:20px;">No students match criteria.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = students.map(s => {
+                const diffs = (s.difficulties || ['Academic Stress', 'Sleep Quality']).map(d => `<span class="tag-pill">${escapeHtml(d)}</span>`).join('');
+                const severity = s.severity || 'normal';
+                const sevBadge = severity === 'crisis'
+                    ? '<span class="badge crisis">🚨 Urgent Alert</span>'
+                    : (severity === 'moderate' ? '<span class="badge moderate">⚠️ Monitored</span>' : '<span class="badge normal">✓ Normal</span>');
+
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(s.name)}</strong><div style="font-size:11px; color:#8c89a8;">${escapeHtml(s.email)}</div></td>
+                        <td>${s.age || 'N/A'}</td>
+                        <td>${diffs}</td>
+                        <td>${sevBadge}</td>
+                        <td><button class="btn-action-sm btn-outline-sm" onclick="window.location.href='book.html'">Schedule Slot</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('counsellorStudentSearch').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase().trim();
+            const filtered = cachedCounsellorStudents.filter(s =>
+                s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q)
+            );
+            renderCounsellorStudentTable(filtered);
+        });
+
+        // 1-Click Counsellor Confirmation
+        async function confirmAppointment(id) {
+            if (!authToken) {
+                alert('Please log in with your counsellor credentials to confirm.');
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/appointments/${id}/confirm`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Appointment confirmed! Confirmation email dispatched to student.');
+                    loadCounsellorDashboard();
+                } else {
+                    alert(data.error || 'Failed to confirm.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error confirming appointment.');
+            }
+        }
+
+        // Feedback Modal Handlers
+        const feedbackModal = document.getElementById('feedbackModal');
+        const feedbackForm = document.getElementById('feedbackForm');
+
+        function openFeedbackModal(apptId, studentName) {
+            document.getElementById('feedbackApptId').value = apptId;
+            document.getElementById('feedbackStudentName').value = studentName;
+            document.getElementById('feedbackText').value = '';
+            document.getElementById('feedbackActionItems').value = '';
+            feedbackModal.classList.add('show');
+        }
+
+        document.getElementById('closeFeedbackModal').addEventListener('click', () => {
+            feedbackModal.classList.remove('show');
+        });
+
+        feedbackForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const apptId = document.getElementById('feedbackApptId').value;
+            const improvementRating = document.getElementById('feedbackImprovementRating').value;
+            const feedback = document.getElementById('feedbackText').value;
+            const rawActions = document.getElementById('feedbackActionItems').value;
+            const markCompleted = document.getElementById('feedbackMarkCompleted').checked;
+
+            const actionItems = rawActions.split(',').map(s => s.trim()).filter(Boolean);
+
+            if (!authToken) {
+                alert('Please log in to save feedback.');
+                feedbackModal.classList.remove('show');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/dashboard/feedback/${apptId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        feedback,
+                        improvementRating: Number(improvementRating),
+                        actionItems,
+                        markCompleted
+                    })
+                });
+
+                if (res.ok) {
+                    alert('Feedback & improvement score saved! Visible on the student dashboard.');
+                    feedbackModal.classList.remove('show');
+                    loadCounsellorDashboard();
+                } else {
+                    const errData = await res.json();
+                    alert(errData.error || 'Failed to submit feedback.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error saving feedback.');
+            }
+        });
+
+        // ==========================================
+        // 3. ADMIN DASHBOARD LOADER
+        // ==========================================
+        async function loadAdminDashboard() {
+            try {
+                let data = null;
+                const res = await fetch(`${API_BASE}/dashboard/admin`);
+                if (res.ok) data = await res.json();
+
+                if (!data) {
+                    data = {
+                        stats: {
+                            totalStudents: 28,
+                            totalCounsellors: 3,
+                            severeCases: 2,
+                            averageCases: 9,
+                            normalCases: 17,
+                            totalAppointments: 14
+                        },
+                        charts: {
+                            severityDistribution: {
+                                'Normal (Coping Well)': 17,
+                                'Moderate (Under Observation)': 9,
+                                'Severe / Urgent Alert': 2
+                            },
+                            campusDifficulties: {
+                                'Academic & Exam Stress': 16,
+                                'Generalized Anxiety': 11,
+                                'Sleep Disruption': 8,
+                                'Peer Loneliness': 6,
+                                'Depressive Mood': 3
+                            },
+                            consultationTrends: {
+                                labels: ['Oct 1-7', 'Oct 8-14', 'Oct 15-21', 'Oct 22-28'],
+                                appointments: [4, 7, 12, 14],
+                                aiChats: [20, 34, 52, 68]
+                            }
+                        },
+                        students: [
+                            { name: 'Khushi Gupta', email: 'kgupta@example.com', role: 'student', age: 20, createdAt: '2026-10-18' },
+                            { name: 'Rahul Verma', email: 'rahul@example.com', role: 'student', age: 19, createdAt: '2026-10-16' },
+                            { name: 'Amit Kumar', email: 'amit@example.com', role: 'student', age: 22, createdAt: '2026-10-12' }
+                        ],
+                        counsellors: [
+                            { name: 'Dr. Sunita Sharma', email: 'sunita.sharma@campus.edu', role: 'counsellor', designation: 'Senior Clinical Psychologist', createdAt: '2026-10-10' },
+                            { name: 'Prof. Rajesh Verma', email: 'rajesh.verma@campus.edu', role: 'counsellor', designation: 'Student Life & Career Counsellor', createdAt: '2026-10-10' },
+                            { name: 'Ms. Ananya Roy', email: 'ananya.roy@campus.edu', role: 'counsellor', designation: 'Youth Wellness & Mindfulness Mentor', createdAt: '2026-10-10' }
+                        ]
+                    };
+                }
+
+                cachedAdminData = data;
+
+                // Update Metric KPIs
+                document.getElementById('adminTotalStudents').textContent = data.stats.totalStudents;
+                document.getElementById('adminTotalCounsellors').textContent = data.stats.totalCounsellors;
+                document.getElementById('adminSevereCases').textContent = data.stats.severeCases;
+                document.getElementById('adminAverageCases').textContent = data.stats.averageCases;
+
+                // Chart 1: Campus Difficulties (Polar Area)
+                renderAdminCampusDiffChart(data.charts.campusDifficulties);
+
+                // Chart 2: Severity Distribution (Doughnut)
+                renderAdminSeverityChart(data.charts.severityDistribution);
+
+                // Chart 3: Weekly Consultation Growth Timeline (Bar/Line Grouped)
+                renderAdminTimelineChart(data.charts.consultationTrends);
+
+                // Render Registry Table
+                renderAdminRegistryTable([...(data.students || []), ...(data.counsellors || [])]);
+
+            } catch (err) {
+                console.error('Error loading admin dashboard:', err);
+            }
+        }
+
+        function renderAdminCampusDiffChart(diffData) {
+            const ctx = document.getElementById('adminCampusDiffChart').getContext('2d');
+            if (adminCampusDiffChartInstance) adminCampusDiffChartInstance.destroy();
+
+            adminCampusDiffChartInstance = new Chart(ctx, {
+                type: 'polarArea',
+                data: {
+                    labels: Object.keys(diffData),
+                    datasets: [{
+                        data: Object.values(diffData),
+                        backgroundColor: [
+                            'rgba(109, 77, 255, 0.75)',
+                            'rgba(6, 182, 212, 0.75)',
+                            'rgba(245, 158, 11, 0.75)',
+                            'rgba(236, 72, 153, 0.75)',
+                            'rgba(16, 185, 129, 0.75)'
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function renderAdminSeverityChart(sevData) {
+            const ctx = document.getElementById('adminSeverityChart').getContext('2d');
+            if (adminSeverityChartInstance) adminSeverityChartInstance.destroy();
+
+            adminSeverityChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(sevData),
+                    datasets: [{
+                        data: Object.values(sevData),
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function renderAdminTimelineChart(trendData) {
+            const ctx = document.getElementById('adminTimelineChart').getContext('2d');
+            if (adminTimelineChartInstance) adminTimelineChartInstance.destroy();
+
+            adminTimelineChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: trendData.labels,
+                    datasets: [
+                        {
+                            label: 'AI First-Aid Conversations',
+                            data: trendData.aiChats,
+                            backgroundColor: '#6d4dff',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Counselling Appointments Booked',
+                            data: trendData.appointments,
+                            backgroundColor: '#06b6d4',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } } },
+                        y: { ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { color: '#f0ecfc' } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 12 } } }
+                    }
+                }
+            });
+        }
+
+        function renderAdminRegistryTable(users) {
+            const tbody = document.getElementById('adminRegistryTableBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#8c89a8; padding:20px;">No accounts found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(u => {
+                const isCounsellor = u.role === 'counsellor';
+                const roleBadge = isCounsellor
+                    ? '<span class="badge" style="background:#e0f7fa; color:#0e7490;">💼 Counsellor</span>'
+                    : '<span class="badge" style="background:#f3f0ff; color:#6d4dff;">🎓 Student</span>';
+
+                const details = isCounsellor ? (u.designation || 'Specialist') : (u.age ? `Age: ${u.age}` : 'Student');
+                const regDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(u.name || 'Anonymous')}</strong></td>
+                        <td>${escapeHtml(u.email || '')}</td>
+                        <td>${roleBadge}</td>
+                        <td>${escapeHtml(details)}</td>
+                        <td style="font-size:12.5px; color:#797699;">${regDate}</td>
+                        <td><span class="badge normal">Active</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('adminRegistrySearch').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase().trim();
+            if (!cachedAdminData) return;
+            const combined = [...(cachedAdminData.students || []), ...(cachedAdminData.counsellors || [])];
+            const filtered = combined.filter(u =>
+                (u.name && u.name.toLowerCase().includes(q)) ||
+                (u.email && u.email.toLowerCase().includes(q)) ||
+                (u.role && u.role.toLowerCase().includes(q))
+            );
+            renderAdminRegistryTable(filtered);
+        });
+
+        // ==========================================
+        // INITIAL PAGE BOOTSTRAP
+        // ==========================================
+        updateHeader();
+
+        // Default to user's logged-in role if present, else student
+        let initialRole = 'student';
+        if (currentRole === 'counsellor' || currentRole === 'admin') {
+            initialRole = currentRole;
+        }
+
+        switchView(initialRole);
+    </script>
+</body>
+</html>
