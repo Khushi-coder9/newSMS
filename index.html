@@ -119,6 +119,12 @@
             flex-shrink: 0;
         }
 
+        .nav-auth-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
         .btn-login {
             background: #fff;
             color: var(--purple);
@@ -127,6 +133,110 @@
             padding: 7px 18px;
             font-size: 13.5px;
             font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-login:hover {
+            background: #f8f6ff;
+            border-color: var(--purple);
+            box-shadow: 0 4px 12px rgba(109, 77, 255, 0.15);
+        }
+
+        .btn-login .dropdown-caret {
+            transition: transform 0.2s ease;
+        }
+
+        .nav-auth-wrapper:not(.logged-in):hover .btn-login .dropdown-caret,
+        .nav-auth-wrapper.open .btn-login .dropdown-caret {
+            transform: rotate(180deg);
+        }
+
+        .auth-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 14px 38px -6px rgba(28, 24, 72, 0.22), 0 0 0 1px rgba(109, 77, 255, 0.12);
+            padding: 8px;
+            min-width: 250px;
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+        }
+
+        .nav-auth-wrapper:not(.logged-in):hover .auth-dropdown-menu,
+        .nav-auth-wrapper.open .auth-dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .nav-auth-wrapper.logged-in .auth-dropdown-menu {
+            display: none !important;
+        }
+
+        .auth-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            color: #2b284e;
+            transition: background 0.15s ease, transform 0.15s ease;
+            box-sizing: border-box;
+            text-decoration: none;
+        }
+
+        .auth-dropdown-item:hover {
+            background: #f4efff;
+            transform: translateX(3px);
+        }
+
+        .auth-dropdown-item .role-icon {
+            font-size: 20px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0ebff;
+            border-radius: 9px;
+            flex-shrink: 0;
+        }
+
+        .auth-dropdown-item:hover .role-icon {
+            background: #e2d7ff;
+        }
+
+        .dropdown-item-text strong {
+            display: block;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #1f1b4d;
+            line-height: 1.25;
+        }
+
+        .dropdown-item-text small {
+            display: block;
+            font-size: 11.5px;
+            color: #79749e;
+            margin-top: 2px;
         }
 
         .btn-signup {
@@ -524,7 +634,37 @@
 
             <div class="nav-actions">
                 <div id="userBadge" class="user-greeting-badge" style="display: none;"></div>
-                <button class="btn-login" id="loginBtn">Login</button>
+                <div class="nav-auth-wrapper" id="loginDropdownWrapper">
+                    <button class="btn-login" id="loginBtn" type="button" aria-expanded="false" aria-haspopup="true">
+                        <span id="loginBtnText">Login</span>
+                        <svg class="dropdown-caret" id="loginBtnCaret" width="10" height="6" viewBox="0 0 10 6" fill="none">
+                            <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="auth-dropdown-menu" id="loginDropdownMenu" role="menu">
+                        <button type="button" class="auth-dropdown-item" data-login-role="student">
+                            <span class="role-icon">🎓</span>
+                            <div class="dropdown-item-text">
+                                <strong>Login as Student</strong>
+                                <small>Chat with AI & book sessions</small>
+                            </div>
+                        </button>
+                        <button type="button" class="auth-dropdown-item" data-login-role="counsellor">
+                            <span class="role-icon">💼</span>
+                            <div class="dropdown-item-text">
+                                <strong>Login as Counsellor</strong>
+                                <small>Review & confirm bookings</small>
+                            </div>
+                        </button>
+                        <button type="button" class="auth-dropdown-item" data-login-role="admin">
+                            <span class="role-icon">🛡️</span>
+                            <div class="dropdown-item-text">
+                                <strong>Login as Admin</strong>
+                                <small>Analytics & monitoring</small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
                 <button class="btn-signup" id="signupBtn">Sign Up</button>
             </div>
         </div>
@@ -824,15 +964,33 @@
         </div>
     </div>
 
-    <!-- Login Modal: strictly asks for email and password only -->
+    <!-- Login Modal: supports Student, Counsellor, and Admin roles -->
     <div class="modal-bg" id="loginModal">
-        <div class="modal">
+        <div class="modal modal-login">
             <h2>Login</h2>
-            <p>Welcome back! Enter your email and password to log in.</p>
+            <p id="loginSubtitle">Welcome back! Choose your role to log in</p>
+
+            <!-- Role Selector: 3 Options -->
+            <div class="role-selector" role="tablist" aria-label="Log in as">
+                <button type="button" class="role-tab active" data-login-role="student" id="loginRoleTabStudent">
+                    <span class="role-icon">🎓</span>
+                    <span>Student</span>
+                </button>
+                <button type="button" class="role-tab" data-login-role="counsellor" id="loginRoleTabCounsellor">
+                    <span class="role-icon">💼</span>
+                    <span>Counsellor</span>
+                </button>
+                <button type="button" class="role-tab" data-login-role="admin" id="loginRoleTabAdmin">
+                    <span class="role-icon">🛡️</span>
+                    <span>Admin</span>
+                </button>
+            </div>
+
             <form id="loginForm">
+                <input type="hidden" id="loginRole" value="student">
                 <div class="form-group">
-                    <label for="loginEmail" class="form-label">Email Address</label>
-                    <input type="email" id="loginEmail" placeholder="name@example.com" required autocomplete="email">
+                    <label for="loginEmail" class="form-label" id="loginEmailLabel">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="student@example.com" required autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label for="loginPassword" class="form-label">Password</label>
@@ -840,7 +998,7 @@
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="icon-btn" id="cancelLogin">Cancel</button>
-                    <button type="submit" class="btn-signup">Login</button>
+                    <button type="submit" class="btn-signup" id="loginSubmitBtn">Login as Student</button>
                 </div>
             </form>
             <div class="modal-footer-hint">
@@ -1471,6 +1629,7 @@
             : '/api';
         let authToken = localStorage.getItem('authToken');
         let currentSignupRole = 'student';
+        let currentLoginRole = 'student';
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -1485,6 +1644,9 @@
         // Check if user is logged in & update header UI
         function updateAuthUI() {
             const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginBtnCaret = document.getElementById('loginBtnCaret');
+            const loginDropdownWrapper = document.getElementById('loginDropdownWrapper');
             const signupBtn = document.getElementById('signupBtn');
             const chatLink = document.getElementById('chatLink');
             const userBadge = document.getElementById('userBadge');
@@ -1493,7 +1655,10 @@
                 const userName = localStorage.getItem('userName') || 'User';
                 const userRole = localStorage.getItem('userRole') || 'student';
 
-                loginBtn.textContent = 'Logout';
+                if (loginBtnText) loginBtnText.textContent = 'Logout';
+                if (loginBtnCaret) loginBtnCaret.style.display = 'none';
+                if (loginDropdownWrapper) loginDropdownWrapper.classList.add('logged-in');
+
                 signupBtn.style.display = 'none';
                 chatLink.style.pointerEvents = 'auto';
                 chatLink.style.opacity = '1';
@@ -1503,7 +1668,10 @@
                     userBadge.innerHTML = `<span>Hi, ${escapeHtml(userName)}</span><span class="user-role-tag">${escapeHtml(userRole)}</span>`;
                 }
             } else {
-                loginBtn.textContent = 'Login';
+                if (loginBtnText) loginBtnText.textContent = 'Login';
+                if (loginBtnCaret) loginBtnCaret.style.display = 'inline-block';
+                if (loginDropdownWrapper) loginDropdownWrapper.classList.remove('logged-in');
+
                 signupBtn.style.display = 'block';
                 chatLink.style.pointerEvents = 'none';
                 chatLink.style.opacity = '0.5';
@@ -1512,6 +1680,44 @@
                     userBadge.style.display = 'none';
                     userBadge.innerHTML = '';
                 }
+            }
+        }
+
+        // Login Role Switcher: Student | Counsellor | Admin
+        function setLoginRole(role) {
+            currentLoginRole = role;
+            const loginRoleInput = document.getElementById('loginRole');
+            if (loginRoleInput) loginRoleInput.value = role;
+
+            // Update active role tabs in login modal
+            document.querySelectorAll('#loginModal .role-tab').forEach(tab => {
+                if (tab.getAttribute('data-login-role') === role) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            const subtitle = document.getElementById('loginSubtitle');
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const emailInput = document.getElementById('loginEmail');
+            const emailLabel = document.getElementById('loginEmailLabel');
+
+            if (role === 'student') {
+                if (subtitle) subtitle.textContent = 'Welcome back! Enter your student email and password to log in.';
+                if (submitBtn) submitBtn.textContent = 'Login as Student';
+                if (emailInput) emailInput.placeholder = 'student@example.com';
+                if (emailLabel) emailLabel.textContent = 'Student Email Address';
+            } else if (role === 'counsellor') {
+                if (subtitle) subtitle.textContent = 'Welcome back, Counsellor! Enter your credentials to manage appointments.';
+                if (submitBtn) submitBtn.textContent = 'Login as Counsellor';
+                if (emailInput) emailInput.placeholder = 'counsellor@example.com';
+                if (emailLabel) emailLabel.textContent = 'Counsellor Email Address';
+            } else if (role === 'admin') {
+                if (subtitle) subtitle.textContent = 'Administrator Portal. Enter your admin email and password.';
+                if (submitBtn) submitBtn.textContent = 'Login as Admin';
+                if (emailInput) emailInput.placeholder = 'admin@example.com';
+                if (emailLabel) emailLabel.textContent = 'Admin Email Address';
             }
         }
 
@@ -1660,12 +1866,32 @@
             }
         });
 
-        // Login Modal Elements & Handlers (only asks email and password)
+        // Login Role Tabs inside Modal
+        document.querySelectorAll('#loginModal .role-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const role = tab.getAttribute('data-login-role');
+                setLoginRole(role);
+            });
+        });
+
+        // Dropdown Items inside Navbar
+        document.querySelectorAll('#loginDropdownMenu .auth-dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const role = item.getAttribute('data-login-role') || 'student';
+                setLoginRole(role);
+                loginModal.classList.add('show');
+                document.getElementById('loginEmail').focus();
+            });
+        });
+
+        // Login Modal Elements & Handlers
         const loginModal = document.getElementById('loginModal');
         const loginForm = document.getElementById('loginForm');
         const loginError = document.getElementById('loginError');
 
-        document.getElementById('loginBtn').addEventListener('click', () => {
+        document.getElementById('loginBtn').addEventListener('click', (e) => {
             if (authToken) {
                 // Logout
                 authToken = null;
@@ -1676,6 +1902,7 @@
                 updateAuthUI();
                 alert('Logged out successfully');
             } else {
+                setLoginRole(currentLoginRole || 'student');
                 loginModal.classList.add('show');
                 document.getElementById('loginEmail').focus();
             }
@@ -1692,6 +1919,7 @@
             loginError.classList.remove('show');
             loginError.textContent = '';
 
+            const role = currentLoginRole;
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
@@ -1699,7 +1927,7 @@
                 const response = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password, role })
                 });
 
                 const data = await response.json();
@@ -1713,9 +1941,17 @@
                     loginModal.classList.remove('show');
                     loginForm.reset();
                     updateAuthUI();
-                    alert(`Login successful! Welcome back, ${data.user.name || 'User'}`);
-                    // Redirect to chat page
-                    window.location.href = 'chat.html';
+
+                    if (data.user.role === 'admin') {
+                        alert(`Login successful! Welcome back, Administrator ${data.user.name || ''}`);
+                        loadMonitoringDashboard();
+                    } else if (data.user.role === 'counsellor') {
+                        alert(`Login successful! Welcome back, Counsellor ${data.user.name || ''}`);
+                        window.location.href = 'book.html';
+                    } else {
+                        alert(`Login successful! Welcome back, ${data.user.name || 'Student'}`);
+                        window.location.href = 'chat.html';
+                    }
                 } else {
                     loginError.textContent = data.error || 'Login failed';
                     loginError.classList.add('show');
@@ -1727,12 +1963,13 @@
             }
         });
 
-        // Quick switcher between Login and Signup modals
+        // Quick switcher between Login and Signup modals (preserves selected role)
         document.getElementById('switchToLogin').addEventListener('click', (e) => {
             e.preventDefault();
             signupModal.classList.remove('show');
             signupForm.reset();
             signupError.classList.remove('show');
+            setLoginRole(currentSignupRole || 'student');
             loginModal.classList.add('show');
             document.getElementById('loginEmail').focus();
         });
@@ -1742,7 +1979,7 @@
             loginModal.classList.remove('show');
             loginForm.reset();
             loginError.classList.remove('show');
-            setSignupRole('student');
+            setSignupRole(currentLoginRole || 'student');
             signupModal.classList.add('show');
             document.getElementById('signupName').focus();
         });

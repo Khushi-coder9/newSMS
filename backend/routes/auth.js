@@ -104,7 +104,7 @@ router.post('/signup', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     // Validate input
     if (!email || !password) {
@@ -122,6 +122,17 @@ router.post('/login', async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Role check if specific role is requested
+    if (role) {
+      const normalizedRole = role.toLowerCase().trim();
+      const userRole = (user.role || 'student').toLowerCase();
+      if (normalizedRole !== userRole) {
+        return res.status(403).json({
+          error: `This account is registered as ${userRole.toUpperCase()}, not ${normalizedRole.toUpperCase()}. Please switch to "Login as ${userRole.charAt(0).toUpperCase() + userRole.slice(1)}".`
+        });
+      }
     }
 
     // Generate token
