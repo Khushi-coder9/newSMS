@@ -736,4 +736,78 @@ router.get('/admin', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/dashboard/admin/users/:id
+ * Admin permission to permanently remove a student or counsellor and purge all their database records.
+ */
+router.delete('/admin/users/:id', authMiddleware, async (req, res) => {
+  try {
+    const requesterRole = (req.user?.role || '').toLowerCase();
+    if (requesterRole !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Administrator privileges required.' });
+    }
+
+    const targetUserId = req.params.id;
+    if (!targetUserId || !targetUserId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ error: 'Invalid user ID format.' });
+    }
+
+    // Prevent admin from deleting their own account
+    if (req.user.userId && targetUserId === req.user.userId.toString()) {
+      return res.status(400).json({ error: 'You cannot remove your own administrator account.' });
+    }
+
+    const targetUser = await User.findById(targetUserId);
+    if (!targetUser) {
+      return res.status(404).json({ error: 'User not found or already removed.' });
+    }
+
+    // Prevent deleting other administrators through this interface
+    if (targetUser.role === 'admin') {
+      return res.status(403).json({ error: 'Administrator accounts cannot be removed from this interface.' });
+    }
+
+    const userEmail = (targetUser.email || '').toLowerCase().trim();
+    const userName = targetUser.name;
+    const userRole = targetUser.role;
+
+    // 1. Purge all ChatMessages associated with this user
+    const chatPurge = await ChatMessage.deleteMany({
+      $or: [
+        { user: targetUserId },
+        { userEmail: userEmail }
+      ]
+    });
+
+    // 2. Purge all Appointments where this user is student or counsellor
+    const apptPurge = await Appointment.deleteMany({
+      $or: [
+        { student: targetUserId },
+        { studentEmail: userEmail },
+        { counsellor: targetUserId },
+        { counsellorEmail: userEmail }
+      ]
+    });
+
+    // 3. Purge the User record itself
+    await User.findByIdAndDelete(targetUserId);
+
+    res.json({
+      success: true,
+      message: `Successfully removed ${userRole} "${userName}" and purged all associated database records.`,
+      purged: {
+        userId: targetUserId,
+        name: userName,
+        email: userEmail,
+        role: userRole,
+        chatMessagesDeleted: chatPurge.deletedCount || 0,
+        appointmentsDeleted: apptPurge.deletedCount || 0
+      }
+    });
+  } catch (error) {
+    console.error('Error removing user and purging records:', error);
+    res.status(500).json({ error: 'Failed to remove user from database.' });
+  }
+});
+
 module.exports = router;

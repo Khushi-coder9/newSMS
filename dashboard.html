@@ -756,6 +756,30 @@
             margin-top: 18px;
         }
 
+        .btn-remove-user {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+            border-radius: 8px;
+            padding: 5px 11px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-remove-user:hover {
+            background: #e11d48;
+            color: #ffffff;
+            border-color: #e11d48;
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+            transform: translateY(-1px);
+        }
+        .btn-remove-user:active {
+            transform: translateY(0);
+        }
+
         /* Search input in table header */
         .table-search-input {
             border: 1.5px solid #dfd7ff;
@@ -1487,11 +1511,12 @@
                                 <th>Age / Designation</th>
                                 <th>Registered Date</th>
                                 <th>Status</th>
+                                <th style="text-align: right;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="adminRegistryTableBody">
                             <tr>
-                                <td colspan="6" style="text-align: center; color: #8c89a8; padding: 20px;">Loading registry data...</td>
+                                <td colspan="7" style="text-align: center; color: #8c89a8; padding: 20px;">Loading registry data...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1716,6 +1741,45 @@
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;" id="modalStudentActionButtons">
                     <!-- Dynamic action buttons -->
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Admin Remove Student / Counsellor Confirmation -->
+    <div class="modal-bg" id="removeUserModal">
+        <div class="modal" style="max-width: 480px; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h2 style="font-size: 18px; margin: 0; color: #991b1b;">Permanently Remove User</h2>
+                    <p style="font-size: 12.5px; margin: 2px 0 0; color: #7f1d1d;">Complete database wipe for this account</p>
+                </div>
+            </div>
+
+            <p style="font-size: 13.5px; color: #374151; line-height: 1.5; margin-bottom: 14px;">
+                Are you sure you want to remove <strong id="modalRemoveUserName" style="color: #111827;">...</strong> (<span id="modalRemoveUserRole" style="font-weight: 700; color: #6d4dff;">...</span>) from the platform?
+            </p>
+
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 12px 14px; margin-bottom: 18px;">
+                <div style="font-size: 12px; font-weight: 800; color: #b91c1c; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Data to be permanently deleted:</div>
+                <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: #7f1d1d; line-height: 1.6;">
+                    <li>User profile and authentication credentials</li>
+                    <li>All AI consultation chats & psychiatric analysis records</li>
+                    <li>All booked appointments, session logs & clinical notes</li>
+                </ul>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button type="button" class="btn-action-sm btn-outline-sm" id="cancelRemoveUserBtn" style="padding: 9px 18px;">Cancel</button>
+                <button type="button" class="btn-action-sm" id="confirmDeleteUserBtn" style="background: #dc2626; color: #fff; padding: 9px 18px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer;">
+                    Confirm & Delete All Info
+                </button>
             </div>
         </div>
     </div>
@@ -3217,7 +3281,7 @@
             const tbody = document.getElementById('adminRegistryTableBody');
             if (!tbody) return;
             if (!users || users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#8c89a8; padding:20px;">No accounts found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#8c89a8; padding:20px;">No accounts found.</td></tr>';
                 return;
             }
 
@@ -3239,14 +3303,34 @@
 
                 const regDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
 
+                let actionCell = '';
+                if (isAdmin) {
+                    actionCell = '<span style="font-size: 11px; color: #a5a3bd; font-weight: 600; padding: 3px 8px; background: #f4f3fa; border-radius: 6px;">Protected</span>';
+                } else {
+                    const safeName = (u.name || 'User').replace(/'/g, "\\'");
+                    const safeRole = isCounsellor ? 'Counsellor' : 'Student';
+                    actionCell = `
+                        <button type="button" class="btn-remove-user" onclick="openRemoveUserModal('${u._id}', '${safeName}', '${safeRole}')" title="Permanently remove account & purge all data">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1.5px; margin-right: 4px;">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            Remove
+                        </button>
+                    `;
+                }
+
                 return `
-                    <tr>
+                    <tr id="admin-user-row-${u._id}">
                         <td><strong>${escapeHtml(u.name || 'Anonymous')}</strong></td>
                         <td>${escapeHtml(u.email || '')}</td>
                         <td>${roleBadge}</td>
                         <td>${escapeHtml(details)}</td>
                         <td style="font-size:12.5px; color:#797699;">${regDate}</td>
                         <td><span class="badge normal">Active</span></td>
+                        <td style="text-align: right;">${actionCell}</td>
                     </tr>
                 `;
             }).join('');
@@ -3267,6 +3351,87 @@
                     return name.includes(q) || email.includes(q) || role.includes(q) || designation.includes(q) || age.includes(q);
                 });
                 renderAdminRegistryTable(filtered);
+            });
+        }
+
+        // ==========================================
+        // ADMIN REMOVE USER HANDLERS
+        // ==========================================
+        let pendingRemoveUserId = null;
+
+        function openRemoveUserModal(userId, userName, userRole) {
+            pendingRemoveUserId = userId;
+            const modal = document.getElementById('removeUserModal');
+            const nameEl = document.getElementById('modalRemoveUserName');
+            const roleEl = document.getElementById('modalRemoveUserRole');
+            if (nameEl) nameEl.textContent = userName;
+            if (roleEl) roleEl.textContent = userRole;
+            if (modal) modal.classList.add('show');
+        }
+        window.openRemoveUserModal = openRemoveUserModal;
+
+        function closeRemoveUserModal() {
+            pendingRemoveUserId = null;
+            const modal = document.getElementById('removeUserModal');
+            if (modal) modal.classList.remove('show');
+            const btn = document.getElementById('confirmDeleteUserBtn');
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Confirm & Delete All Info';
+            }
+        }
+        window.closeRemoveUserModal = closeRemoveUserModal;
+
+        const cancelRemoveBtn = document.getElementById('cancelRemoveUserBtn');
+        if (cancelRemoveBtn) {
+            cancelRemoveBtn.addEventListener('click', closeRemoveUserModal);
+        }
+
+        const removeUserModalEl = document.getElementById('removeUserModal');
+        if (removeUserModalEl) {
+            removeUserModalEl.addEventListener('click', (e) => {
+                if (e.target === removeUserModalEl) {
+                    closeRemoveUserModal();
+                }
+            });
+        }
+
+        const confirmRemoveBtn = document.getElementById('confirmDeleteUserBtn');
+        if (confirmRemoveBtn) {
+            confirmRemoveBtn.addEventListener('click', async () => {
+                if (!pendingRemoveUserId) return;
+                const btn = confirmRemoveBtn;
+                btn.disabled = true;
+                btn.textContent = 'Purging Data...';
+
+                try {
+                    const res = await fetch(`${API_BASE}/dashboard/admin/users/${pendingRemoveUserId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        alert(data.error || 'Failed to remove user.');
+                        btn.disabled = false;
+                        btn.textContent = 'Confirm & Delete All Info';
+                        return;
+                    }
+
+                    closeRemoveUserModal();
+                    alert(data.message || 'User and all associated database records were permanently purged.');
+                    
+                    // Reload admin dashboard to recalculate charts, KPIs, and refresh table
+                    await loadAdminDashboard();
+
+                } catch (err) {
+                    console.error('Error removing user:', err);
+                    alert('Network error while removing user.');
+                    btn.disabled = false;
+                    btn.textContent = 'Confirm & Delete All Info';
+                }
             });
         }
 
