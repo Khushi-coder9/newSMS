@@ -43,7 +43,8 @@ const buddyMessageSchema = new mongoose.Schema({
   senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   senderPseudonym: { type: String, default: 'Buddy' },
   text: { type: String, required: true, maxlength: 1500 },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 const peerBuddyMatchSchema = new mongoose.Schema({

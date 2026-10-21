@@ -2439,6 +2439,20 @@
                     if (targetTab === 'tab-buddy') {
                         checkBuddyMatch();
                         loadStudentPeerProfile();
+                        if (activeBuddyMatch) {
+                            fetch(`${API_BASE}/peer/buddy/mark-read`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`
+                                },
+                                body: JSON.stringify({ matchId: activeBuddyMatch._id })
+                            }).catch(() => {});
+                            notifItems.forEach(n => {
+                                if (n.matchId === activeBuddyMatch._id) n.isRead = true;
+                            });
+                            renderNotifDropdown();
+                        }
                     }
                     if (targetTab === 'tab-circles') loadCircles();
                     if (targetTab === 'tab-kindness') loadKindness();
@@ -2871,13 +2885,11 @@
         let lastRenderedMsgCount = 0;
         let notifUnreadCount = 0;
         let notifItems = []; // { id, type, text, sub, isRead, matchId }
-        let lastKnownMsgCount = 0; // tracks msg count from last heartbeat for new-message detection
         let notifDropdownOpen = false;
 
         // ---------- NOTIFICATION BELL LOGIC ----------
         function renderNotifDropdown() {
             const notifList = document.getElementById('notifList');
-            const notifEmpty = document.getElementById('notifEmpty');
             const badge = document.getElementById('navBellBadge');
 
             notifUnreadCount = notifItems.filter(n => !n.isRead).length;
@@ -2909,11 +2921,43 @@
             `).join('');
         }
 
+        // Apply notifications fetched from server
+        function applyServerNotifications(serverNotifs, unreadCount) {
+            if (Array.isArray(serverNotifs) && serverNotifs.length > 0) {
+                notifItems = serverNotifs.map(n => ({
+                    id: n.id || `notif_${n.matchId}`,
+                    type: n.type || 'buddy_msg',
+                    icon: '💬',
+                    text: n.text,
+                    sub: n.sub || 'Tap to open chat',
+                    isRead: false,
+                    matchId: n.matchId,
+                    unreadCount: n.unreadCount || 1
+                }));
+            } else if (unreadCount === 0) {
+                notifItems.forEach(n => { if (n.type === 'buddy_msg') n.isRead = true; });
+            }
+            renderNotifDropdown();
+        }
+
+        // Fetch unread notifications from API
+        async function loadPeerNotifications() {
+            if (!authToken) return;
+            try {
+                const res = await fetch(`${API_BASE}/peer/buddy/notifications`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                if (data.success && Array.isArray(data.notifications)) {
+                    applyServerNotifications(data.notifications, data.unreadCount || 0);
+                }
+            } catch (e) {}
+        }
+
         function addBuddyMessageNotif(senderName, messagePreview, matchId) {
             const id = `notif-${Date.now()}`;
             const existing = notifItems.find(n => n.matchId === matchId && n.type === 'buddy_msg');
             if (existing) {
-                // Update existing notification instead of stacking
                 existing.text = `${senderName}: ${messagePreview}`;
                 existing.sub = 'Just now • Tap to open chat';
                 existing.isRead = false;
@@ -2929,30 +2973,40 @@
                 isRead: false,
                 matchId
             });
-            // Cap at 10 notifications
             if (notifItems.length > 10) notifItems = notifItems.slice(0, 10);
             renderNotifDropdown();
         }
 
-        window.handleNotifClick = function(notifId, matchId) {
-            // Mark as read
+        window.handleNotifClick = async function(notifId, matchId) {
             const notif = notifItems.find(n => n.id === notifId);
             if (notif) notif.isRead = true;
             renderNotifDropdown();
 
-            // Close dropdown
+            if (matchId) {
+                try {
+                    await fetch(`${API_BASE}/peer/buddy/mark-read`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ matchId })
+                    });
+                } catch (e) {}
+            }
+
             const dropdown = document.getElementById('notifDropdown');
             if (dropdown) dropdown.style.display = 'none';
             notifDropdownOpen = false;
 
-            // Switch to peer buddy tab
             const buddyTabBtn = document.querySelector('.support-card-btn[data-tab="tab-buddy"]');
             if (buddyTabBtn) {
                 buddyTabBtn.click();
-                // Scroll to buddy section
                 setTimeout(() => {
                     const buddySection = document.getElementById('tab-buddy');
                     if (buddySection) buddySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const input = document.getElementById('buddyMsgInput');
+                    if (input) input.focus();
                 }, 200);
             }
         };
@@ -2966,7 +3020,10 @@
                 if (!dropdown) return;
                 notifDropdownOpen = !notifDropdownOpen;
                 dropdown.style.display = notifDropdownOpen ? 'block' : 'none';
-                if (notifDropdownOpen) renderNotifDropdown();
+                if (notifDropdownOpen) {
+                    loadPeerNotifications();
+                    renderNotifDropdown();
+                }
             });
         }
 
@@ -2982,10 +3039,20 @@
         // Mark all read button
         const btnMarkAllRead = document.getElementById('btnMarkAllRead');
         if (btnMarkAllRead) {
-            btnMarkAllRead.addEventListener('click', (e) => {
+            btnMarkAllRead.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 notifItems.forEach(n => n.isRead = true);
                 renderNotifDropdown();
+                try {
+                    await fetch(`${API_BASE}/peer/buddy/mark-read`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({})
+                    });
+                } catch (err) {}
             });
         }
 
@@ -3000,7 +3067,10 @@
                     if (dropdown) {
                         notifDropdownOpen = !notifDropdownOpen;
                         dropdown.style.display = notifDropdownOpen ? 'block' : 'none';
-                        if (notifDropdownOpen) renderNotifDropdown();
+                        if (notifDropdownOpen) {
+                            loadPeerNotifications();
+                            renderNotifDropdown();
+                        }
                     }
                 }
             });
@@ -3020,13 +3090,13 @@
                         if (onlineStudentsCounter) {
                             onlineStudentsCounter.textContent = `🟢 ${data.onlineCount || 1} Student${data.onlineCount === 1 ? '' : 's'} Online`;
                         }
+                        // Update notifications directly from heartbeat response
+                        if (Array.isArray(data.notifications)) {
+                            applyServerNotifications(data.notifications, data.unreadCount || 0);
+                        }
                         // If a match was formed while searching in another tab or background, load it!
                         if (data.hasActiveMatch && !activeBuddyMatch) {
                             checkBuddyMatch();
-                        }
-                        // Check for new buddy messages to show notifications
-                        if (data.hasActiveMatch) {
-                            checkForNewBuddyMessages();
                         }
                     }
                 } catch (e) {
@@ -3035,33 +3105,6 @@
             };
             ping();
             setInterval(ping, 15000); // every 15s
-        }
-
-        // Check for new buddy messages and fire notification
-        async function checkForNewBuddyMessages() {
-            if (!authToken) return;
-            try {
-                const res = await fetch(`${API_BASE}/peer/buddy/active-match`, {
-                    headers: { 'Authorization': `Bearer ${authToken}` }
-                });
-                const data = await res.json();
-                if (data.success && data.match) {
-                    const msgs = data.match.messages || [];
-                    const myPseudonym = data.match.myPseudonym;
-                    // Find messages from buddy (not me) that are new since last check
-                    if (msgs.length > lastKnownMsgCount) {
-                        const newMsgs = msgs.slice(lastKnownMsgCount);
-                        // Only notify for messages from the other person
-                        const newFromBuddy = newMsgs.filter(m => m.senderPseudonym !== myPseudonym);
-                        if (newFromBuddy.length > 0) {
-                            const latestMsg = newFromBuddy[newFromBuddy.length - 1];
-                            const preview = latestMsg.text.length > 45 ? latestMsg.text.slice(0, 45) + '…' : latestMsg.text;
-                            addBuddyMessageNotif(data.match.buddyPseudonym, preview, data.match._id);
-                        }
-                    }
-                    lastKnownMsgCount = msgs.length;
-                }
-            } catch (e) { /* silent */ }
         }
 
         // Silently fetch and display the student's automatically collected matching profile
@@ -3200,8 +3243,9 @@
             } else {
                 const myPN = match.myPseudonym || '';
                 buddyMessagesList.innerHTML = msgs.map(m => {
-                    // Use myPseudonym (returned from server) for reliable sender detection
-                    const isMine = myPN ? (m.senderPseudonym === myPN) : (m.senderPseudonym !== match.buddyPseudonym);
+                    const isMine = (match.currentUserId && m.senderId)
+                        ? String(m.senderId) === String(match.currentUserId)
+                        : (myPN ? m.senderPseudonym === myPN : m.senderPseudonym !== match.buddyPseudonym);
                     return `
                         <div class="chat-msg ${isMine ? 'mine' : 'buddy'}">
                             <strong>${escapeHtml(m.senderPseudonym)}:</strong> ${escapeHtml(m.text)}
@@ -3210,8 +3254,22 @@
                     `;
                 }).join('');
                 buddyMessagesList.scrollTop = buddyMessagesList.scrollHeight;
-                // Update lastKnownMsgCount so heartbeat doesn't double-notify
-                lastKnownMsgCount = msgs.length;
+
+                // If currently looking at the chat tab, mark messages as read immediately
+                if (currentActiveTab === 'tab-buddy') {
+                    fetch(`${API_BASE}/peer/buddy/mark-read`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ matchId: match._id })
+                    }).catch(() => {});
+                    notifItems.forEach(n => {
+                        if (n.matchId === match._id) n.isRead = true;
+                    });
+                    renderNotifDropdown();
+                }
             }
             // Always ensure input row is visible when a match is active
             if (buddyInputRow) buddyInputRow.style.display = 'flex';
@@ -3221,7 +3279,11 @@
                 chatPollInterval = setInterval(async () => {
                     if (!activeBuddyMatch || !authToken) return;
                     try {
-                        const res = await fetch(`${API_BASE}/peer/buddy/active-match`, {
+                        const isChatVisible = (currentActiveTab === 'tab-buddy');
+                        const url = isChatVisible
+                            ? `${API_BASE}/peer/buddy/active-match?markRead=true`
+                            : `${API_BASE}/peer/buddy/active-match`;
+                        const res = await fetch(url, {
                             headers: { 'Authorization': `Bearer ${authToken}` }
                         });
                         const data = await res.json();
@@ -3229,10 +3291,14 @@
                             activeBuddyMatch = data.match;
                             const newMsgs = data.match.messages || [];
                             if (newMsgs.length !== lastRenderedMsgCount) {
+                                const prevCount = lastRenderedMsgCount;
                                 lastRenderedMsgCount = newMsgs.length;
+
                                 buddyMessagesList.innerHTML = newMsgs.map(m => {
                                     const mp = data.match.myPseudonym || '';
-                                    const isMine = mp ? (m.senderPseudonym === mp) : (m.senderPseudonym !== data.match.buddyPseudonym);
+                                    const isMine = (data.match.currentUserId && m.senderId)
+                                        ? String(m.senderId) === String(data.match.currentUserId)
+                                        : (mp ? m.senderPseudonym === mp : m.senderPseudonym !== data.match.buddyPseudonym);
                                     return `
                                         <div class="chat-msg ${isMine ? 'mine' : 'buddy'}">
                                             <strong>${escapeHtml(m.senderPseudonym)}:</strong> ${escapeHtml(m.text)}
@@ -3241,8 +3307,28 @@
                                     `;
                                 }).join('');
                                 buddyMessagesList.scrollTop = buddyMessagesList.scrollHeight;
-                                lastKnownMsgCount = newMsgs.length;
-                                // Keep input row visible during polling re-renders
+
+                                // If user is on another tab, show notification on the bell!
+                                if (!isChatVisible && newMsgs.length > prevCount) {
+                                    const myPN = data.match.myPseudonym || '';
+                                    const partnerMsgs = newMsgs.slice(prevCount).filter(m => {
+                                        return (data.match.currentUserId && m.senderId)
+                                            ? String(m.senderId) !== String(data.match.currentUserId)
+                                            : m.senderPseudonym !== myPN;
+                                    });
+                                    if (partnerMsgs.length > 0) {
+                                        const latestMsg = partnerMsgs[partnerMsgs.length - 1];
+                                        const preview = latestMsg.text.length > 45 ? latestMsg.text.slice(0, 45) + '…' : latestMsg.text;
+                                        addBuddyMessageNotif(data.match.buddyPseudonym, preview, data.match._id);
+                                    }
+                                } else if (isChatVisible) {
+                                    // Chat is actively open, clear notifications for this match
+                                    notifItems.forEach(n => {
+                                        if (n.matchId === data.match._id) n.isRead = true;
+                                    });
+                                    renderNotifDropdown();
+                                }
+
                                 if (buddyInputRow) buddyInputRow.style.display = 'flex';
                             }
                         } else if (data.success && !data.match) {
@@ -3690,10 +3776,20 @@
             // Show notification bell in nav for logged-in students
             const navNotifWrap = document.getElementById('navNotifWrap');
             if (navNotifWrap) navNotifWrap.style.display = 'block';
+            loadPeerNotifications();
             renderNotifDropdown();
             startHeartbeat();
             loadStudentPeerProfile();
             checkBuddyMatch();
+        }
+
+        // Auto open buddy tab if requested in URL query or hash
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('tab') === 'buddy' || window.location.hash === '#buddy') {
+            const buddyTabBtn = document.querySelector('.support-card-btn[data-tab="tab-buddy"]');
+            if (buddyTabBtn) {
+                buddyTabBtn.click();
+            }
         }
     </script>
 </body>

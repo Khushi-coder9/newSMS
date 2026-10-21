@@ -554,12 +554,62 @@ async function cleanupLegacyBotMatches() {
   }
 }
 
+// Helper: Get all unread buddy messages / notifications for a student
+async function getUserPeerNotifications(userId) {
+  if (!userId) return { unreadCount: 0, notifications: [] };
+  try {
+    const activeMatches = await PeerBuddyMatch.find({
+      status: 'active',
+      $expr: { $ne: ['$studentA', '$studentB'] },
+      $or: [{ studentA: userId }, { studentB: userId }]
+    }).lean();
+
+    const notifications = [];
+    let totalUnread = 0;
+
+    for (const match of activeMatches) {
+      const isStudentA = match.studentA.toString() === userId.toString();
+      const buddyPseudonym = isStudentA ? match.pseudonymB : match.pseudonymA;
+      const msgs = match.messages || [];
+
+      // Find messages from buddy that haven't been read by this user
+      const unreadMsgs = msgs.filter(m => {
+        if (!m.senderId) return false;
+        if (m.senderId.toString() === userId.toString()) return false;
+        if (m.readBy && m.readBy.some(id => id && id.toString() === userId.toString())) return false;
+        return true;
+      });
+
+      if (unreadMsgs.length > 0) {
+        totalUnread += unreadMsgs.length;
+        const latestMsg = unreadMsgs[unreadMsgs.length - 1];
+        const preview = latestMsg.text.length > 50 ? latestMsg.text.slice(0, 50) + '…' : latestMsg.text;
+        notifications.push({
+          id: `match_${match._id}`,
+          type: 'buddy_msg',
+          matchId: match._id.toString(),
+          senderName: buddyPseudonym,
+          text: `${buddyPseudonym}: ${preview}`,
+          sub: `${unreadMsgs.length} new message${unreadMsgs.length > 1 ? 's' : ''} • Tap to open chat`,
+          unreadCount: unreadMsgs.length,
+          createdAt: latestMsg.createdAt
+        });
+      }
+    }
+
+    return { unreadCount: totalUnread, notifications };
+  } catch (err) {
+    console.error('Error in getUserPeerNotifications:', err);
+    return { unreadCount: 0, notifications: [] };
+  }
+}
+
 // POST /api/peer/buddy/heartbeat — updates online presence and checks live match status
 router.post('/buddy/heartbeat', async (req, res) => {
   try {
     const authUser = getAuthUser(req);
     if (!authUser) {
-      return res.json({ success: true, isOnline: false, onlineCount: 1 });
+      return res.json({ success: true, isOnline: false, onlineCount: 1, unreadCount: 0, notifications: [] });
     }
 
     const now = new Date();
@@ -629,7 +679,9 @@ router.post('/buddy/heartbeat', async (req, res) => {
             isSearching: false,
             hasActiveMatch: true,
             activeMatchId: newMatch._id,
-            onlineCount: 2
+            onlineCount: 2,
+            unreadCount: 0,
+            notifications: []
           });
         }
       }
@@ -641,13 +693,18 @@ router.post('/buddy/heartbeat', async (req, res) => {
       lastSeen: { $gte: onlineThreshold }
     });
 
+    // Fetch unread buddy message notifications
+    const notifData = await getUserPeerNotifications(authUser.userId);
+
     res.json({
       success: true,
       isOnline: true,
       isSearching: profile ? Boolean(profile.isSearching) : false,
       hasActiveMatch: Boolean(activeMatch),
       activeMatchId: activeMatch ? activeMatch._id : null,
-      onlineCount: Math.max(1, onlineCount)
+      onlineCount: Math.max(1, onlineCount),
+      unreadCount: notifData.unreadCount,
+      notifications: notifData.notifications
     });
   } catch (error) {
     console.error('Error in peer heartbeat:', error);
@@ -726,10 +783,29 @@ router.get('/buddy/active-match', async (req, res) => {
       ? (Date.now() - new Date(otherProfile.lastSeen).getTime() < 90 * 1000)
       : false;
 
+    // Auto mark partner messages as read if markRead query parameter is provided
+    if (req.query.markRead === 'true') {
+      const matchDoc = await PeerBuddyMatch.findById(activeMatch._id);
+      if (matchDoc && matchDoc.messages) {
+        let changed = false;
+        matchDoc.messages.forEach(m => {
+          if (m.senderId && m.senderId.toString() !== authUser.userId.toString()) {
+            if (!m.readBy) m.readBy = [];
+            if (!m.readBy.some(id => id.toString() === authUser.userId.toString())) {
+              m.readBy.push(authUser.userId);
+              changed = true;
+            }
+          }
+        });
+        if (changed) await matchDoc.save();
+      }
+    }
+
     res.json({
       success: true,
       match: {
         _id: activeMatch._id,
+        currentUserId: authUser.userId,
         myPseudonym,
         buddyPseudonym,
         sharedGoal: activeMatch.sharedGoal,
@@ -936,7 +1012,8 @@ router.post('/buddy/message', async (req, res) => {
       senderId: authUser.userId,
       senderPseudonym,
       text: text.trim(),
-      createdAt: new Date()
+      createdAt: new Date(),
+      readBy: [authUser.userId]
     };
 
     match.messages.push(messageObj);
@@ -949,6 +1026,61 @@ router.post('/buddy/message', async (req, res) => {
   } catch (error) {
     console.error('Error sending buddy message:', error);
     res.status(500).json({ error: 'Failed to send check-in message' });
+  }
+});
+
+// GET /api/peer/buddy/notifications — fetch unread buddy message alerts
+router.get('/buddy/notifications', async (req, res) => {
+  try {
+    const authUser = getAuthUser(req);
+    if (!authUser) {
+      return res.json({ success: true, unreadCount: 0, notifications: [] });
+    }
+    const notifData = await getUserPeerNotifications(authUser.userId);
+    res.json({ success: true, ...notifData });
+  } catch (error) {
+    console.error('Error getting peer notifications:', error);
+    res.status(500).json({ error: 'Failed to retrieve notifications' });
+  }
+});
+
+// POST /api/peer/buddy/mark-read — mark messages in a match as read
+router.post('/buddy/mark-read', async (req, res) => {
+  try {
+    const authUser = getAuthUser(req);
+    if (!authUser) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const { matchId } = req.body;
+    const query = {
+      status: 'active',
+      $expr: { $ne: ['$studentA', '$studentB'] },
+      $or: [{ studentA: authUser.userId }, { studentB: authUser.userId }]
+    };
+    if (matchId) query._id = matchId;
+
+    const matches = await PeerBuddyMatch.find(query);
+    for (const match of matches) {
+      let modified = false;
+      if (match.messages && match.messages.length > 0) {
+        match.messages.forEach(m => {
+          if (m.senderId && m.senderId.toString() !== authUser.userId.toString()) {
+            if (!m.readBy) m.readBy = [];
+            if (!m.readBy.some(id => id.toString() === authUser.userId.toString())) {
+              m.readBy.push(authUser.userId);
+              modified = true;
+            }
+          }
+        });
+      }
+      if (modified) await match.save();
+    }
+
+    res.json({ success: true, message: 'Messages marked as read' });
+  } catch (error) {
+    console.error('Error marking buddy messages as read:', error);
+    res.status(500).json({ error: 'Failed to mark messages as read' });
   }
 });
 
