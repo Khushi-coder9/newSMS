@@ -9,7 +9,18 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 // Signup
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password, role = 'student', age, designation } = req.body;
+    const {
+      name,
+      email,
+      password,
+      role = 'student',
+      age,
+      designation,
+      phone,
+      alternatePhone,
+      mobileNumber,
+      altMobileNumber
+    } = req.body;
 
     // Validate role
     const validRoles = ['student', 'counsellor', 'admin'];
@@ -35,10 +46,21 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
+    const selfPhone = (phone || mobileNumber || '').trim();
+    const altPhone = (alternatePhone || altMobileNumber || '').trim();
+
     // Validate role-specific fields
     if (normalizedRole === 'student') {
       if (age === undefined || age === null || age === '' || isNaN(Number(age)) || Number(age) < 1) {
         return res.status(400).json({ error: 'Valid age is required for student registration' });
+      }
+
+      if (!selfPhone) {
+        return res.status(400).json({ error: 'Self mobile number is required for student registration' });
+      }
+
+      if (!altPhone) {
+        return res.status(400).json({ error: 'Alternative mobile number is required for student registration' });
       }
     }
 
@@ -68,6 +90,8 @@ router.post('/signup', async (req, res) => {
 
     if (normalizedRole === 'student') {
       userData.age = Number(age);
+      userData.phone = selfPhone;
+      userData.alternatePhone = altPhone;
     } else if (normalizedRole === 'counsellor') {
       userData.designation = designation.trim();
     }
@@ -92,6 +116,8 @@ router.post('/signup', async (req, res) => {
         email: user.email,
         role: user.role,
         age: user.age,
+        phone: user.phone,
+        alternatePhone: user.alternatePhone,
         designation: user.designation
       }
     });

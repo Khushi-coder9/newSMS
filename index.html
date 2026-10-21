@@ -1315,6 +1315,18 @@
                     <input type="number" id="signupAge" placeholder="Enter your age (e.g. 20)" min="1" max="120" required>
                 </div>
 
+                <!-- Student Only: Mobile Number -->
+                <div class="form-group" id="studentPhoneGroup">
+                    <label for="signupPhone" class="form-label">Mobile Number</label>
+                    <input type="tel" id="signupPhone" placeholder="Enter your 10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required>
+                </div>
+
+                <!-- Student Only: Alternate Mobile Number -->
+                <div class="form-group" id="studentAltPhoneGroup">
+                    <label for="signupAltPhone" class="form-label">Alternative Mobile Number</label>
+                    <input type="tel" id="signupAltPhone" placeholder="Enter alternative 10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required>
+                </div>
+
                 <!-- Counsellor Only: Designation -->
                 <div class="form-group" id="counsellorDesignationGroup" style="display: none;">
                     <label for="signupDesignation" class="form-label">Designation</label>
@@ -2165,17 +2177,25 @@
             });
 
             const studentAgeGroup = document.getElementById('studentAgeGroup');
+            const studentPhoneGroup = document.getElementById('studentPhoneGroup');
+            const studentAltPhoneGroup = document.getElementById('studentAltPhoneGroup');
             const counsellorDesignationGroup = document.getElementById('counsellorDesignationGroup');
             const ageInput = document.getElementById('signupAge');
+            const phoneInput = document.getElementById('signupPhone');
+            const altPhoneInput = document.getElementById('signupAltPhone');
             const designationInput = document.getElementById('signupDesignation');
             const submitBtn = document.getElementById('signupSubmitBtn');
             const subtitle = document.getElementById('signupSubtitle');
 
             if (role === 'student') {
-                // Student: Name, Email, Password, Age
+                // Student: Name, Email, Password, Age, Phone, AltPhone
                 studentAgeGroup.style.display = 'block';
+                studentPhoneGroup.style.display = 'block';
+                studentAltPhoneGroup.style.display = 'block';
                 counsellorDesignationGroup.style.display = 'none';
                 ageInput.required = true;
+                phoneInput.required = true;
+                altPhoneInput.required = true;
                 designationInput.required = false;
                 designationInput.value = '';
                 submitBtn.textContent = 'Sign Up as Student';
@@ -2183,18 +2203,30 @@
             } else if (role === 'counsellor') {
                 // Counsellor: Name, Email, Password, Designation
                 studentAgeGroup.style.display = 'none';
+                studentPhoneGroup.style.display = 'none';
+                studentAltPhoneGroup.style.display = 'none';
                 counsellorDesignationGroup.style.display = 'block';
                 ageInput.required = false;
                 ageInput.value = '';
+                phoneInput.required = false;
+                phoneInput.value = '';
+                altPhoneInput.required = false;
+                altPhoneInput.value = '';
                 designationInput.required = true;
                 submitBtn.textContent = 'Sign Up as Counsellor';
                 subtitle.textContent = 'Join as a counsellor to provide guidance and schedule sessions';
             } else if (role === 'admin') {
                 // Admin: Name, Email, Password (no extra fields)
                 studentAgeGroup.style.display = 'none';
+                studentPhoneGroup.style.display = 'none';
+                studentAltPhoneGroup.style.display = 'none';
                 counsellorDesignationGroup.style.display = 'none';
                 ageInput.required = false;
                 ageInput.value = '';
+                phoneInput.required = false;
+                phoneInput.value = '';
+                altPhoneInput.required = false;
+                altPhoneInput.value = '';
                 designationInput.required = false;
                 designationInput.value = '';
                 submitBtn.textContent = 'Sign Up as Admin';
@@ -2237,6 +2269,8 @@
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
             const ageVal = document.getElementById('signupAge').value;
+            const phoneVal = document.getElementById('signupPhone').value.trim();
+            const altPhoneVal = document.getElementById('signupAltPhone').value.trim();
             const designationVal = document.getElementById('signupDesignation').value.trim();
 
             const payload = {
@@ -2252,7 +2286,24 @@
                     signupError.classList.add('show');
                     return;
                 }
+                if (!phoneVal || !/^[0-9]{10}$/.test(phoneVal)) {
+                    signupError.textContent = 'Please enter a valid 10-digit mobile number.';
+                    signupError.classList.add('show');
+                    return;
+                }
+                if (!altPhoneVal || !/^[0-9]{10}$/.test(altPhoneVal)) {
+                    signupError.textContent = 'Please enter a valid 10-digit alternative mobile number.';
+                    signupError.classList.add('show');
+                    return;
+                }
+                if (phoneVal === altPhoneVal) {
+                    signupError.textContent = 'Mobile number and alternative mobile number must be different.';
+                    signupError.classList.add('show');
+                    return;
+                }
                 payload.age = Number(ageVal);
+                payload.phone = phoneVal;
+                payload.alternatePhone = altPhoneVal;
             } else if (role === 'counsellor') {
                 if (!designationVal) {
                     signupError.textContent = 'Please enter your counsellor designation.';

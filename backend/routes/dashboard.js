@@ -681,7 +681,7 @@ router.get('/admin', authMiddleware, async (req, res) => {
 
     // 5. Fetch Students Registry (with detected difficulties)
     const studentsListRaw = await User.find({ role: 'student' })
-      .select('name email age role createdAt')
+      .select('name email age role phone alternatePhone createdAt')
       .sort({ createdAt: -1 })
       .limit(50)
       .lean();

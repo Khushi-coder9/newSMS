@@ -89,6 +89,8 @@ router.post('/save', authMiddleware, async (req, res) => {
         studentName: userName,
         studentEmail: userEmail,
         studentId: userId,
+        studentPhone: req.userDoc?.phone || null,
+        studentAltPhone: req.userDoc?.alternatePhone || null,
         detectedKeywords: analysisResult.detectedKeywords,
         messageSnippet: distressText,
         timestamp: new Date()
@@ -134,6 +136,8 @@ router.post('/crisis-alert', authMiddleware, async (req, res) => {
       studentName: userName,
       studentEmail: userEmail,
       studentId: userId,
+      studentPhone: req.userDoc?.phone || null,
+      studentAltPhone: req.userDoc?.alternatePhone || null,
       detectedKeywords: keywords,
       messageSnippet: distressText,
       timestamp: new Date(),

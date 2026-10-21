@@ -345,6 +345,8 @@ async function sendVolunteerEmergencyAlert({
   studentName = 'Anonymous Student',
   studentEmail = 'Not provided / Anonymous',
   studentId = null,
+  studentPhone = null,
+  studentAltPhone = null,
   detectedKeywords = [],
   messageSnippet = '',
   timestamp = new Date(),

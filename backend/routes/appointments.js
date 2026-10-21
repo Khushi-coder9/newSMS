@@ -203,6 +203,50 @@ router.get('/by-token/:token', async (req, res) => {
 });
 
 /**
+ * POST /api/appointments/by-token/:token/messages
+ * Sends a message in the 1-on-1 private session using the confirmation token (e.g. from email links)
+ */
+router.post('/by-token/:token/messages', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { text, senderRole, senderName } = req.body;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: 'Message text is required.' });
+    }
+
+    const appointment = await Appointment.findOne({ confirmationToken: token });
+    if (!appointment) {
+      return res.status(404).json({ error: 'Session not found or link expired.' });
+    }
+
+    const role = (senderRole || 'student').toLowerCase() === 'counsellor' ? 'counsellor' : 'student';
+    const name = senderName || (role === 'counsellor' ? appointment.counsellorName : appointment.studentName);
+    const senderId = role === 'counsellor' ? appointment.counsellor : appointment.student;
+
+    const newMsg = {
+      senderId,
+      senderName: name,
+      senderRole: role,
+      text: text.trim(),
+      createdAt: new Date()
+    };
+
+    appointment.messages.push(newMsg);
+    await appointment.save();
+
+    res.status(201).json({
+      success: true,
+      message: newMsg,
+      messages: appointment.messages
+    });
+  } catch (error) {
+    console.error('Error sending message via token:', error);
+    res.status(500).json({ error: 'Failed to send message.' });
+  }
+});
+
+/**
  * GET /api/appointments/confirm/:token
  * Counsellor confirms the appointment.
  * Supports:

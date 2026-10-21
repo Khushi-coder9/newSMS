@@ -19,7 +19,7 @@ module.exports = async function authMiddleware(req, res, next) {
     req.user = decoded; // { userId, role, email }
 
     // Optionally attach full user info if needed
-    const userDoc = await User.findById(decoded.userId).select('name email role age designation');
+    const userDoc = await User.findById(decoded.userId).select('name email role age designation phone alternatePhone');
     if (userDoc) {
       req.userDoc = userDoc;
     }
