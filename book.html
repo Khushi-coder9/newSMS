@@ -1768,7 +1768,7 @@
                                     const meetUrl = app.meetingLink || 'https://meet.jit.si/StudentMindSupport-Live';
                                     actionBtnHtml = `<a href="${meetUrl}" target="_blank" rel="noopener" class="btn-join-meet">📹 Start Meet</a>`;
                                 } else {
-                                    actionBtnHtml = `<a href="chat.html" class="btn-open-chat">💬 Open Chat</a>`;
+                                    actionBtnHtml = `<a href="session-chat.html?appointmentId=${app._id}" class="btn-open-chat">💬 Open Chat</a>`;
                                 }
                                 actionBtnHtml += `<button type="button" class="btn-cancel-app" onclick="cancelAppointment('${app._id}')">Cancel</button>`;
                             }
@@ -1786,7 +1786,7 @@
                                     const meetUrl = app.meetingLink || 'https://meet.jit.si/StudentMindSupport-Live';
                                     actionBtnHtml = `<a href="${meetUrl}" target="_blank" rel="noopener" class="btn-join-meet">📹 Join Meet</a>`;
                                 } else {
-                                    actionBtnHtml = `<a href="chat.html" class="btn-open-chat">💬 Open Chat</a>`;
+                                    actionBtnHtml = `<a href="session-chat.html?appointmentId=${app._id}" class="btn-open-chat">💬 Open Chat</a>`;
                                 }
                                 actionBtnHtml += `<button type="button" class="btn-cancel-app" onclick="cancelAppointment('${app._id}')">Cancel</button>`;
                             }

@@ -1482,7 +1482,7 @@
                 if (a.sessionType === 'meet' && a.meetingLink && a.status === 'confirmed') {
                     actionBtn = `<a href="${a.meetingLink}" target="_blank" class="btn-action-sm btn-green-sm">🎥 Join Meet</a>`;
                 } else if (a.sessionType === 'chat' && a.status === 'confirmed') {
-                    actionBtn = `<a href="chat.html" class="btn-action-sm btn-primary-sm">💬 Open Chat</a>`;
+                    actionBtn = `<a href="session-chat.html?appointmentId=${a._id}" class="btn-action-sm btn-primary-sm">💬 Open Chat</a>`;
                 } else if (a.status === 'pending') {
                     actionBtn = `<span style="font-size:12px; color:#b45309; font-weight:600;">Awaiting confirmation</span>`;
                 } else if (a.status === 'cancelled') {
@@ -1648,6 +1648,9 @@
                 }
                 if (a.sessionType === 'meet' && a.meetingLink && a.status === 'confirmed') {
                     actions += `<a href="${a.meetingLink}" target="_blank" class="btn-action-sm btn-outline-sm">🎥 Meet</a> `;
+                }
+                if (a.sessionType === 'chat' && a.status === 'confirmed') {
+                    actions += `<a href="session-chat.html?appointmentId=${a._id}" class="btn-action-sm btn-primary-sm">💬 Open Chat</a> `;
                 }
                 actions += `<button class="btn-action-sm btn-primary-sm" onclick="openFeedbackModal('${a._id}', '${escapeHtml(a.studentName)}')">📝 Add Feedback</button>`;
 

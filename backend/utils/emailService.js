@@ -184,7 +184,9 @@ async function sendStudentConfirmation(appointment) {
 
   const isMeet = appointment.sessionType === 'meet';
   const modeText = isMeet ? '📹 Video Meet' : '💬 Private Chat';
-  const accessUrl = isMeet ? (appointment.meetingLink || `${FRONTEND_URL}/book.html`) : `${FRONTEND_URL}/chat.html`;
+  const accessUrl = isMeet
+    ? (appointment.meetingLink || `${FRONTEND_URL}/book.html`)
+    : `${FRONTEND_URL}/session-chat.html?appointmentId=${appointment._id}`;
 
   const bodyContent = `
     <h1>🎉 Your Appointment is Confirmed!</h1>

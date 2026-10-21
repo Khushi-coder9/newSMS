@@ -816,6 +816,13 @@
 
     <script src="config.js"></script>
     <script>
+        // Auto-redirect to 1-on-1 Counsellor Chat if an appointmentId is provided
+        const initialParams = new URLSearchParams(window.location.search);
+        const redirectApptId = initialParams.get('appointmentId') || initialParams.get('appointment') || initialParams.get('session');
+        if (redirectApptId) {
+            window.location.replace(`session-chat.html?appointmentId=${encodeURIComponent(redirectApptId)}`);
+        }
+
         const STORAGE_KEY = "sms_gemini_api_key";
         const MODELS = [
             (window.SMS_CONFIG && window.SMS_CONFIG.MODEL) || "gemini-2.0-flash-lite",

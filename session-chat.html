@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>1-on-1 Counselling Chat • Student Mind Support</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1f1b4d;
+            --heading: #1c1848;
+            --purple: #6d4dff;
+            --purple-hover: #5b3ae6;
+            --purple-light: #f4f0ff;
+            --text: #5a5878;
+            --text-light: #8c8aa8;
+            --border: #ece8fc;
+            --white: #ffffff;
+            --green: #10b981;
+            --green-light: #dcfce7;
+            --red: #ef4444;
+            --bg-page: #f7f5ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+            background: var(--bg-page);
+            color: var(--navy);
+        }
+
+        /* App Layout */
+        .chat-app-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-width: 1050px;
+            margin: 0 auto;
+            background: var(--white);
+            box-shadow: 0 10px 40px rgba(109, 77, 255, 0.08);
+            position: relative;
+        }
+
+        /* Top Header */
+        header.chat-header {
+            background: #ffffff;
+            border-bottom: 1.5px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            z-index: 20;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--purple-light);
+            color: var(--purple);
+            text-decoration: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-back:hover {
+            background: #e7defc;
+            transform: scale(1.05);
+        }
+
+        .participant-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6d4dff, #9076ff);
+            color: #ffffff;
+            display: grid;
+            place-items: center;
+            font-size: 16px;
+            font-weight: 800;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(109, 77, 255, 0.25);
+            position: relative;
+        }
+        .online-dot {
+            width: 11px;
+            height: 11px;
+            background: var(--green);
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .participant-info {
+            min-width: 0;
+        }
+        .participant-name {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--heading);
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .role-chip {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #ede8ff;
+            color: var(--purple);
+        }
+        .participant-sub {
+            font-size: 12px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .btn-header-link {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--purple);
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--purple-light);
+            border: 1px solid #dfd7ff;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-header-link:hover {
+            background: #e9e1ff;
+        }
+
+        /* Session Info Sub-banner */
+        .session-sub-banner {
+            background: #faf8ff;
+            border-bottom: 1px solid var(--border);
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text);
+            flex-shrink: 0;
+        }
+        .session-topic-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+            color: var(--navy);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .session-secure-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--green);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Messages Area */
+        .messages-viewport {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: #fbf9ff;
+            scroll-behavior: smooth;
+        }
+
+        .session-start-card {
+            background: #ffffff;
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            padding: 20px 24px;
+            text-align: center;
+            margin: 10px auto 20px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 4px 18px rgba(109, 77, 255, 0.05);
+        }
+        .session-start-card .icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .session-start-card h2 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--heading);
+            margin-bottom: 4px;
+        }
+        .session-start-card p {
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .session-details-summary {
+            background: #faf8ff;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-top: 12px;
+            font-size: 12px;
+            text-align: left;
+            border: 1px dashed #dfd7ff;
+        }
+
+        /* Message Bubbles */
+        .msg-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 75%;
+            animation: fadeIn 0.25s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-row.outgoing {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+        .msg-row.incoming {
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+        .msg-sender-meta {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .msg-bubble {
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.55;
+            word-break: break-word;
+            position: relative;
+        }
+
+        .msg-row.outgoing .msg-bubble {
+            background: linear-gradient(135deg, #6d4dff 0%, #7e57c2 100%);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 14px rgba(109, 77, 255, 0.22);
+        }
+
+        .msg-row.incoming .msg-bubble {
+            background: #ffffff;
+            color: var(--navy);
+            border: 1.5px solid var(--border);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 3px 12px rgba(28, 24, 72, 0.05);
+        }
+
+        .msg-time {
+            font-size: 10px;
+            margin-top: 4px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+        .msg-row.outgoing .msg-time {
+            color: #7b7899;
+            text-align: right;
+        }
+        .msg-row.incoming .msg-time {
+            color: #8c8aa8;
+        }
+
+        /* Quick Suggestion Chips */
+        .quick-chips-bar {
+            padding: 8px 18px 4px;
+            background: #ffffff;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            flex-shrink: 0;
+            border-top: 1px solid var(--border);
+        }
+        .quick-chips-bar::-webkit-scrollbar { display: none; }
+
+        .chip-btn {
+            background: var(--purple-light);
+            color: var(--purple);
+            border: 1px solid #dfd7ff;
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .chip-btn:hover {
+            background: #ece4ff;
+            border-color: var(--purple);
+            transform: translateY(-1px);
+        }
+
+        /* Composer Area */
+        .composer-bar {
+            background: #ffffff;
+            padding: 12px 18px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 20;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 13px 20px;
+            border-radius: 999px;
+            border: 1.6px solid var(--border);
+            background: #faf9ff;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--navy);
+            outline: none;
+            transition: all 0.2s;
+        }
+        .chat-input:focus {
+            background: #ffffff;
+            border-color: var(--purple);
+            box-shadow: 0 0 0 4px rgba(109, 77, 255, 0.12);
+        }
+
+        .btn-send {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6d4dff 0%, #8b5cf6 100%);
+            color: #ffffff;
+            border: none;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(109, 77, 255, 0.32);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-send:hover:not(:disabled) {
+            transform: scale(1.06);
+            box-shadow: 0 6px 20px rgba(109, 77, 255, 0.42);
+        }
+        .btn-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* State Alerts */
+        .empty-state, .error-banner {
+            margin: auto;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .msg-row { max-width: 88%; }
+            .chat-header { padding: 10px 14px; }
+            .participant-name { font-size: 14.5px; }
+            .session-sub-banner { padding: 6px 14px; flex-direction: column; align-items: flex-start; gap: 4px; }
+            .composer-bar { padding: 10px 14px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-app-wrapper">
+
+    <!-- Top Header -->
+    <header class="chat-header">
+        <div class="header-left">
+            <a href="book.html" class="btn-back" title="Back to Appointments">&larr;</a>
+            <div class="participant-avatar" id="avatarBox">
+                <span id="avatarInitials">💬</span>
+                <span class="online-dot" title="Session Active"></span>
+            </div>
+            <div class="participant-info">
+                <div class="participant-name">
+                    <span id="otherName">Counselling Session</span>
+                    <span class="role-chip" id="otherRoleChip">CONFIDENTIAL</span>
+                </div>
+                <div class="participant-sub">
+                    <span id="sessionMetaText">Private 1-on-1 Chat</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="dashboard.html" class="btn-header-link">📊 Dashboard</a>
+            <a href="book.html" class="btn-header-link">📅 Bookings</a>
+        </div>
+    </header>
+
+    <!-- Session Topic & Security Sub-banner -->
+    <div class="session-sub-banner">
+        <div class="session-topic-pill">
+            <span>🎯 Topic:</span>
+            <span id="sessionTopicText" style="color: var(--purple);">General Mental Wellness</span>
+        </div>
+        <div class="session-secure-tag">
+            <span>🔒 Confidential &amp; End-to-End Private Session</span>
+        </div>
+    </div>
+
+    <!-- Scrollable Messages Container -->
+    <div class="messages-viewport" id="messagesViewport">
+        <div id="loadingIndicator" style="text-align:center; padding: 40px; color: var(--text-light); font-size: 13.5px;">
+            ⏳ Connecting to private session room…
+        </div>
+    </div>
+
+    <!-- Quick Prompt Suggestions -->
+    <div class="quick-chips-bar" id="quickChipsBar">
+        <!-- Injected via JavaScript based on role -->
+    </div>
+
+    <!-- Composer Bar -->
+    <form class="composer-bar" id="composerForm">
+        <input 
+            type="text" 
+            id="chatInput" 
+            class="chat-input" 
+            placeholder="Type your confidential message here…" 
+            autocomplete="off"
+            required
+        >
+        <button type="submit" id="sendBtn" class="btn-send" title="Send message">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+        </button>
+    </form>
+
+</div>
+
+<script>
+    // Detect API Base URL
+    const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000/api'
+        : '/api';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const appointmentId = urlParams.get('appointmentId');
+    const authToken = localStorage.getItem('authToken');
+
+    const viewport = document.getElementById('messagesViewport');
+    const composerForm = document.getElementById('composerForm');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const otherNameEl = document.getElementById('otherName');
+    const otherRoleChip = document.getElementById('otherRoleChip');
+    const sessionMetaText = document.getElementById('sessionMetaText');
+    const sessionTopicText = document.getElementById('sessionTopicText');
+    const avatarInitials = document.getElementById('avatarInitials');
+    const quickChipsBar = document.getElementById('quickChipsBar');
+
+    let currentUserId = null;
+    let currentUserRole = null;
+    let lastRenderedCount = 0;
+    let pollInterval = null;
+
+    function esc(s) {
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function formatTime(isoStr) {
+        if (!isoStr) return '';
+        try {
+            return new Date(isoStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } catch(_) {
+            return '';
+        }
+    }
+
+    function scrollToBottom() {
+        viewport.scrollTop = viewport.scrollHeight;
+    }
+
+    // Render Quick Prompt Chips
+    function setupQuickChips(isStudent, otherName) {
+        let chips = [];
+        if (isStudent) {
+            chips = [
+                "Hello! Thank you for scheduling this session with me.",
+                "I have been feeling quite overwhelmed with my academic workload.",
+                "Could you share some grounding or breathing exercises with me?",
+                "How can I better manage exam stress and sleep?"
+            ];
+        } else {
+            chips = [
+                `Hello! Welcome to our session. How are you feeling today?`,
+                "Take your time, this is a safe and confidential space.",
+                "Would you like to share what has been on your mind recently?",
+                "Let's practice a 2-minute 4-7-8 breathing exercise together."
+            ];
+        }
+
+        quickChipsBar.innerHTML = chips.map(text => `
+            <button type="button" class="chip-btn" onclick="sendQuickChip('${esc(text).replace(/'/g, "\\'")}')">
+                ${esc(text)}
+            </button>
+        `).join('');
+    }
+
+    window.sendQuickChip = function(text) {
+        chatInput.value = text;
+        chatInput.focus();
+    };
+
+    // Render Full Message Stream
+    function renderMessages(messages, sessionInfo) {
+        if (!messages || messages.length === 0) {
+            viewport.innerHTML = `
+                <div class="session-start-card">
+                    <div class="icon">💬</div>
+                    <h2>1-on-1 Counselling Chat Started</h2>
+                    <p>Welcome to your private session between <strong>${esc(sessionInfo.studentName)}</strong> and <strong>${esc(sessionInfo.counsellorName)}</strong>.</p>
+                    <div class="session-details-summary">
+                        <div>🗓️ <strong>Date &amp; Time:</strong> ${esc(sessionInfo.date)} at ${esc(sessionInfo.time)}</div>
+                        <div style="margin-top: 4px;">🎯 <strong>Topic:</strong> ${esc(sessionInfo.concern || 'General Wellness Support')}</div>
+                    </div>
+                    <p style="margin-top: 14px; font-size: 12px; color: var(--purple); font-weight: 700;">
+                        👋 Send your first message below to begin your conversation!
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `
+            <div class="session-start-card" style="margin-bottom: 12px; padding: 14px 18px;">
+                <div style="font-size: 12px; color: var(--text-light);">
+                    🔒 <strong>Confidential 1-on-1 Session</strong> • ${esc(sessionInfo.date)} at ${esc(sessionInfo.time)}
+                </div>
+            </div>
+        `;
+
+        messages.forEach(msg => {
+            const isOutgoing = (msg.senderId && currentUserId && msg.senderId.toString() === currentUserId.toString()) ||
+                               (msg.senderRole && currentUserRole && msg.senderRole.toLowerCase() === currentUserRole.toLowerCase());
+
+            const roleLabel = msg.senderRole === 'counsellor' ? 'Counsellor' : 'Student';
+            const timeStr = formatTime(msg.createdAt);
+
+            html += `
+                <div class="msg-row ${isOutgoing ? 'outgoing' : 'incoming'}">
+                    <div class="msg-sender-meta">
+                        <span>${isOutgoing ? 'You' : esc(msg.senderName)}</span>
+                        <span style="opacity: 0.6;">&bull;</span>
+                        <span style="font-size: 10px; text-transform: uppercase;">${isOutgoing ? (currentUserRole ? currentUserRole.toUpperCase() : '') : roleLabel}</span>
+                    </div>
+                    <div class="msg-bubble">
+                        ${esc(msg.text)}
+                    </div>
+                    <div class="msg-time">${timeStr}</div>
+                </div>
+            `;
+        });
+
+        viewport.innerHTML = html;
+        scrollToBottom();
+    }
+
+    // Load Session Meta & Messages
+    async function loadSession() {
+        if (!authToken) {
+            viewport.innerHTML = `
+                <div class="error-banner">
+                    <h2 style="font-size: 18px; color: var(--navy); margin-bottom: 8px;">Authentication Required</h2>
+                    <p style="font-size: 13.5px; color: var(--text); margin-bottom: 18px;">Please log in with your registered account to join this counselling session.</p>
+                    <a href="book.html" class="btn-header-link" style="display:inline-block; padding: 10px 24px;">Go to Portal &rarr;</a>
+                </div>
+            `;
+            composerForm.style.display = 'none';
+            return;
+        }
+
+        if (!appointmentId) {
+            viewport.innerHTML = `
+                <div class="error-banner">
+                    <h2 style="font-size: 18px; color: var(--red); margin-bottom: 8px;">No Appointment Selected</h2>
+                    <p style="font-size: 13.5px; color: var(--text);">Please select a confirmed session from your appointments list.</p>
+                    <a href="book.html" class="btn-header-link" style="display:inline-block; margin-top: 14px;">View Appointments</a>
+                </div>
+            `;
+            composerForm.style.display = 'none';
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_BASE}/appointments/${appointmentId}/session`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                viewport.innerHTML = `
+                    <div class="error-banner">
+                        <h2 style="font-size: 18px; color: var(--red); margin-bottom: 8px;">Access Denied</h2>
+                        <p style="font-size: 13.5px; color: var(--text);">${esc(err.error || 'You do not have permission to access this counselling chat.')}</p>
+                        <a href="book.html" class="btn-header-link" style="display:inline-block; margin-top: 14px;">Return to Bookings</a>
+                    </div>
+                `;
+                composerForm.style.display = 'none';
+                return;
+            }
+
+            const data = await res.json();
+            const app = data.appointment;
+            const currentPart = data.currentParticipant;
+            const otherPart = data.otherParticipant;
+
+            currentUserId = currentPart.id;
+            currentUserRole = currentPart.role;
+
+            // Set Header details
+            otherNameEl.textContent = otherPart.name;
+            otherRoleChip.textContent = otherPart.role.toUpperCase();
+            sessionMetaText.textContent = `${otherPart.designation} • ${app.date} at ${app.time}`;
+            sessionTopicText.textContent = app.concern || 'Mental Wellness Session';
+
+            // Set initials
+            const initials = otherPart.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            avatarInitials.textContent = initials || '💬';
+
+            // Setup Quick chips for current role
+            setupQuickChips(currentUserRole === 'student', otherPart.name);
+
+            // Render existing messages
+            renderMessages(app.messages || [], app);
+            lastRenderedCount = (app.messages || []).length;
+
+            // Start live polling every 1.5s
+            if (!pollInterval) {
+                pollInterval = setInterval(pollNewMessages, 1500);
+            }
+
+        } catch (err) {
+            console.error('Session loading error:', err);
+            viewport.innerHTML = `
+                <div class="error-banner">
+                    <h2 style="font-size: 18px; color: var(--red);">Connection Error</h2>
+                    <p style="font-size: 13.5px; color: var(--text);">Could not connect to session chat. Please check your internet connection.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Polling for live incoming messages
+    async function pollNewMessages() {
+        if (!authToken || !appointmentId) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/appointments/${appointmentId}/messages`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                const msgs = data.messages || [];
+
+                if (msgs.length !== lastRenderedCount) {
+                    lastRenderedCount = msgs.length;
+                    renderMessages(msgs, {
+                        studentName: 'Student',
+                        counsellorName: 'Counsellor',
+                        date: 'Confirmed Session',
+                        time: ''
+                    });
+                }
+            }
+        } catch (_) {}
+    }
+
+    // Sending a message
+    composerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        sendBtn.disabled = true;
+        chatInput.value = '';
+
+        try {
+            const res = await fetch(`${API_BASE}/appointments/${appointmentId}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ text })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                lastRenderedCount = (data.messages || []).length;
+                renderMessages(data.messages, {
+                    studentName: 'Student',
+                    counsellorName: 'Counsellor',
+                    date: 'Live Session',
+                    time: ''
+                });
+            } else {
+                const err = await res.json().catch(() => ({}));
+                alert(err.error || 'Failed to send message.');
+                chatInput.value = text;
+            }
+        } catch (err) {
+            console.error('Error sending message:', err);
+            alert('Network error sending message.');
+            chatInput.value = text;
+        } finally {
+            sendBtn.disabled = false;
+            chatInput.focus();
+        }
+    });
+
+    // Cleanup on window unload
+    window.addEventListener('beforeunload', () => {
+        if (pollInterval) clearInterval(pollInterval);
+    });
+
+    init();
+
+    function init() {
+        loadSession();
+    }
+</script>
+</body>
+</html>

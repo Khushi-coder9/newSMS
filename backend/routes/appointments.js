@@ -467,4 +467,165 @@ router.patch('/:id/cancel', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * Helper: Check if user has permission to access an appointment's 1-on-1 chat
+ */
+function canAccessAppointmentChat(appointment, user) {
+  if (!appointment || !user) return false;
+  const userIdStr = user.userId ? user.userId.toString() : '';
+  const userEmail = (user.email || '').toLowerCase().trim();
+  const userRole = (user.role || '').toLowerCase();
+
+  if (userRole === 'admin') return true;
+  if (appointment.student && appointment.student.toString() === userIdStr) return true;
+  if (appointment.counsellor && appointment.counsellor.toString() === userIdStr) return true;
+  if (appointment.studentEmail && appointment.studentEmail.toLowerCase() === userEmail) return true;
+  if (appointment.counsellorEmail && appointment.counsellorEmail.toLowerCase() === userEmail) return true;
+
+  return false;
+}
+
+/**
+ * GET /api/appointments/:id/session
+ * Retrieves 1-on-1 private counselling session details and full chat history
+ */
+router.get('/:id/session', authMiddleware, async (req, res) => {
+  try {
+    const appointmentId = req.params.id;
+    const appointment = await Appointment.findById(appointmentId).lean();
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Session not found.' });
+    }
+
+    if (!canAccessAppointmentChat(appointment, req.user)) {
+      return res.status(403).json({ error: 'Access denied. You are not a participant in this counselling session.' });
+    }
+
+    const currentUserId = req.user.userId.toString();
+    const isStudent = (appointment.student && appointment.student.toString() === currentUserId) ||
+                      (appointment.studentEmail && appointment.studentEmail.toLowerCase() === (req.user.email || '').toLowerCase());
+
+    const otherParticipant = isStudent ? {
+      name: appointment.counsellorName,
+      email: appointment.counsellorEmail,
+      role: 'counsellor',
+      designation: appointment.counsellorDesignation || 'Campus Counsellor'
+    } : {
+      name: appointment.studentName,
+      email: appointment.studentEmail,
+      role: 'student',
+      designation: 'Student'
+    };
+
+    res.json({
+      success: true,
+      appointment: {
+        id: appointment._id,
+        studentName: appointment.studentName,
+        studentEmail: appointment.studentEmail,
+        counsellorName: appointment.counsellorName,
+        counsellorEmail: appointment.counsellorEmail,
+        counsellorDesignation: appointment.counsellorDesignation,
+        date: appointment.date,
+        time: appointment.time,
+        sessionType: appointment.sessionType,
+        meetingLink: appointment.meetingLink,
+        concern: appointment.concern,
+        status: appointment.status,
+        messages: appointment.messages || []
+      },
+      currentParticipant: {
+        id: currentUserId,
+        name: req.userDoc ? req.userDoc.name : (isStudent ? appointment.studentName : appointment.counsellorName),
+        role: isStudent ? 'student' : 'counsellor'
+      },
+      otherParticipant
+    });
+  } catch (error) {
+    console.error('Error fetching session details:', error);
+    res.status(500).json({ error: 'Failed to retrieve session details.' });
+  }
+});
+
+/**
+ * GET /api/appointments/:id/messages
+ * Polling endpoint for real-time 1-on-1 session messages
+ */
+router.get('/:id/messages', authMiddleware, async (req, res) => {
+  try {
+    const appointmentId = req.params.id;
+    const appointment = await Appointment.findById(appointmentId).select('student counsellor studentEmail counsellorEmail messages status').lean();
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Session not found.' });
+    }
+
+    if (!canAccessAppointmentChat(appointment, req.user)) {
+      return res.status(403).json({ error: 'Access denied.' });
+    }
+
+    res.json({
+      success: true,
+      status: appointment.status,
+      count: (appointment.messages || []).length,
+      messages: appointment.messages || []
+    });
+  } catch (error) {
+    console.error('Error retrieving session messages:', error);
+    res.status(500).json({ error: 'Failed to retrieve messages.' });
+  }
+});
+
+/**
+ * POST /api/appointments/:id/messages
+ * Sends a message in the 1-on-1 private session chat
+ */
+router.post('/:id/messages', authMiddleware, async (req, res) => {
+  try {
+    const appointmentId = req.params.id;
+    const { text } = req.body;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: 'Message text is required.' });
+    }
+
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ error: 'Session not found.' });
+    }
+
+    if (!canAccessAppointmentChat(appointment, req.user)) {
+      return res.status(403).json({ error: 'Access denied.' });
+    }
+
+    const currentUserId = req.user.userId;
+    const isStudent = (appointment.student && appointment.student.toString() === currentUserId.toString()) ||
+                      (appointment.studentEmail && appointment.studentEmail.toLowerCase() === (req.user.email || '').toLowerCase());
+
+    const senderRole = isStudent ? 'student' : 'counsellor';
+    const senderName = req.userDoc ? req.userDoc.name : (isStudent ? appointment.studentName : appointment.counsellorName);
+
+    const newMsg = {
+      senderId: currentUserId,
+      senderName,
+      senderRole,
+      text: text.trim(),
+      createdAt: new Date()
+    };
+
+    appointment.messages.push(newMsg);
+    await appointment.save();
+
+    res.status(201).json({
+      success: true,
+      message: newMsg,
+      messages: appointment.messages
+    });
+  } catch (error) {
+    console.error('Error sending session message:', error);
+    res.status(500).json({ error: 'Failed to send message.' });
+  }
+});
+
 module.exports = router;
