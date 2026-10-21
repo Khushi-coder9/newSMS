@@ -1309,12 +1309,29 @@
                 </div>
             </div>
 
+            <!-- Interactive Student Case Navigator -->
+            <div style="background: #ffffff; border: 1.5px solid var(--border); border-radius: 18px; padding: 16px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; box-shadow: 0 4px 18px rgba(109, 77, 255, 0.05);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 12px; background: #f0ebff; color: var(--purple); font-size: 20px; display: grid; place-items: center; font-weight: 800;">🔍</div>
+                    <div>
+                        <strong style="font-size: 14px; color: var(--heading); display: block;">Interactive Student Clinical Case Navigator</strong>
+                        <span style="font-size: 12.5px; color: var(--text);">Directly inspect any student who booked with you to view their AI psychiatric impression, radar chart, and trajectory curves</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <select id="counsellorStudentSelector" style="padding: 8px 14px; border-radius: 10px; border: 1.5px solid #dcd4fa; font-size: 13px; font-weight: 600; background: #faf9ff; color: var(--navy); min-width: 230px; outline: none;">
+                        <option value="">-- Choose Student to Analyze --</option>
+                    </select>
+                    <button class="btn-action-sm btn-primary-sm" onclick="openSelectedStudentAnalysis()" style="padding: 8px 16px;">📊 View Student Analysis</button>
+                </div>
+            </div>
+
             <!-- Counsellor's Active Appointments Queue -->
             <div class="content-card">
                 <div class="card-header-flex">
                     <div>
                         <h2 style="font-size: 18px; font-weight: 800; color: var(--heading);">Active Appointment Queue & Management</h2>
-                        <p style="font-size: 13px; color: var(--text);">Confirm appointments, join Jitsi meets, or submit session feedback</p>
+                        <p style="font-size: 13px; color: var(--text);">Click any student to view their AI analysis and interactive graphs, or confirm & meet</p>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -1530,6 +1547,179 @@
         </div>
     </div>
 
+    <!-- Modal: Counsellor Student Clinical Analysis & Interactive Graphs -->
+    <div class="modal-bg" id="studentAnalysisModal">
+        <div class="modal modal-analysis" style="width: min(1040px, 96vw); max-height: 92vh; padding: 28px 24px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; border-bottom: 1.5px solid var(--border); padding-bottom: 18px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 52px; height: 52px; border-radius: 16px; background: #f0ebff; color: var(--purple); font-size: 26px; display: grid; place-items: center; font-weight: 800;">🎓</div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h2 style="font-size: 22px; font-weight: 800; color: var(--heading); margin-bottom: 0;" id="analysisModalStudentName">Student Clinical Analysis</h2>
+                            <span class="badge" id="analysisModalRiskBadge" style="background:#dcfce7; color:#15803d;">Low Risk • Monitored</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text); margin-bottom: 0; margin-top: 3px;" id="analysisModalStudentMeta">
+                            student@example.com &bull; Age: 20 &bull; Private Clinical Profile
+                        </p>
+                    </div>
+                </div>
+                <button type="button" class="btn-action-sm btn-outline-sm" id="closeStudentAnalysisModal" style="font-size: 16px; padding: 4px 10px; border-radius: 50%;">✕</button>
+            </div>
+
+            <!-- Top 4 Metric Cards for this student -->
+            <div class="metrics-grid" style="margin-bottom: 20px;">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-label">Improvement Index</span>
+                        <div class="metric-icon-wrap" style="background:#f0ebff; color:#6d4dff;">📈</div>
+                    </div>
+                    <div class="metric-val" id="modalStudentImpVal">90%</div>
+                    <div class="metric-progress">
+                        <div class="metric-progress-fill" id="modalStudentProgressFill" style="width: 90%;"></div>
+                    </div>
+                    <div class="metric-sub" id="modalStudentImpSub">★ 4.6/5.0 Significant Growth</div>
+                </div>
+
+                <div class="metric-card cyan">
+                    <div class="metric-header">
+                        <span class="metric-label">AI Chats Logged</span>
+                        <div class="metric-icon-wrap" style="background:#e0f7fa; color:#06b6d4;">💬</div>
+                    </div>
+                    <div class="metric-val" id="modalStudentChatsVal">11</div>
+                    <div class="metric-sub" id="modalStudentChatsSub">MindMate AI interactions</div>
+                </div>
+
+                <div class="metric-card green">
+                    <div class="metric-header">
+                        <span class="metric-label">Sessions with Counsellor</span>
+                        <div class="metric-icon-wrap" style="background:#e8f5e9; color:#10b981;">📅</div>
+                    </div>
+                    <div class="metric-val" id="modalStudentApptsVal">4</div>
+                    <div class="metric-sub" id="modalStudentApptsSub">Completed sessions</div>
+                </div>
+
+                <div class="metric-card amber">
+                    <div class="metric-header">
+                        <span class="metric-label">Primary Clinical Focus</span>
+                        <div class="metric-icon-wrap" style="background:#fffbeb; color:#f59e0b;">🏷️</div>
+                    </div>
+                    <div class="metric-val" style="font-size: 19px; line-height: 1.25;" id="modalStudentFocusVal">Depression & Low Mood</div>
+                    <div class="metric-sub">Identified via AI & Clinical history</div>
+                </div>
+            </div>
+
+            <!-- AI & Counsellor Dual Clinical Spotlight for this student -->
+            <div class="clinical-spotlight" style="margin-bottom: 22px;">
+                <div class="spotlight-col">
+                    <div class="spotlight-header">
+                        <div class="spotlight-title">
+                            <span>🤖</span> MindMate AI Psychiatric Impression
+                        </div>
+                        <span class="chart-badge" id="modalAiSentimentBadge">Reflective & Stabilizing</span>
+                    </div>
+                    <div class="spotlight-quote" id="modalAiImpressionText">
+                        "Student demonstrates high emotional self-awareness and active therapeutic engagement."
+                    </div>
+                    <div class="spotlight-tags" id="modalAiKeywordTags">
+                        <!-- Keyword tags -->
+                    </div>
+                </div>
+
+                <div class="spotlight-col counsellor">
+                    <div class="spotlight-header">
+                        <div class="spotlight-title">
+                            <span>🩺</span> Counsellor Clinical Assessment
+                        </div>
+                        <span class="chart-badge cyan">Clinical Guidance</span>
+                    </div>
+                    <div class="spotlight-quote" id="modalCounsellorSummaryText">
+                        "Positive response to grounding and breathing exercises. Continued follow-up recommended."
+                    </div>
+                    <div style="font-size: 12.5px; color: #5a5878; font-weight: 600;" id="modalCounsellorGoalText">
+                        Target: Consolidate stress management mechanisms and sleep hygiene.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2x2 Interactive Charts Grid for this student -->
+            <div class="chart-grid-2x2">
+                <!-- Chart 1: Psychological Radar -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Psychological Dimensions & Mind Map</div>
+                            <div class="chart-desc">Baseline intake vs current therapeutic state</div>
+                        </div>
+                        <span class="chart-badge">Psychiatric Radar</span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="modalStudentRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Wellness vs Stress Dual Trajectory -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Wellness Trajectory vs Stress Level</div>
+                            <div class="chart-desc">Recovery progress across clinical milestones</div>
+                        </div>
+                        <span class="chart-badge green">Dual Trajectory</span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="modalStudentTrajectoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Emotional & Concern Spectrum -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Emotional & Concern Spectrum</div>
+                            <div class="chart-desc">Distribution of topics discussed in AI chats</div>
+                        </div>
+                        <span class="chart-badge amber">Topic Breakdown</span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="modalStudentDifficultyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 4: Counsellor Evaluation Ratings -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Counsellor Clinical Competencies</div>
+                            <div class="chart-desc">Evaluated therapeutic proficiencies</div>
+                        </div>
+                        <span class="chart-badge cyan">Clinical Ratings</span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="modalStudentCompetencyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prescribed Coping Plan / Habit Tracker -->
+            <div style="margin-top: 18px; margin-bottom: 22px;">
+                <div class="card-header-flex">
+                    <h3 style="font-size: 16px; font-weight: 800; color: var(--heading);">Assigned Coping Plan & Habits</h3>
+                </div>
+                <div class="prescribed-plan-grid" id="modalStudentPrescribedGrid"></div>
+            </div>
+
+            <!-- Counsellor Action Bar -->
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #faf9ff; border: 1.5px solid #ece6ff; border-radius: 16px; padding: 14px 18px;">
+                <div style="font-size: 13px; font-weight: 700; color: var(--navy);">
+                    ⚡ Counsellor Actions for this Student:
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;" id="modalStudentActionButtons">
+                    <!-- Dynamic action buttons -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '80' && window.location.port !== ''
             ? 'http://localhost:5000/api'
@@ -1544,6 +1734,10 @@
         let studentTrajChartInstance = null;
         let studentDiffChartInstance = null;
         let studentCompetencyChartInstance = null;
+        let modalRadarChartInstance = null;
+        let modalTrajChartInstance = null;
+        let modalDiffChartInstance = null;
+        let modalCompetencyChartInstance = null;
         let counsellorDiffChartInstance = null;
         let counsellorStatusChartInstance = null;
         let adminCampusDiffChartInstance = null;
@@ -1553,6 +1747,7 @@
         // Cache for filtering
         let cachedAdminData = null;
         let cachedCounsellorStudents = [];
+        let cachedCounsellorAppointments = [];
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -2138,11 +2333,33 @@
                 renderCounsellorStatusChart(data.charts?.appointmentStatusBreakdown || {});
 
                 // Render Appointment Queue
-                renderCounsellorAppointmentsTable(data.appointments || []);
+                cachedCounsellorAppointments = data.appointments || [];
+                renderCounsellorAppointmentsTable(cachedCounsellorAppointments);
 
                 // Render Student Clinical Reports Table
                 cachedCounsellorStudents = data.students || [];
                 renderCounsellorStudentTable(cachedCounsellorStudents);
+
+                // Populate Interactive Student Case Navigator Dropdown
+                const selector = document.getElementById('counsellorStudentSelector');
+                if (selector) {
+                    const studentMap = new Map();
+                    (data.appointments || []).forEach(a => {
+                        const sId = a.student || a.studentEmail;
+                        if (sId && !studentMap.has(sId.toString())) {
+                            studentMap.set(sId.toString(), { id: sId, name: a.studentName || 'Student', email: a.studentEmail });
+                        }
+                    });
+                    (data.students || []).forEach(s => {
+                        const sId = s._id || s.email;
+                        if (sId && !studentMap.has(sId.toString())) {
+                            studentMap.set(sId.toString(), { id: sId, name: s.name || 'Student', email: s.email });
+                        }
+                    });
+
+                    selector.innerHTML = '<option value="">-- Choose Student to Analyze --</option>' +
+                        Array.from(studentMap.values()).map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name)} (${escapeHtml(s.email)})</option>`).join('');
+                }
 
             } catch (err) {
                 console.error('Error loading counsellor dashboard:', err);
@@ -2233,7 +2450,12 @@
             }
 
             tbody.innerHTML = appointments.map(a => {
+                const sId = a.student || a.studentEmail;
                 let actions = '';
+                
+                // Direct Case Analysis Button
+                actions += `<button class="btn-action-sm btn-outline-sm" style="color:#6d4dff; border-color:#c4b5fd; background:#f5f2ff; font-weight:700;" onclick="viewStudentAnalysis('${sId}', '${escapeHtml(a.studentName)}')">📊 Analysis</button> `;
+
                 if (a.status === 'pending') {
                     actions += `<button class="btn-action-sm btn-green-sm" onclick="confirmAppointment('${a._id}')">✓ Confirm</button> `;
                     actions += `<button class="btn-action-sm btn-outline-sm" style="color:#dc2626; border-color:#fca5a5;" onclick="declineAppointment('${a._id}')">✗ Decline</button> `;
@@ -2244,11 +2466,16 @@
                 if (a.sessionType === 'chat' && a.status === 'confirmed') {
                     actions += `<a href="session-chat.html?appointmentId=${a._id}" class="btn-action-sm btn-primary-sm">💬 Open Chat</a> `;
                 }
-                actions += `<button class="btn-action-sm btn-primary-sm" onclick="openFeedbackModal('${a._id}', '${escapeHtml(a.studentName)}')">📝 Add Feedback</button>`;
+                actions += `<button class="btn-action-sm btn-outline-sm" onclick="openFeedbackModal('${a._id}', '${escapeHtml(a.studentName)}')">📝 Feedback</button>`;
 
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(a.studentName)}</strong><div style="font-size:11px; color:#8c89a8;">${escapeHtml(a.studentEmail)}</div></td>
+                        <td>
+                            <a href="javascript:void(0)" onclick="viewStudentAnalysis('${sId}', '${escapeHtml(a.studentName)}')" style="color:var(--purple); font-weight:800; text-decoration:underline;" title="Click to view interactive analysis & charts">
+                                ${escapeHtml(a.studentName)} 📊
+                            </a>
+                            <div style="font-size:11px; color:#8c89a8;">${escapeHtml(a.studentEmail)}</div>
+                        </td>
                         <td>${escapeHtml(a.date)} &bull; ${escapeHtml(a.time)}</td>
                         <td><span class="tag-pill">${a.sessionType === 'meet' ? '🎥 Video Meet' : '💬 Chat'}</span></td>
                         <td style="font-size:12.5px; max-width:220px;">${escapeHtml(a.concern || a.notes || 'Mental Wellness Support')}</td>
@@ -2268,6 +2495,7 @@
             }
 
             tbody.innerHTML = students.map(s => {
+                const sId = s._id || s.email;
                 const diffs = (s.difficulties || ['Academic Stress', 'Sleep Quality']).map(d => `<span class="tag-pill">${escapeHtml(d)}</span>`).join('');
                 const severity = s.severity || 'normal';
                 const sevBadge = severity === 'crisis'
@@ -2276,15 +2504,428 @@
 
                 return `
                     <tr>
-                        <td><strong>${escapeHtml(s.name)}</strong><div style="font-size:11px; color:#8c89a8;">${escapeHtml(s.email)}</div></td>
+                        <td>
+                            <a href="javascript:void(0)" onclick="viewStudentAnalysis('${sId}', '${escapeHtml(s.name)}')" style="color:var(--purple); font-weight:800; text-decoration:underline;" title="Click to view interactive analysis & charts">
+                                ${escapeHtml(s.name)} 📊
+                            </a>
+                            <div style="font-size:11px; color:#8c89a8;">${escapeHtml(s.email)}</div>
+                        </td>
                         <td>${s.age || 'N/A'}</td>
                         <td>${diffs}</td>
                         <td>${sevBadge}</td>
-                        <td><button class="btn-action-sm btn-outline-sm" onclick="window.location.href='book.html'">Schedule Slot</button></td>
+                        <td>
+                            <button class="btn-action-sm btn-primary-sm" onclick="viewStudentAnalysis('${sId}', '${escapeHtml(s.name)}')">📊 View Analytics</button>
+                        </td>
                     </tr>
                 `;
             }).join('');
         }
+
+        // ==========================================
+        // COUNSELLOR INTERACTIVE STUDENT ANALYSIS
+        // ==========================================
+        function openSelectedStudentAnalysis() {
+            const selector = document.getElementById('counsellorStudentSelector');
+            if (!selector || !selector.value) {
+                alert('Please select a student from the dropdown list to view their analysis.');
+                return;
+            }
+            const selectedOpt = selector.options[selector.selectedIndex];
+            viewStudentAnalysis(selector.value, selectedOpt ? selectedOpt.text.split('(')[0].trim() : 'Student');
+        }
+
+        async function viewStudentAnalysis(studentIdOrEmail, studentName) {
+            if (!studentIdOrEmail) return;
+            const modal = document.getElementById('studentAnalysisModal');
+            if (!modal) return;
+
+            // Set loading state in modal
+            document.getElementById('analysisModalStudentName').textContent = studentName ? `Analyzing ${studentName}...` : 'Loading Student Analysis...';
+            document.getElementById('analysisModalStudentMeta').textContent = 'Fetching AI first-aid chat analysis and clinical charts...';
+            modal.classList.add('show');
+
+            try {
+                const res = await fetch(`${API_BASE}/dashboard/student-analysis/${encodeURIComponent(studentIdOrEmail)}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    alert(err.error || 'Failed to fetch student analysis.');
+                    modal.classList.remove('show');
+                    return;
+                }
+
+                const data = await res.json();
+                if (!data || !data.success) {
+                    alert('Unable to load clinical data for this student.');
+                    modal.classList.remove('show');
+                    return;
+                }
+
+                // Populate Header & Metas
+                document.getElementById('analysisModalStudentName').textContent = data.student.name || 'Student Clinical Case';
+                document.getElementById('analysisModalStudentMeta').textContent = `${data.student.email} • Age: ${data.student.age || 'N/A'} • Private Clinical Profile`;
+                
+                const riskBadge = document.getElementById('analysisModalRiskBadge');
+                if (riskBadge) {
+                    const isCrisis = data.stats.riskLevel === 'High' || (data.stats.riskLevel || '').includes('Crisis');
+                    const isModerate = (data.stats.riskLevel || '').includes('Moderate');
+                    if (isCrisis) {
+                        riskBadge.className = 'badge crisis';
+                        riskBadge.textContent = '🚨 Urgent Case Attention';
+                    } else if (isModerate) {
+                        riskBadge.className = 'badge moderate';
+                        riskBadge.textContent = '⚠️ Monitored Case';
+                    } else {
+                        riskBadge.className = 'badge normal';
+                        riskBadge.textContent = '✓ Low Risk • Stable';
+                    }
+                }
+
+                // Metric Cards
+                document.getElementById('modalStudentImpVal').textContent = `${data.stats.improvementPercentage || 90}%`;
+                document.getElementById('modalStudentProgressFill').style.width = `${data.stats.improvementPercentage || 90}%`;
+                document.getElementById('modalStudentImpSub').textContent = `★ ${data.stats.improvementRating || '4.6'}/5.0 • ${data.stats.improvementLevelText || 'Significant Growth'}`;
+                document.getElementById('modalStudentChatsVal').textContent = data.stats.totalChats || 0;
+                document.getElementById('modalStudentChatsSub').textContent = `MindMate AI interactions • ${data.stats.aiSentiment || 'Reflective'}`;
+                document.getElementById('modalStudentApptsVal').textContent = data.stats.totalAppointments || 0;
+                document.getElementById('modalStudentApptsSub').textContent = `${data.stats.completedAppointments || 0} Completed • ${data.stats.upcomingAppointments || 0} Upcoming`;
+                document.getElementById('modalStudentFocusVal').textContent = data.stats.primaryDifficulty || 'General Well-being';
+
+                // Clinical Spotlight
+                if (data.clinicalAnalysis) {
+                    const aiImp = data.clinicalAnalysis.aiImpression;
+                    if (aiImp) {
+                        const sBadge = document.getElementById('modalAiSentimentBadge');
+                        if (sBadge) sBadge.textContent = aiImp.emotionalState || 'Reflective & Receptive';
+                        const sText = document.getElementById('modalAiImpressionText');
+                        if (sText && aiImp.summary) sText.textContent = `"${aiImp.summary}"`;
+                        const tagsWrap = document.getElementById('modalAiKeywordTags');
+                        if (tagsWrap && aiImp.topKeywords) {
+                            tagsWrap.innerHTML = aiImp.topKeywords.slice(0, 5).map(k => `<span class="spotlight-tag">#${escapeHtml(k.replace(/\s+/g, ''))}</span>`).join('');
+                        }
+                    }
+                    const cSum = data.clinicalAnalysis.counsellorSummary;
+                    if (cSum) {
+                        const cText = document.getElementById('modalCounsellorSummaryText');
+                        if (cText && cSum.overallPrognosis) cText.textContent = `"${cSum.overallPrognosis}"`;
+                        const cGoal = document.getElementById('modalCounsellorGoalText');
+                        if (cGoal && cSum.targetGoal) cGoal.textContent = `Target: ${cSum.targetGoal}`;
+                    }
+                }
+
+                // 4 Interactive Charts
+                if (data.charts) {
+                    renderModalRadarChart(data.charts.psychologicalRadar);
+                    renderModalTrajectoryChart(data.charts.wellnessTrajectory);
+                    renderModalDifficultyChart(data.charts.difficultyBreakdown);
+                    renderModalCompetencyChart(data.charts.counsellorCompetencies);
+                }
+
+                // Prescribed Habits
+                renderModalPrescribedPlan(data.prescribedPlan || []);
+
+                // Actions bar
+                const btnContainer = document.getElementById('modalStudentActionButtons');
+                if (btnContainer) {
+                    const appts = data.appointments || [];
+                    const latestConfirmedAppt = appts.find(a => a.status === 'confirmed');
+                    let actionHtml = '';
+                    if (latestConfirmedAppt) {
+                        if (latestConfirmedAppt.sessionType === 'chat') {
+                            actionHtml += `<a href="session-chat.html?appointmentId=${latestConfirmedAppt._id}" class="btn-action-sm btn-primary-sm">💬 Open 1-on-1 Chat</a> `;
+                        }
+                        if (latestConfirmedAppt.meetingLink) {
+                            actionHtml += `<a href="${latestConfirmedAppt.meetingLink}" target="_blank" class="btn-action-sm btn-green-sm">🎥 Join Meet</a> `;
+                        }
+                    }
+                    const targetApptId = appts[0] ? appts[0]._id : '';
+                    if (targetApptId) {
+                        actionHtml += `<button class="btn-action-sm btn-outline-sm" onclick="closeAnalysisAndOpenFeedback('${targetApptId}', '${escapeHtml(data.student.name)}')">📝 Record Session Feedback</button>`;
+                    }
+                    btnContainer.innerHTML = actionHtml || '<span style="font-size:12px; color:#8c89a8;">No pending actions for this student.</span>';
+                }
+
+            } catch (err) {
+                console.error('Error in viewStudentAnalysis:', err);
+                alert('Network error loading student analysis.');
+                modal.classList.remove('show');
+            }
+        }
+
+        function closeAnalysisAndOpenFeedback(apptId, studentName) {
+            document.getElementById('studentAnalysisModal')?.classList.remove('show');
+            openFeedbackModal(apptId, studentName);
+        }
+
+        // Modal Chart 1: Radar Chart
+        function renderModalRadarChart(radarData) {
+            const canvas = document.getElementById('modalStudentRadarChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (modalRadarChartInstance) modalRadarChartInstance.destroy();
+
+            const labels = radarData?.labels || ['Emotional Regulation', 'Stress Resilience', 'Sleep & Vitality', 'Cognitive Focus', 'Hope & Optimism', 'Social Connection'];
+            const baseline = radarData?.baseline || [48, 44, 40, 52, 46, 50];
+            const current = radarData?.current || [88, 84, 78, 89, 92, 85];
+
+            modalRadarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Current State (Post-Guidance)',
+                            data: current,
+                            backgroundColor: 'rgba(109, 77, 255, 0.22)',
+                            borderColor: '#6d4dff',
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#6d4dff',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4.5
+                        },
+                        {
+                            label: 'Intake Baseline (AI Screening)',
+                            data: baseline,
+                            backgroundColor: 'rgba(148, 163, 184, 0.12)',
+                            borderColor: '#94a3b8',
+                            borderWidth: 1.8,
+                            borderDash: [5, 4],
+                            pointBackgroundColor: '#94a3b8',
+                            pointBorderColor: '#ffffff',
+                            pointRadius: 3.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 20,
+                            max: 100,
+                            ticks: { display: false, stepSize: 20 },
+                            grid: { color: 'rgba(109, 77, 255, 0.09)' },
+                            angleLines: { color: 'rgba(109, 77, 255, 0.12)' },
+                            pointLabels: {
+                                font: { family: 'Plus Jakarta Sans', size: 10.5, weight: '700' },
+                                color: '#2a265c'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' } } },
+                        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%` } }
+                    }
+                }
+            });
+        }
+
+        // Modal Chart 2: Trajectory Spline
+        function renderModalTrajectoryChart(trajData) {
+            const canvas = document.getElementById('modalStudentTrajectoryChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (modalTrajChartInstance) modalTrajChartInstance.destroy();
+
+            const labels = trajData?.labels || ['Intake', 'AI Chat', 'Session 1', 'Breathing', 'Check-in', 'Follow-up', 'Current'];
+            const wellnessScores = trajData?.wellnessScores || trajData?.scores || [58, 65, 72, 78, 83, 87, 90];
+            const stressScores = trajData?.stressScores || [85, 75, 64, 52, 40, 32, 24];
+
+            const purpleGrad = ctx.createLinearGradient(0, 0, 0, 260);
+            purpleGrad.addColorStop(0, 'rgba(109, 77, 255, 0.32)');
+            purpleGrad.addColorStop(1, 'rgba(109, 77, 255, 0.01)');
+
+            const amberGrad = ctx.createLinearGradient(0, 0, 0, 260);
+            amberGrad.addColorStop(0, 'rgba(245, 158, 11, 0.22)');
+            amberGrad.addColorStop(1, 'rgba(245, 158, 11, 0.01)');
+
+            modalTrajChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Wellness Index (%)',
+                            data: wellnessScores,
+                            borderColor: '#6d4dff',
+                            backgroundColor: purpleGrad,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#6d4dff',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4.5,
+                            fill: true,
+                            tension: 0.38
+                        },
+                        {
+                            label: 'Stress Level (%)',
+                            data: stressScores,
+                            borderColor: '#f59e0b',
+                            backgroundColor: amberGrad,
+                            borderWidth: 2.5,
+                            borderDash: [4, 4],
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            fill: true,
+                            tension: 0.38
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { min: 15, max: 100, ticks: { callback: v => `${v}%`, font: { family: 'Plus Jakarta Sans', size: 10.5, weight: '600' } }, grid: { color: '#f0ecfc' } },
+                        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10, weight: '600' } } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' } } },
+                        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%` } }
+                    }
+                }
+            });
+        }
+
+        // Modal Chart 3: Difficulty Donut
+        function renderModalDifficultyChart(diffData) {
+            const canvas = document.getElementById('modalStudentDifficultyChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (modalDiffChartInstance) modalDiffChartInstance.destroy();
+
+            const labels = Object.keys(diffData || {});
+            const values = Object.values(diffData || {});
+            const palette = ['#6d4dff', '#06b6d4', '#f59e0b', '#ec4899', '#10b981', '#8b5cf6'];
+
+            modalDiffChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: palette.slice(0, labels.length),
+                        borderWidth: 3,
+                        borderColor: '#ffffff',
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { family: 'Plus Jakarta Sans', size: 10.5, weight: '600' } } },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    const val = ctx.raw;
+                                    const pct = Math.round((val / total) * 100);
+                                    return ` ${ctx.label}: ${val} (${pct}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '66%'
+                }
+            });
+        }
+
+        // Modal Chart 4: Competencies Bar
+        function renderModalCompetencyChart(compData) {
+            const canvas = document.getElementById('modalStudentCompetencyChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (modalCompetencyChartInstance) modalCompetencyChartInstance.destroy();
+
+            const labels = compData?.labels || ['Emotional Insight', 'Coping Skill Adoption', 'Stress Regulation', 'Academic Balance', 'Action Plan Execution'];
+            const scores = compData?.scores || [90, 85, 82, 78, 88];
+            const colors = ['#6d4dff', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'];
+
+            modalCompetencyChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Clinical Attainment (%)',
+                        data: scores,
+                        backgroundColor: colors,
+                        borderRadius: 8,
+                        barThickness: 15
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { min: 40, max: 100, ticks: { callback: v => `${v}%`, font: { family: 'Plus Jakarta Sans', size: 10, weight: '600' } }, grid: { color: '#f0ecfc' } },
+                        y: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 10.5, weight: '700' } } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => ` Rating: ${ctx.raw}% Progress` } }
+                    }
+                }
+            });
+        }
+
+        // Modal Prescribed Plan Renderer
+        function renderModalPrescribedPlan(planList) {
+            const grid = document.getElementById('modalStudentPrescribedGrid');
+            if (!grid) return;
+            if (!planList || planList.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #8c89a8; padding: 16px;">No active prescriptions logged yet.</div>';
+                return;
+            }
+
+            const icons = { 'mindfulness': '🧘', 'cbt': '📝', 'behavioral': '🚶', 'sleep': '🌙', 'default': '✨' };
+
+            grid.innerHTML = planList.map((plan) => {
+                const catLower = (plan.category || '').toLowerCase();
+                let icon = icons.default;
+                if (catLower.includes('mindful') || catLower.includes('breath')) icon = icons.mindfulness;
+                else if (catLower.includes('cbt') || catLower.includes('reframe')) icon = icons.cbt;
+                else if (catLower.includes('walk') || catLower.includes('behavior')) icon = icons.behavioral;
+                else if (catLower.includes('sleep') || catLower.includes('rest')) icon = icons.sleep;
+
+                const progress = plan.progress || 80;
+
+                return `
+                    <div class="plan-card">
+                        <div>
+                            <div class="plan-card-top">
+                                <span class="plan-card-category">${icon} ${escapeHtml(plan.category || 'Therapeutic Action')}</span>
+                                <span class="badge ${plan.status === 'Completed' ? 'completed' : 'confirmed'}" style="font-size:10px;">${escapeHtml(plan.status || 'Active')}</span>
+                            </div>
+                            <div class="plan-card-title">${escapeHtml(plan.title)}</div>
+                            <div class="plan-card-freq">🗓️ ${escapeHtml(plan.frequency || 'Daily Habit')}</div>
+                        </div>
+                        <div class="plan-progress-wrap">
+                            <div class="plan-progress-labels">
+                                <span>Adherence</span>
+                                <span>${progress}%</span>
+                            </div>
+                            <div class="plan-progress-bar">
+                                <div class="plan-progress-fill" style="width: ${progress}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Modal Close Event Listeners
+        document.getElementById('closeStudentAnalysisModal')?.addEventListener('click', () => {
+            document.getElementById('studentAnalysisModal')?.classList.remove('show');
+        });
+        document.getElementById('studentAnalysisModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'studentAnalysisModal') e.target.classList.remove('show');
+        });
 
         const counsellorStudentSearch = document.getElementById('counsellorStudentSearch');
         if (counsellorStudentSearch) {
