@@ -3,7 +3,8 @@ const router = express.Router();
 const ChatMessage = require('../models/ChatMessage');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
-const { analyzeMessage, DIFFICULTY_DEFINITIONS } = require('../utils/difficultyAnalyzer');
+const { analyzeMessage, DIFFICULTY_DEFINITIONS, isSevereCrisis } = require('../utils/difficultyAnalyzer');
+const { sendVolunteerEmergencyAlert } = require('../utils/emailService');
 
 /**
  * POST /api/chat/save
@@ -79,15 +80,74 @@ router.post('/save', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Message content is required.' });
     }
 
+    // Trigger volunteer emergency email alert if a severe crisis trigger was encountered
+    let emergencyDispatched = false;
+    if (analysisResult && analysisResult.severity === 'crisis') {
+      emergencyDispatched = true;
+      const distressText = userMessage || message;
+      sendVolunteerEmergencyAlert({
+        studentName: userName,
+        studentEmail: userEmail,
+        studentId: userId,
+        detectedKeywords: analysisResult.detectedKeywords,
+        messageSnippet: distressText,
+        timestamp: new Date()
+      }).then(alertRes => {
+        console.log(`[Emergency Alert] Volunteer alert dispatched for student ${userName} (${userEmail}):`, alertRes);
+      }).catch(err => {
+        console.error('[Emergency Alert Error] Failed to broadcast alert to volunteers:', err.message);
+      });
+    }
+
     res.status(201).json({
       success: true,
       message: 'Chat saved successfully',
       analysis: analysisResult,
+      emergencyAlertTriggered: emergencyDispatched,
       saved: savedMessages
     });
   } catch (error) {
     console.error('Error saving chat message:', error);
     res.status(500).json({ error: 'Failed to save chat message.' });
+  }
+});
+
+/**
+ * POST /api/chat/crisis-alert
+ * Explicitly triggers volunteer emergency alert for severe cases
+ */
+router.post('/crisis-alert', authMiddleware, async (req, res) => {
+  try {
+    const { message, detectedKeywords, force } = req.body;
+    const userId = req.user.userId;
+    const userEmail = req.user.email;
+    const userName = req.userDoc ? req.userDoc.name : (req.user.name || 'Student');
+
+    const distressText = message || 'Urgent crisis distress detected in chat session';
+    const analysis = analyzeMessage(distressText);
+
+    const keywords = (detectedKeywords && detectedKeywords.length > 0)
+      ? detectedKeywords
+      : analysis.detectedKeywords;
+
+    const alertResult = await sendVolunteerEmergencyAlert({
+      studentName: userName,
+      studentEmail: userEmail,
+      studentId: userId,
+      detectedKeywords: keywords,
+      messageSnippet: distressText,
+      timestamp: new Date(),
+      force: Boolean(force)
+    });
+
+    res.json({
+      success: true,
+      message: 'Emergency alert processed',
+      alertResult
+    });
+  } catch (error) {
+    console.error('Error in crisis-alert endpoint:', error);
+    res.status(500).json({ error: 'Failed to process crisis alert' });
   }
 });
 

@@ -8,7 +8,13 @@ const DIFFICULTY_DEFINITIONS = [
     category: 'Crisis & Self-Harm',
     severity: 'crisis',
     keywords: [
-      'suicide', 'suicidal', 'kill myself', 'end my life', 'want to die', 'wanna die',
+      'suicide', 'sucide', 'suicidal', 'kill', 'kill myself', 'killing myself', 'kill me', 'want to kill',
+      'self-destruction', 'self destruction', 'self-destructive', 'self destructive',
+      'self-murder', 'self murder',
+      'self-slaughter', 'self slaughter',
+      'self-annihilation', 'self annihilation',
+      'felo-de-se', 'felo de se',
+      'end my life', 'want to die', 'wanna die',
       'self harm', 'self-harm', 'cut myself', 'harming myself', 'no reason to live',
       'better off dead', 'hang myself', 'overdose', 'hurt myself', 'end it all',
       'खुदकुशी', 'आत्महत्या', 'मरने का मन'
@@ -181,7 +187,17 @@ function analyzeMessage(text) {
   };
 }
 
+/**
+ * Helper to check if a message has severe crisis keywords
+ */
+function isSevereCrisis(text) {
+  if (!text || typeof text !== 'string') return false;
+  const analysis = analyzeMessage(text);
+  return analysis.severity === 'crisis';
+}
+
 module.exports = {
   DIFFICULTY_DEFINITIONS,
-  analyzeMessage
+  analyzeMessage,
+  isSevereCrisis
 };

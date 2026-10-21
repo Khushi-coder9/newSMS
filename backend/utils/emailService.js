@@ -186,7 +186,7 @@ async function sendStudentConfirmation(appointment) {
   const modeText = isMeet ? '📹 Video Meet' : '💬 Private Chat';
   const accessUrl = isMeet
     ? (appointment.meetingLink || `${FRONTEND_URL}/book.html`)
-    : `${FRONTEND_URL}/session-chat.html?appointmentId=${appointment._id}`;
+    : `${FRONTEND_URL}/session-chat.html?appointmentId=${appointment._id}&token=${appointment.confirmationToken}`;
 
   const bodyContent = `
     <h1>🎉 Your Appointment is Confirmed!</h1>
@@ -333,8 +333,201 @@ async function sendStudentDeclinedNotification(appointment) {
   }
 }
 
+// In-memory cooldown tracking per student to prevent spamming volunteers (3-minute cooldown)
+const lastAlertTimestamp = new Map();
+const ALERT_COOLDOWN_MS = 3 * 60 * 1000;
+
+/**
+ * 4. Send Emergency Crisis Alert Email to all registered Campus Volunteers
+ * Triggered when an AI chat encounters severe distress keywords (suicide, kill, self-destruction, etc.)
+ */
+async function sendVolunteerEmergencyAlert({
+  studentName = 'Anonymous Student',
+  studentEmail = 'Not provided / Anonymous',
+  studentId = null,
+  detectedKeywords = [],
+  messageSnippet = '',
+  timestamp = new Date(),
+  force = false
+}) {
+  const Volunteer = require('../models/Volunteer');
+
+  // Cooldown check per student email / id
+  const studentKey = (studentEmail || studentId || studentName).toLowerCase().trim();
+  const now = Date.now();
+  const lastSent = lastAlertTimestamp.get(studentKey);
+
+  if (!force && lastSent && (now - lastSent) < ALERT_COOLDOWN_MS) {
+    const remainingSec = Math.round((ALERT_COOLDOWN_MS - (now - lastSent)) / 1000);
+    console.log(`[Volunteer Alert] Emergency alert debounced for ${studentKey} (${remainingSec}s remaining in cooldown).`);
+    return { success: true, debounced: true, remainingCooldownSec: remainingSec };
+  }
+
+  // 1. Fetch all registered volunteers from database
+  const volunteers = await Volunteer.find({}).lean();
+  if (!volunteers || volunteers.length === 0) {
+    console.warn('[Volunteer Alert] No volunteers currently registered in database to receive crisis alert.');
+    return { success: false, reason: 'no_volunteers', count: 0 };
+  }
+
+  const volunteerList = volunteers.filter(v => v.email && v.email.includes('@'));
+  if (volunteerList.length === 0) {
+    console.warn('[Volunteer Alert] No volunteers with valid email addresses found.');
+    return { success: false, reason: 'no_valid_emails', count: 0 };
+  }
+
+  // Update last sent timestamp
+  lastAlertTimestamp.set(studentKey, now);
+
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.BREVO_SMTP_USER || 'crisis-alert@studentmindsupport.com';
+  const senderName = process.env.BREVO_SENDER_NAME || 'Student Mind Support';
+
+  const formattedTime = new Date(timestamp).toLocaleString('en-US', {
+    dateStyle: 'full',
+    timeStyle: 'medium',
+    timeZone: 'Asia/Kolkata'
+  });
+
+  const keywordsDisplay = detectedKeywords && detectedKeywords.length > 0
+    ? detectedKeywords.map(k => `<span style="display:inline-block; background:#fee2e2; color:#991b1b; padding:4px 10px; border-radius:999px; font-weight:700; font-size:12px; margin:2px 4px 2px 0; border:1px solid #fecaca;">⚠️ ${k}</span>`).join(' ')
+    : '<span style="color:#b91c1c; font-weight:700;">Severe Distress Keywords Detected</span>';
+
+  const safeSnippet = String(messageSnippet || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const bodyContent = `
+    <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 14px; padding: 18px 20px; margin-bottom: 24px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <span style="font-size: 24px;">🚨</span>
+        <h2 style="font-size: 18px; color: #991b1b; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+          CRITICAL CRISIS ALERT: Immediate Volunteer Action Required
+        </h2>
+      </div>
+      <p style="font-size: 14px; color: #7f1d1d; margin: 0; line-height: 1.5; font-weight: 600;">
+        An AI mental health chat on Student Mind Support has just encountered an active, high-severity self-harm / suicide trigger. As a registered campus volunteer, your prompt attention and intervention protocol are urgently requested.
+      </p>
+    </div>
+
+    <!-- Student & Trigger Incident Details -->
+    <div class="card" style="background:#ffffff; border:1.5px solid #fecaca; box-shadow:0 4px 12px rgba(239,68,68,0.08); margin-bottom: 24px;">
+      <div style="font-size: 13px; font-weight: 800; color: #991b1b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+        📋 Incident Summary & Student Details
+      </div>
+      <div class="row">
+        <span class="row-label">Student Name:</span>
+        <span class="row-val" style="color: #111827;">${studentName}</span>
+      </div>
+      <div class="row">
+        <span class="row-label">Student Email:</span>
+        <span class="row-val"><a href="mailto:${studentEmail}" style="color:#dc2626; text-decoration:none;">${studentEmail}</a></span>
+      </div>
+      <div class="row">
+        <span class="row-label">Alert Timestamp:</span>
+        <span class="row-val">${formattedTime}</span>
+      </div>
+      <div class="row" style="flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0;">
+        <span class="row-label">Trigger Keywords Flagged:</span>
+        <div>${keywordsDisplay}</div>
+      </div>
+      <div class="row" style="flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0; border-bottom: none;">
+        <span class="row-label">Reported Distress Message:</span>
+        <div style="background: #fff5f5; border-left: 4px solid #ef4444; padding: 10px 14px; border-radius: 6px; font-style: italic; color: #374151; font-size: 13.5px; line-height: 1.5; width: 100%; box-sizing: border-box; margin-top: 4px;">
+          "${safeSnippet}"
+        </div>
+      </div>
+    </div>
+
+    <!-- Mandatory Immediate Actions Protocol -->
+    <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 14px; padding: 20px; margin-bottom: 24px;">
+      <h3 style="font-size: 16px; color: #92400e; margin-top: 0; margin-bottom: 12px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+        <span>⚡</span> MANDATORY IMMEDIATE ACTION PROTOCOL
+      </h3>
+      <ol style="margin: 0; padding-left: 20px; font-size: 13.5px; color: #78350f; line-height: 1.7;">
+        <li><strong>Reach Out Promptly:</strong> Contact the student immediately via secure campus channels or their registered email to establish a supportive, non-judgmental human presence.</li>
+        <li><strong>Alert Campus Emergency & Counselling Team:</strong> Notify the duty campus psychologist, counsellor, or medical center about this urgent alert immediately.</li>
+        <li><strong>Ensure Continuous Support:</strong> If the student is reachable, do not leave them unattended until professional or emergency help arrives.</li>
+        <li><strong>Deploy 24/7 National Emergency Helplines:</strong>
+          <ul style="margin-top: 6px; padding-left: 18px;">
+            <li><strong>KIRAN Helpline (Govt. of India):</strong> <a href="tel:18005990019" style="color:#b45309; font-weight:700;">1800-599-0019</a> (Toll-Free, 24/7)</li>
+            <li><strong>Tele-MANAS:</strong> <a href="tel:14416" style="color:#b45309; font-weight:700;">14416</a> or <a href="tel:18008914416" style="color:#b45309; font-weight:700;">1800-891-4416</a></li>
+            <li><strong>iCall Psychosocial Helpline:</strong> <a href="tel:9152987821" style="color:#b45309; font-weight:700;">9152987821</a></li>
+            <li><strong>US / International:</strong> <a href="tel:988" style="color:#b45309; font-weight:700;">988 Suicide & Crisis Lifeline</a></li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+
+    <div class="cta-container">
+      <a href="${FRONTEND_URL}/dashboard.html" class="btn" style="background:#dc2626 !important; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);">
+        🚨 Open Emergency Crisis Center in Dashboard
+      </a>
+    </div>
+
+    <p style="font-size: 12px; color: #9ca3af; text-align: center; margin-top: 24px;">
+      This is an automated high-priority emergency notification dispatched to all certified campus volunteers registered on Student Mind Support.
+    </p>
+  `;
+
+  const html = wrapEmailHtml('CRITICAL CRISIS ALERT', 'Immediate volunteer intervention requested for severe distress case', bodyContent);
+  const subject = `🚨 URGENT: Mental Health Crisis Alert - Immediate Action Required (${studentName})`;
+
+  const transporter = getBrevoTransporter();
+  if (transporter) {
+    const sendPromises = volunteerList.map(vol => {
+      const mailOptions = {
+        from: `"${senderName} [EMERGENCY]" <${senderEmail}>`,
+        to: vol.email,
+        subject,
+        html,
+        priority: 'high',
+        headers: {
+          'X-Priority': '1',
+          'X-MSMail-Priority': 'High',
+          'Importance': 'high'
+        }
+      };
+
+      return transporter.sendMail(mailOptions)
+        .then(info => {
+          console.log(`[Brevo SMTP Emergency] Crisis email delivered to volunteer ${vol.name} (${vol.email}). ID: ${info.messageId}`);
+          return { email: vol.email, messageId: info.messageId, success: true };
+        })
+        .catch(err => {
+          console.error(`[Brevo SMTP Emergency Error] Failed to send to volunteer (${vol.email}):`, err.message);
+          return { email: vol.email, error: err.message, success: false };
+        });
+    });
+
+    const results = await Promise.all(sendPromises);
+    const sentCount = results.filter(r => r.success).length;
+
+    return {
+      success: sentCount > 0,
+      totalVolunteers: volunteerList.length,
+      sentCount,
+      mode: 'brevo_smtp',
+      results
+    };
+  } else {
+    console.log(`[SIMULATED VOLUNTEER EMERGENCY ALERT]`);
+    console.log(`Broadcasting to ${volunteerList.length} volunteers: ${volunteerList.map(v => v.email).join(', ')}`);
+    console.log(`Student: ${studentName} (${studentEmail})`);
+    console.log(`Keywords: ${(detectedKeywords || []).join(', ')}`);
+    console.log(`Snippet: ${messageSnippet}`);
+    return {
+      success: true,
+      totalVolunteers: volunteerList.length,
+      sentCount: volunteerList.length,
+      mode: 'simulated_logged'
+    };
+  }
+}
+
 module.exports = {
   sendCounsellorNotification,
   sendStudentConfirmation,
-  sendStudentDeclinedNotification
+  sendStudentDeclinedNotification,
+  sendVolunteerEmergencyAlert
 };
