@@ -62,9 +62,160 @@
             background: #ffffff;
             position: sticky;
             top: 0;
-            z-index: 50;
+            z-index: 100;
             border-bottom: 1px solid rgba(19, 62, 51, 0.08);
             box-shadow: 0 1px 12px rgba(19, 62, 51, 0.03);
+        }
+
+        /* ------------------ NOTIFICATION BELL (NAV) ------------------ */
+        .nav-notif-wrap {
+            position: relative;
+        }
+
+        .nav-bell-btn {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--forest-50);
+            border: 1.5px solid #d0e8df;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-bell-btn:hover {
+            background: #d4ede3;
+            border-color: var(--primary-green);
+        }
+
+        .nav-bell-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e53e3e;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            min-width: 17px;
+            height: 17px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+            border: 2px solid #fff;
+            animation: bellPop 0.3s ease;
+        }
+
+        @keyframes bellPop {
+            0% { transform: scale(0.5); }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .notif-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 320px;
+            background: #fff;
+            border: 1.5px solid #d8eae3;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(19, 62, 51, 0.13);
+            z-index: 9999;
+            overflow: hidden;
+            animation: dropIn 0.2s ease;
+        }
+
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .notif-dropdown-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px 10px;
+            border-bottom: 1px solid #e8f0ec;
+            background: var(--forest-50);
+        }
+
+        .notif-dropdown-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--forest-900);
+        }
+
+        .notif-mark-read {
+            font-size: 11px;
+            color: var(--primary-green);
+            font-weight: 700;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .notif-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notif-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f5f3;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .notif-item:hover {
+            background: var(--forest-50);
+        }
+
+        .notif-item.unread {
+            background: #f0faf5;
+        }
+
+        .notif-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .notif-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notif-text {
+            font-size: 13px;
+            color: var(--text-dark);
+            font-weight: 600;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notif-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .notif-empty {
+            padding: 30px 16px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
         }
 
         .nav {
@@ -1757,6 +1908,22 @@
 
             <div class="nav-actions">
                 <div id="userBadge" class="user-greeting-badge" style="display: none;"></div>
+                <!-- Notification Bell (Nav) -->
+                <div class="nav-notif-wrap" id="navNotifWrap" style="display:none;">
+                    <button class="nav-bell-btn" id="navBellBtn" title="Notifications" aria-label="Notifications">
+                        🔔
+                        <span class="nav-bell-badge" id="navBellBadge" style="display:none;">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown" style="display:none;">
+                        <div class="notif-dropdown-header">
+                            <span class="notif-dropdown-title">🔔 Notifications</span>
+                            <button class="notif-mark-read" id="btnMarkAllRead">Mark all read</button>
+                        </div>
+                        <div class="notif-list" id="notifList">
+                            <div class="notif-empty" id="notifEmpty">No new notifications</div>
+                        </div>
+                    </div>
+                </div>
                 <button class="btn-nav-auth" id="authBtn">Login</button>
             </div>
         </div>
@@ -2702,6 +2869,142 @@
         let matchPollInterval = null;
         let chatPollInterval = null;
         let lastRenderedMsgCount = 0;
+        let notifUnreadCount = 0;
+        let notifItems = []; // { id, type, text, sub, isRead, matchId }
+        let lastKnownMsgCount = 0; // tracks msg count from last heartbeat for new-message detection
+        let notifDropdownOpen = false;
+
+        // ---------- NOTIFICATION BELL LOGIC ----------
+        function renderNotifDropdown() {
+            const notifList = document.getElementById('notifList');
+            const notifEmpty = document.getElementById('notifEmpty');
+            const badge = document.getElementById('navBellBadge');
+
+            notifUnreadCount = notifItems.filter(n => !n.isRead).length;
+
+            if (badge) {
+                if (notifUnreadCount > 0) {
+                    badge.textContent = notifUnreadCount > 9 ? '9+' : notifUnreadCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            if (!notifList) return;
+
+            if (notifItems.length === 0) {
+                notifList.innerHTML = '<div class="notif-empty">No new notifications</div>';
+                return;
+            }
+
+            notifList.innerHTML = notifItems.map(n => `
+                <div class="notif-item ${n.isRead ? '' : 'unread'}" data-id="${n.id}" onclick="handleNotifClick('${n.id}', '${n.matchId || ''}')">
+                    <div class="notif-icon">${n.icon || '💬'}</div>
+                    <div class="notif-body">
+                        <div class="notif-text">${escapeHtml(n.text)}</div>
+                        <div class="notif-sub">${escapeHtml(n.sub || '')}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addBuddyMessageNotif(senderName, messagePreview, matchId) {
+            const id = `notif-${Date.now()}`;
+            const existing = notifItems.find(n => n.matchId === matchId && n.type === 'buddy_msg');
+            if (existing) {
+                // Update existing notification instead of stacking
+                existing.text = `${senderName}: ${messagePreview}`;
+                existing.sub = 'Just now • Tap to open chat';
+                existing.isRead = false;
+                renderNotifDropdown();
+                return;
+            }
+            notifItems.unshift({
+                id,
+                type: 'buddy_msg',
+                icon: '💬',
+                text: `${senderName}: ${messagePreview}`,
+                sub: 'Just now • Tap to open chat',
+                isRead: false,
+                matchId
+            });
+            // Cap at 10 notifications
+            if (notifItems.length > 10) notifItems = notifItems.slice(0, 10);
+            renderNotifDropdown();
+        }
+
+        window.handleNotifClick = function(notifId, matchId) {
+            // Mark as read
+            const notif = notifItems.find(n => n.id === notifId);
+            if (notif) notif.isRead = true;
+            renderNotifDropdown();
+
+            // Close dropdown
+            const dropdown = document.getElementById('notifDropdown');
+            if (dropdown) dropdown.style.display = 'none';
+            notifDropdownOpen = false;
+
+            // Switch to peer buddy tab
+            const buddyTabBtn = document.querySelector('.support-card-btn[data-tab="tab-buddy"]');
+            if (buddyTabBtn) {
+                buddyTabBtn.click();
+                // Scroll to buddy section
+                setTimeout(() => {
+                    const buddySection = document.getElementById('tab-buddy');
+                    if (buddySection) buddySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 200);
+            }
+        };
+
+        // Toggle notification dropdown
+        const navBellBtn = document.getElementById('navBellBtn');
+        if (navBellBtn) {
+            navBellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dropdown = document.getElementById('notifDropdown');
+                if (!dropdown) return;
+                notifDropdownOpen = !notifDropdownOpen;
+                dropdown.style.display = notifDropdownOpen ? 'block' : 'none';
+                if (notifDropdownOpen) renderNotifDropdown();
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            const dropdown = document.getElementById('notifDropdown');
+            if (dropdown && notifDropdownOpen) {
+                dropdown.style.display = 'none';
+                notifDropdownOpen = false;
+            }
+        });
+
+        // Mark all read button
+        const btnMarkAllRead = document.getElementById('btnMarkAllRead');
+        if (btnMarkAllRead) {
+            btnMarkAllRead.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifItems.forEach(n => n.isRead = true);
+                renderNotifDropdown();
+            });
+        }
+
+        // Wire existing hero bell button to same dropdown
+        const heroBellBtn = document.getElementById('bellBtn');
+        if (heroBellBtn) {
+            heroBellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (navBellBtn) navBellBtn.click();
+                else {
+                    const dropdown = document.getElementById('notifDropdown');
+                    if (dropdown) {
+                        notifDropdownOpen = !notifDropdownOpen;
+                        dropdown.style.display = notifDropdownOpen ? 'block' : 'none';
+                        if (notifDropdownOpen) renderNotifDropdown();
+                    }
+                }
+            });
+        }
 
         // Start heartbeat to maintain online status and detect matches in real time
         function startHeartbeat() {
@@ -2721,6 +3024,10 @@
                         if (data.hasActiveMatch && !activeBuddyMatch) {
                             checkBuddyMatch();
                         }
+                        // Check for new buddy messages to show notifications
+                        if (data.hasActiveMatch) {
+                            checkForNewBuddyMessages();
+                        }
                     }
                 } catch (e) {
                     // Ignore ping network hiccups
@@ -2728,6 +3035,33 @@
             };
             ping();
             setInterval(ping, 15000); // every 15s
+        }
+
+        // Check for new buddy messages and fire notification
+        async function checkForNewBuddyMessages() {
+            if (!authToken) return;
+            try {
+                const res = await fetch(`${API_BASE}/peer/buddy/active-match`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                if (data.success && data.match) {
+                    const msgs = data.match.messages || [];
+                    const myPseudonym = data.match.myPseudonym;
+                    // Find messages from buddy (not me) that are new since last check
+                    if (msgs.length > lastKnownMsgCount) {
+                        const newMsgs = msgs.slice(lastKnownMsgCount);
+                        // Only notify for messages from the other person
+                        const newFromBuddy = newMsgs.filter(m => m.senderPseudonym !== myPseudonym);
+                        if (newFromBuddy.length > 0) {
+                            const latestMsg = newFromBuddy[newFromBuddy.length - 1];
+                            const preview = latestMsg.text.length > 45 ? latestMsg.text.slice(0, 45) + '…' : latestMsg.text;
+                            addBuddyMessageNotif(data.match.buddyPseudonym, preview, data.match._id);
+                        }
+                    }
+                    lastKnownMsgCount = msgs.length;
+                }
+            } catch (e) { /* silent */ }
         }
 
         // Silently fetch and display the student's automatically collected matching profile
@@ -2864,8 +3198,10 @@
                     </div>
                 `;
             } else {
+                const myPN = match.myPseudonym || '';
                 buddyMessagesList.innerHTML = msgs.map(m => {
-                    const isMine = m.senderId === (localStorage.getItem('userId') || '') || m.senderPseudonym !== match.buddyPseudonym;
+                    // Use myPseudonym (returned from server) for reliable sender detection
+                    const isMine = myPN ? (m.senderPseudonym === myPN) : (m.senderPseudonym !== match.buddyPseudonym);
                     return `
                         <div class="chat-msg ${isMine ? 'mine' : 'buddy'}">
                             <strong>${escapeHtml(m.senderPseudonym)}:</strong> ${escapeHtml(m.text)}
@@ -2874,7 +3210,11 @@
                     `;
                 }).join('');
                 buddyMessagesList.scrollTop = buddyMessagesList.scrollHeight;
+                // Update lastKnownMsgCount so heartbeat doesn't double-notify
+                lastKnownMsgCount = msgs.length;
             }
+            // Always ensure input row is visible when a match is active
+            if (buddyInputRow) buddyInputRow.style.display = 'flex';
 
             // Real-time chat polling every 2s for instant message delivery between students
             if (!chatPollInterval) {
@@ -2891,7 +3231,8 @@
                             if (newMsgs.length !== lastRenderedMsgCount) {
                                 lastRenderedMsgCount = newMsgs.length;
                                 buddyMessagesList.innerHTML = newMsgs.map(m => {
-                                    const isMine = m.senderId === (localStorage.getItem('userId') || '') || m.senderPseudonym !== data.match.buddyPseudonym;
+                                    const mp = data.match.myPseudonym || '';
+                                    const isMine = mp ? (m.senderPseudonym === mp) : (m.senderPseudonym !== data.match.buddyPseudonym);
                                     return `
                                         <div class="chat-msg ${isMine ? 'mine' : 'buddy'}">
                                             <strong>${escapeHtml(m.senderPseudonym)}:</strong> ${escapeHtml(m.text)}
@@ -2900,6 +3241,9 @@
                                     `;
                                 }).join('');
                                 buddyMessagesList.scrollTop = buddyMessagesList.scrollHeight;
+                                lastKnownMsgCount = newMsgs.length;
+                                // Keep input row visible during polling re-renders
+                                if (buddyInputRow) buddyInputRow.style.display = 'flex';
                             }
                         } else if (data.success && !data.match) {
                             // Match ended by partner
@@ -3343,6 +3687,10 @@
         loadCheckinSummary();
         loadPosts();
         if (authToken) {
+            // Show notification bell in nav for logged-in students
+            const navNotifWrap = document.getElementById('navNotifWrap');
+            if (navNotifWrap) navNotifWrap.style.display = 'block';
+            renderNotifDropdown();
             startHeartbeat();
             loadStudentPeerProfile();
             checkBuddyMatch();
