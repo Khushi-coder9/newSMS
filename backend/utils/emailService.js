@@ -429,6 +429,22 @@ async function sendVolunteerEmergencyAlert({
         <span class="row-label">Alert Timestamp:</span>
         <span class="row-val">${formattedTime}</span>
       </div>
+      <div class="row">
+        <span class="row-label">Mobile Number:</span>
+        <span class="row-val">
+          ${studentPhone
+            ? `<a href="tel:${studentPhone}" style="color:#dc2626; font-weight:800; font-size:15px; text-decoration:none;">📞 ${studentPhone}</a>`
+            : '<span style="color:#9ca3af; font-style:italic;">Not provided</span>'}
+        </span>
+      </div>
+      <div class="row">
+        <span class="row-label">Alternative Mobile:</span>
+        <span class="row-val">
+          ${studentAltPhone
+            ? `<a href="tel:${studentAltPhone}" style="color:#dc2626; font-weight:800; font-size:15px; text-decoration:none;">📞 ${studentAltPhone}</a>`
+            : '<span style="color:#9ca3af; font-style:italic;">Not provided</span>'}
+        </span>
+      </div>
       <div class="row" style="flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0;">
         <span class="row-label">Trigger Keywords Flagged:</span>
         <div>${keywordsDisplay}</div>

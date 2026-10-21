@@ -1272,27 +1272,10 @@
         }
 
         function renderMonitorBox() {
+            // Difficulty monitor box is intentionally hidden from the student.
+            // Monitoring data is collected silently and shown only in counsellor/admin dashboards.
             const box = document.getElementById('difficultyMonitorBox');
-            const tagsEl = document.getElementById('difficultyTags');
-            const kwEl = document.getElementById('keywordsList');
-            if (!box || !tagsEl || !kwEl) return;
-
-            if (userDifficultiesSet.size === 0) {
-                box.style.display = 'none';
-                return;
-            }
-
-            box.style.display = 'block';
-            tagsEl.innerHTML = Array.from(userDifficultiesSet).map(d => {
-                const isCrisis = d.toLowerCase().includes('crisis') || d.toLowerCase().includes('harm');
-                return `<span class="diff-tag ${isCrisis ? 'crisis' : ''}">🏷️ ${escapeHtml(d)}</span>`;
-            }).join('');
-
-            if (userKeywordsSet.size > 0) {
-                kwEl.innerHTML = Array.from(userKeywordsSet).slice(0, 12).map(k => {
-                    return `<span class="kw-chip">#${escapeHtml(k)}</span>`;
-                }).join('');
-            }
+            if (box) box.style.display = 'none';
         }
 
         async function loadUserChatHistory() {
@@ -1314,8 +1297,8 @@
                         addBubble("bot", "Welcome back! Here is your conversation history. What is on your mind today?");
 
                         data.messages.forEach(msg => {
-                            const isCrisis = msg.severity === 'crisis';
-                            addBubble(msg.sender === 'user' ? 'user' : 'bot', msg.message, isCrisis ? 'crisis' : '');
+                            // Never apply crisis styling to student-visible bubbles
+                            addBubble(msg.sender === 'user' ? 'user' : 'bot', msg.message, '');
                             history.push({
                                 role: msg.sender === 'user' ? 'user' : 'model',
                                 text: msg.message
@@ -1351,12 +1334,10 @@
 
             addBubble("user", userText);
             history.push({ role: "user", text: userText });
-            if (history.length > 24) history = history.slice(-24);
-
-            if (CRISIS_RE.test(userText)) {
-                addBubble("bot", "I’m really glad you told me. Please reach a person who can help you right now — a trusted adult, campus counsellor, or emergency services.\n\nIndia: KIRAN 1800-599-0019 • iCall 9152987821\nUS: 988\nIf you are in immediate danger, call local emergency services.", "crisis");
-            }
-
+            if (history.length > 24) history = history.slice(-24);
+            // Crisis detection runs silently on the backend - no alert bubble shown to student.
+            // The AI (Gemini / offlineReply) handles the conversation naturally, like a real psychiatrist.
+
             input.value = "";
             sendBtn.disabled = true;
             addTyping();
