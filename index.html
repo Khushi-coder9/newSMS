@@ -256,7 +256,7 @@
             background:
                 radial-gradient(640px 280px at 78% 38%, #ece8ff 0%, transparent 70%),
                 linear-gradient(180deg, #f7f4ff 0%, #f3f0ff 55%, #ffffff 100%);
-            padding: 28px 0 0;
+            padding: 34px 0 0;
         }
 
         .hero-grid {
@@ -407,6 +407,273 @@
             font-size: 16px;
             margin-left: 28px;
             transform: rotate(-8deg);
+        }
+
+        /* ================= Thought of the Day Cloud Header ================= */
+        .thought-cloud-wrapper {
+            position: absolute;
+            top: -22px;
+            left: 12px;
+            width: 375px;
+            max-width: calc(100% - 120px);
+            z-index: 15;
+            pointer-events: auto;
+            animation: thoughtCloudFloat 5.5s ease-in-out infinite;
+        }
+
+        @keyframes thoughtCloudFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .thought-cloud {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 241, 255, 0.96) 55%, rgba(239, 246, 255, 0.98) 100%);
+            border: 1.5px solid rgba(198, 184, 255, 0.88);
+            border-radius: 26px;
+            box-shadow: 
+                0 16px 36px rgba(109, 77, 255, 0.14),
+                0 4px 14px rgba(124, 58, 237, 0.08),
+                inset 0 2px 4px rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 13px 18px 12px;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .thought-cloud:hover {
+            box-shadow: 
+                0 20px 42px rgba(109, 77, 255, 0.2),
+                0 6px 18px rgba(124, 58, 237, 0.12),
+                inset 0 2px 4px rgba(255, 255, 255, 1);
+            border-color: rgba(167, 139, 250, 0.95);
+        }
+
+        /* Fluffy cloud puff lobes on top of the card */
+        .cloud-puff {
+            position: absolute;
+            background: linear-gradient(180deg, #ffffff 0%, #f7f3ff 100%);
+            z-index: -1;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cloud-puff-1 {
+            top: -18px;
+            left: 36px;
+            width: 66px;
+            height: 38px;
+            border-top: 1.5px solid rgba(198, 184, 255, 0.88);
+            border-left: 1.5px solid rgba(198, 184, 255, 0.7);
+            border-right: 1px solid rgba(198, 184, 255, 0.3);
+            box-shadow: 0 -4px 10px rgba(109, 77, 255, 0.04);
+        }
+
+        .cloud-puff-2 {
+            top: -26px;
+            left: 88px;
+            width: 90px;
+            height: 52px;
+            border-top: 1.5px solid rgba(198, 184, 255, 0.88);
+            border-left: 1px solid rgba(198, 184, 255, 0.45);
+            border-right: 1.5px solid rgba(198, 184, 255, 0.7);
+            box-shadow: 0 -6px 12px rgba(109, 77, 255, 0.05);
+        }
+
+        .cloud-puff-3 {
+            top: -16px;
+            left: 164px;
+            width: 58px;
+            height: 34px;
+            border-top: 1.5px solid rgba(198, 184, 255, 0.88);
+            border-right: 1.5px solid rgba(198, 184, 255, 0.7);
+            box-shadow: 0 -3px 8px rgba(109, 77, 255, 0.04);
+        }
+
+        .thought-cloud-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header row inside cloud */
+        .cloud-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 7px;
+        }
+
+        .cloud-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, rgba(109, 77, 255, 0.1) 0%, rgba(229, 106, 214, 0.12) 100%);
+            border: 1px solid rgba(109, 77, 255, 0.22);
+            color: #5c3fe6;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 999px;
+        }
+
+        .cloud-badge-icon {
+            font-size: 13px;
+            line-height: 1;
+        }
+
+        .cloud-badge-sparkle {
+            font-size: 11px;
+            display: inline-block;
+            animation: cloudSparklePulse 2.8s ease-in-out infinite;
+        }
+
+        @keyframes cloudSparklePulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+            50% { transform: scale(1.25) rotate(15deg); opacity: 1; }
+        }
+
+        .cloud-refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #ffffff;
+            border: 1px solid rgba(109, 77, 255, 0.22);
+            color: #553bbd;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 3.5px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 6px rgba(109, 77, 255, 0.08);
+        }
+
+        .cloud-refresh-btn:hover {
+            background: #6d4dff;
+            color: #ffffff;
+            border-color: #6d4dff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(109, 77, 255, 0.26);
+        }
+
+        .cloud-refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .cloud-refresh-btn.is-refreshing .refresh-icon {
+            animation: spinRefresh 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes spinRefresh {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Thought Body */
+        .thought-body {
+            position: relative;
+            padding: 1px 2px 2px;
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+            transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+
+        .thought-quote-mark {
+            font-family: Georgia, serif;
+            font-size: 19px;
+            line-height: 1;
+            color: #927eff;
+            opacity: 0.75;
+            user-select: none;
+            flex-shrink: 0;
+            margin-top: -2px;
+        }
+
+        .thought-quote-text {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+            color: #26204c;
+            margin: 0;
+            flex: 1;
+        }
+
+        /* Thought Footer */
+        .thought-cloud-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 7px;
+            padding-top: 5px;
+            border-top: 1px dashed rgba(198, 184, 255, 0.5);
+        }
+
+        .thought-category-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #4b3bbd;
+            background: rgba(109, 77, 255, 0.08);
+            padding: 2px 8px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .thought-sub-prompt {
+            font-family: "Caveat", cursive;
+            font-size: 15.5px;
+            font-weight: 700;
+            color: #7a6eac;
+            white-space: nowrap;
+        }
+
+        /* Trailing thought bubbles pointing to the girl */
+        .cloud-pointer-trail {
+            position: absolute;
+            bottom: -30px;
+            left: 215px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .trail-circle {
+            background: linear-gradient(135deg, #ffffff 0%, #f1ecff 100%);
+            border: 1.5px solid rgba(198, 184, 255, 0.85);
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(109, 77, 255, 0.12);
+        }
+
+        .trail-circle.circle-1 {
+            width: 14px;
+            height: 14px;
+            margin-top: -2px;
+            transform: translateX(0px);
+        }
+
+        .trail-circle.circle-2 {
+            width: 9px;
+            height: 9px;
+            transform: translateX(7px);
+        }
+
+        .trail-circle.circle-3 {
+            width: 5px;
+            height: 5px;
+            transform: translateX(14px);
         }
 
         /* Features */
@@ -808,6 +1075,17 @@
             .nav-links { gap: 14px; font-size: 13px; }
             .cards { grid-template-columns: repeat(3, 1fr); }
             .hero-art img { height: 360px; }
+            .thought-cloud-wrapper {
+                top: -15px;
+                left: 10px;
+                width: 330px;
+            }
+            .thought-quote-text {
+                font-size: 12.5px;
+            }
+            .cloud-pointer-trail {
+                left: 185px;
+            }
         }
 
         @media (max-width: 860px) {
@@ -852,6 +1130,29 @@
                 width: 100%;
                 margin-top: 6px;
             }
+            .thought-cloud-wrapper {
+                position: relative;
+                top: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-width: 350px;
+                margin: 0 auto 16px auto;
+                animation: thoughtCloudFloatMobile 4.5s ease-in-out infinite;
+            }
+            @keyframes thoughtCloudFloatMobile {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-5px); }
+            }
+            .cloud-pointer-trail {
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: -22px;
+                gap: 3px;
+            }
+            .trail-circle.circle-1 { transform: none; width: 12px; height: 12px; }
+            .trail-circle.circle-2 { transform: none; width: 8px; height: 8px; }
+            .trail-circle.circle-3 { transform: none; width: 5px; height: 5px; }
             .hero-art img {
                 width: 100%;
                 max-width: 280px;
@@ -1069,6 +1370,50 @@
             </div>
 
             <div class="hero-art">
+                <!-- Attractive Thought Cloud Header pointing to girl -->
+                <div class="thought-cloud-wrapper" id="thoughtCloudWrapper">
+                    <div class="thought-cloud" id="thoughtCloud">
+                        <!-- Decorative Cloud Puff lobes for dreamy cloud silhouette -->
+                        <div class="cloud-puff cloud-puff-1"></div>
+                        <div class="cloud-puff cloud-puff-2"></div>
+                        <div class="cloud-puff cloud-puff-3"></div>
+
+                        <div class="thought-cloud-inner">
+                            <div class="cloud-top-row">
+                                <div class="cloud-pill-badge">
+                                    <span class="cloud-badge-icon">☁️</span>
+                                    <span class="cloud-badge-label">Thought of the Day</span>
+                                    <span class="cloud-badge-sparkle">✨</span>
+                                </div>
+                                <button type="button" class="cloud-refresh-btn" id="refreshThoughtBtn" title="Get another inspiring thought" aria-label="Get another thought of the day">
+                                    <svg class="refresh-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                                    </svg>
+                                    <span>New Thought</span>
+                                </button>
+                            </div>
+
+                            <div class="thought-body" id="thoughtBody" aria-live="polite">
+                                <span class="thought-quote-mark" aria-hidden="true">“</span>
+                                <p class="thought-quote-text" id="thoughtQuoteText">Loading thoughtful reminder...</p>
+                                <span class="thought-quote-mark" aria-hidden="true">”</span>
+                            </div>
+
+                            <div class="thought-cloud-footer">
+                                <span class="thought-category-tag" id="thoughtCategoryTag">🌱 One Step at a Time</span>
+                                <span class="thought-sub-prompt" id="thoughtSubPrompt">You are doing your best ♡</span>
+                            </div>
+                        </div>
+
+                        <!-- Thought pointer trail directing towards the girl -->
+                        <div class="cloud-pointer-trail" aria-hidden="true">
+                            <span class="trail-circle circle-1"></span>
+                            <span class="trail-circle circle-2"></span>
+                            <span class="trail-circle circle-3"></span>
+                        </div>
+                    </div>
+                </div>
+
                 <img src="hero.png" alt="Student feeling supported and calm">
                 <div class="notes">
                     <div class="sticky sticky-heard">Be Heard</div>
@@ -2687,6 +3032,164 @@
                 const emailInput = document.getElementById('loginEmail');
                 if (emailInput) emailInput.focus();
             }
+        }
+
+        // ================= Thought of the Day (Student Mental Stress Support) =================
+        const studentWellnessThoughts = [
+            {
+                quote: "You don't have to figure out your entire life today. Take a deep breath and just take the next small, gentle step.",
+                tag: "🌱 One Step at a Time",
+                sub: "You are doing your best ♡"
+            },
+            {
+                quote: "Your self-worth will never be measured by an exam score, a GPA, or a deadline. You matter simply because you exist.",
+                tag: "💜 Inherent Worth",
+                sub: "You are more than grades ♡"
+            },
+            {
+                quote: "Rest is not a reward you have to earn after collapsing. Rest is a necessity that keeps your mind and heart healthy.",
+                tag: "🌿 Permission to Rest",
+                sub: "Take a pause without guilt ♡"
+            },
+            {
+                quote: "Heavy days do not mean you are weak or failing. They simply mean you have been carrying too much for too long.",
+                tag: "🕊️ Release the Weight",
+                sub: "It's okay to let down your guard ♡"
+            },
+            {
+                quote: "Flowers do not bloom every single month, and neither do you. Allow yourself quiet seasons of healing and recharging.",
+                tag: "🌸 Natural Rhythms",
+                sub: "Be patient with your season ♡"
+            },
+            {
+                quote: "Be gentle with your mind today. You are learning, unlearning, and growing all at the exact same time.",
+                tag: "✨ Inner Kindness",
+                sub: "Kindness starts inward ♡"
+            },
+            {
+                quote: "A tough semester or a difficult exam is only a sentence in your story, never the final chapter.",
+                tag: "📖 Trust Your Story",
+                sub: "Brighter days ahead ♡"
+            },
+            {
+                quote: "Comparison will trick you into believing everyone else has it figured out. In truth, we are all learning as we go.",
+                tag: "🌟 Run Your Own Race",
+                sub: "Honor your unique path ♡"
+            },
+            {
+                quote: "You survived 100% of the overwhelming days you thought you couldn't handle. Trust your quiet resilience.",
+                tag: "💪 Quiet Resilience",
+                sub: "You are stronger than you realize ♡"
+            },
+            {
+                quote: "It takes tremendous courage to pause, take a deep breath, and reach out to someone when you need support.",
+                tag: "🤝 Safe Connection",
+                sub: "You never have to walk alone ♡"
+            },
+            {
+                quote: "You don't have to prove your value to anyone today. Protecting your peace of mind is productive enough.",
+                tag: "🤍 Peace Over Pressure",
+                sub: "Your peace is sacred ♡"
+            },
+            {
+                quote: "Mistakes are not proof that you don't belong here. They are proof that you are daring to grow and learn.",
+                tag: "🎯 Growth Mindset",
+                sub: "Embrace the learning curve ♡"
+            },
+            {
+                quote: "Inhale calm, exhale the pressure to be perfect. Perfect is an illusion; being true to yourself is everything.",
+                tag: "🌬️ Deep Breath",
+                sub: "Slow down and exhale ♡"
+            },
+            {
+                quote: "Behind every test and assignment is a human heart that deserves rest, gentle warmth, and patience.",
+                tag: "❤️ Honor Your Humanity",
+                sub: "You come before work ♡"
+            },
+            {
+                quote: "Progress is rarely a straight line. Every small effort you made today counts, even if all you did was keep going.",
+                tag: "🪜 Every Effort Counts",
+                sub: "Celebrate little victories ♡"
+            },
+            {
+                quote: "You are not falling behind. Life is not a race against others; it is your personal unfolding journey.",
+                tag: "🧭 Your Own Timeline",
+                sub: "Trust your timing ♡"
+            },
+            {
+                quote: "No letter grade can ever evaluate your empathy, your creativity, or the kindness you bring into the world.",
+                tag: "✨ What Truly Matters",
+                sub: "Your light shines bright ♡"
+            },
+            {
+                quote: "Give yourself permission to feel overwhelmed without judging yourself. Feelings are passing weather, not your permanent state.",
+                tag: "🌧️ Passing Weather",
+                sub: "The sun will return ♡"
+            },
+            {
+                quote: "When everything feels like too much, narrow your focus to right here, right now, and one single breath.",
+                tag: "🧘 Grounded in the Now",
+                sub: "Right here, you are safe ♡"
+            },
+            {
+                quote: "Whatever weighed you down today, let tonight bring peace and rest. Tomorrow is a fresh, blank canvas.",
+                tag: "🌅 Tomorrow's Promise",
+                sub: "Tomorrow holds new hope ♡"
+            }
+        ];
+
+        let currentThoughtIdx = -1;
+
+        function displayRandomThought(animate = false) {
+            const quoteEl = document.getElementById('thoughtQuoteText');
+            const tagEl = document.getElementById('thoughtCategoryTag');
+            const subEl = document.getElementById('thoughtSubPrompt');
+            const bodyEl = document.getElementById('thoughtBody');
+            const btnEl = document.getElementById('refreshThoughtBtn');
+
+            if (!quoteEl || !studentWellnessThoughts.length) return;
+
+            let nextIdx;
+            if (studentWellnessThoughts.length === 1) {
+                nextIdx = 0;
+            } else {
+                do {
+                    nextIdx = Math.floor(Math.random() * studentWellnessThoughts.length);
+                } while (nextIdx === currentThoughtIdx);
+            }
+
+            currentThoughtIdx = nextIdx;
+            const item = studentWellnessThoughts[currentThoughtIdx];
+
+            if (animate && bodyEl) {
+                if (btnEl) btnEl.classList.add('is-refreshing');
+                bodyEl.style.opacity = '0';
+                bodyEl.style.transform = 'translateY(-4px)';
+
+                setTimeout(() => {
+                    quoteEl.textContent = item.quote;
+                    if (tagEl) tagEl.textContent = item.tag;
+                    if (subEl) subEl.textContent = item.sub;
+                    bodyEl.style.opacity = '1';
+                    bodyEl.style.transform = 'translateY(0)';
+                }, 180);
+
+                setTimeout(() => {
+                    if (btnEl) btnEl.classList.remove('is-refreshing');
+                }, 600);
+            } else {
+                quoteEl.textContent = item.quote;
+                if (tagEl) tagEl.textContent = item.tag;
+                if (subEl) subEl.textContent = item.sub;
+            }
+        }
+
+        // Initialize Thought of the Day on load
+        displayRandomThought(false);
+
+        const refreshThoughtBtn = document.getElementById('refreshThoughtBtn');
+        if (refreshThoughtBtn) {
+            refreshThoughtBtn.addEventListener('click', () => displayRandomThought(true));
         }
     </script>
     <script src="site-presence.js"></script>
