@@ -209,6 +209,18 @@
             gap: 16px;
             margin-bottom: 24px;
         }
+        .metrics-grid.five-cols {
+            grid-template-columns: repeat(5, 1fr);
+        }
+        @media (max-width: 1200px) {
+            .metrics-grid.five-cols { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .metrics-grid.five-cols { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .metrics-grid.five-cols { grid-template-columns: 1fr; }
+        }
 
         .metric-card {
             background: #ffffff;
@@ -1413,8 +1425,8 @@
         <!-- 3. ADMIN DASHBOARD VIEW -->
         <!-- ========================================== -->
         <section class="role-view" id="viewAdmin">
-            <!-- 4 Metric Cards -->
-            <div class="metrics-grid">
+            <!-- 5 Metric Cards -->
+            <div class="metrics-grid five-cols">
                 <div class="metric-card">
                     <div class="metric-header">
                         <span class="metric-label">Registered Students</span>
@@ -1433,6 +1445,15 @@
                     <div class="metric-sub">Registered medical specialists</div>
                 </div>
 
+                <div class="metric-card green">
+                    <div class="metric-header">
+                        <span class="metric-label">Campus Volunteers</span>
+                        <div class="metric-icon-wrap" style="background:#e8f5e9; color:#10b981;">🤝</div>
+                    </div>
+                    <div class="metric-val" id="adminTotalVolunteers">0</div>
+                    <div class="metric-sub">Peer support facilitators</div>
+                </div>
+
                 <div class="metric-card red">
                     <div class="metric-header">
                         <span class="metric-label">Severe / Crisis Cases</span>
@@ -1448,7 +1469,7 @@
                         <div class="metric-icon-wrap" style="background:#fffbeb; color:#f59e0b;">📊</div>
                     </div>
                     <div class="metric-val" id="adminAverageCases">8</div>
-                    <div class="metric-sub">Receiving first-aid coping guidance</div>
+                    <div class="metric-sub">Receiving first-aid guidance</div>
                 </div>
             </div>
 
@@ -1517,6 +1538,49 @@
                         <tbody id="adminRegistryTableBody">
                             <tr>
                                 <td colspan="7" style="text-align: center; color: #8c89a8; padding: 20px;">Loading registry data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Campus Volunteers Directory -->
+            <div class="content-card" style="margin-top: 24px;">
+                <div class="card-header-flex" style="flex-wrap: wrap; gap: 14px;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h2 style="font-size: 18px; font-weight: 800; color: var(--heading); margin: 0;">Campus Peer Volunteers</h2>
+                            <span class="badge" style="background:#e8f5e9; color:#15803d; font-weight: 700;" id="volunteerCountBadge">0 Registered</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text); margin-top: 4px; margin-bottom: 0;">Volunteers authorized by administration to assist students and mental health campaigns</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" id="adminVolunteerSearch" placeholder="Search by name, email, contact..." class="table-search-input" style="width: 250px;">
+                        <button type="button" class="btn-action-sm btn-primary-sm" id="openRegisterVolunteerModalBtn" style="padding: 9px 18px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(109, 77, 255, 0.25);">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Register Volunteer
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="dash-table">
+                        <thead>
+                            <tr>
+                                <th>Volunteer Name</th>
+                                <th>Email</th>
+                                <th>Contact Number</th>
+                                <th>Registered By</th>
+                                <th>Enrolled Date</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminVolunteerTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; color: #8c89a8; padding: 24px;">Loading volunteers...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1779,6 +1843,74 @@
                 <button type="button" class="btn-action-sm btn-outline-sm" id="cancelRemoveUserBtn" style="padding: 9px 18px;">Cancel</button>
                 <button type="button" class="btn-action-sm" id="confirmDeleteUserBtn" style="background: #dc2626; color: #fff; padding: 9px 18px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer;">
                     Confirm & Delete All Info
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Admin Register Volunteer -->
+    <div class="modal-bg" id="registerVolunteerModal">
+        <div class="modal" style="max-width: 480px; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: #e8f5e9; color: #16a34a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px;">
+                    🤝
+                </div>
+                <div>
+                    <h2 style="font-size: 18px; margin: 0; color: var(--heading);">Register Campus Volunteer</h2>
+                    <p style="font-size: 12.5px; margin: 2px 0 0; color: var(--text);">Enroll a certified peer volunteer to support campus mental health</p>
+                </div>
+            </div>
+
+            <form id="registerVolunteerForm">
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label" for="volName" style="display:block; margin-bottom:6px; font-weight:700; font-size:13px; color:var(--heading);">Full Name *</label>
+                    <input type="text" id="volName" placeholder="e.g. Rahul Sharma" required style="width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid var(--border); font-size:14px; outline:none; box-sizing:border-box;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label" for="volEmail" style="display:block; margin-bottom:6px; font-weight:700; font-size:13px; color:var(--heading);">Email Address *</label>
+                    <input type="email" id="volEmail" placeholder="e.g. rahul.sharma@campus.edu" required style="width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid var(--border); font-size:14px; outline:none; box-sizing:border-box;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label class="form-label" for="volContact" style="display:block; margin-bottom:6px; font-weight:700; font-size:13px; color:var(--heading);">Contact Number *</label>
+                    <input type="tel" id="volContact" placeholder="e.g. +91 98765 43210" required style="width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid var(--border); font-size:14px; outline:none; box-sizing:border-box;">
+                </div>
+
+                <div id="volErrorNotice" style="display:none; background:#fef2f2; border:1px solid #fecaca; color:#dc2626; padding:10px 14px; border-radius:10px; font-size:13px; margin-bottom:14px; font-weight:600;"></div>
+
+                <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                    <button type="button" class="btn-action-sm btn-outline-sm" id="closeRegisterVolModalBtn" style="padding: 9px 18px;">Cancel</button>
+                    <button type="submit" class="btn-action-sm btn-primary-sm" id="submitRegisterVolBtn" style="padding: 9px 20px; font-weight:700; border-radius:10px;">Enroll Volunteer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Admin Remove Volunteer Confirmation -->
+    <div class="modal-bg" id="removeVolunteerModal">
+        <div class="modal" style="max-width: 440px; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 style="font-size: 18px; margin: 0; color: #991b1b;">Remove Volunteer</h2>
+                    <p style="font-size: 12.5px; margin: 2px 0 0; color: #7f1d1d;">Unenroll campus volunteer from system</p>
+                </div>
+            </div>
+
+            <p style="font-size: 13.5px; color: #374151; line-height: 1.5; margin-bottom: 18px;">
+                Are you sure you want to remove <strong id="modalRemoveVolName" style="color: #111827;">...</strong> from the campus volunteer registry?
+            </p>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-action-sm btn-outline-sm" id="cancelRemoveVolBtn" style="padding: 9px 18px;">Cancel</button>
+                <button type="button" class="btn-action-sm" id="confirmDeleteVolBtn" style="background: #dc2626; color: #fff; padding: 9px 18px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer;">
+                    Remove Volunteer
                 </button>
             </div>
         </div>
@@ -3150,12 +3282,17 @@
                 // Update Metric KPIs
                 const stVal = document.getElementById('adminTotalStudents');
                 const coVal = document.getElementById('adminTotalCounsellors');
+                const voVal = document.getElementById('adminTotalVolunteers');
                 const seVal = document.getElementById('adminSevereCases');
                 const avVal = document.getElementById('adminAverageCases');
                 if (stVal) stVal.textContent = data.stats.totalStudents || 0;
                 if (coVal) coVal.textContent = data.stats.totalCounsellors || 0;
+                if (voVal) voVal.textContent = data.stats.totalVolunteers !== undefined ? data.stats.totalVolunteers : (data.volunteers?.length || 0);
                 if (seVal) seVal.textContent = data.stats.severeCases || 0;
                 if (avVal) avVal.textContent = data.stats.averageCases || 0;
+
+                const voBadge = document.getElementById('volunteerCountBadge');
+                if (voBadge) voBadge.textContent = `${(data.volunteers || []).length} Registered`;
 
                 // Chart 1: Campus Difficulties (Polar Area)
                 renderAdminCampusDiffChart(data.charts?.campusDifficulties || {});
@@ -3168,6 +3305,9 @@
 
                 // Render Registry Table
                 renderAdminRegistryTable([...(data.students || []), ...(data.counsellors || [])]);
+
+                // Render Volunteers Table
+                renderAdminVolunteersTable(data.volunteers || []);
 
             } catch (err) {
                 console.error('Error loading admin dashboard:', err);
@@ -3431,6 +3571,243 @@
                     alert('Network error while removing user.');
                     btn.disabled = false;
                     btn.textContent = 'Confirm & Delete All Info';
+                }
+            });
+        }
+
+        // ==========================================
+        // ADMIN VOLUNTEER MANAGEMENT
+        // ==========================================
+        function renderAdminVolunteersTable(volunteers) {
+            const tbody = document.getElementById('adminVolunteerTableBody');
+            if (!tbody) return;
+            if (!volunteers || volunteers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#8c89a8; padding:24px;">No volunteers registered yet. Click &quot;Register Volunteer&quot; to enroll your first campus volunteer.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = volunteers.map(v => {
+                const regDate = v.createdAt ? new Date(v.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
+                const safeName = (v.name || 'Volunteer').replace(/'/g, "\\'");
+                const regBy = v.registeredByName || 'Administrator';
+
+                return `
+                    <tr id="admin-vol-row-${v._id}">
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="width:34px; height:34px; border-radius:50%; background:#e8f5e9; color:#16a34a; font-weight:800; font-size:14px; display:grid; place-items:center;">
+                                    ${escapeHtml((v.name || 'V').charAt(0).toUpperCase())}
+                                </div>
+                                <div>
+                                    <strong style="color:var(--heading);">${escapeHtml(v.name || 'Volunteer')}</strong>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="mailto:${escapeHtml(v.email)}" style="color:var(--purple); text-decoration:none; font-weight:600;">
+                                ${escapeHtml(v.email || '')}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="tel:${escapeHtml(v.contact)}" style="color:var(--navy); text-decoration:none; font-family:monospace; font-size:13px; font-weight:600;">
+                                📞 ${escapeHtml(v.contact || '')}
+                            </a>
+                        </td>
+                        <td style="font-size:12.5px; color:#635f85;">
+                            ${escapeHtml(regBy)}
+                        </td>
+                        <td style="font-size:12.5px; color:#797699;">${regDate}</td>
+                        <td>
+                            <span class="badge" style="background:#e8f5e9; color:#15803d; font-weight:700;">Active Volunteer</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn-remove-user" onclick="openRemoveVolunteerModal('${v._id}', '${safeName}')" title="Remove volunteer from registry">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1.5px; margin-right: 4px;">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Volunteer Search Input
+        const adminVolSearchEl = document.getElementById('adminVolunteerSearch');
+        if (adminVolSearchEl) {
+            adminVolSearchEl.addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase().trim();
+                if (!cachedAdminData || !cachedAdminData.volunteers) return;
+                const filtered = cachedAdminData.volunteers.filter(v => {
+                    const name = (v.name || '').toLowerCase();
+                    const email = (v.email || '').toLowerCase();
+                    const contact = (v.contact || '').toLowerCase();
+                    return name.includes(q) || email.includes(q) || contact.includes(q);
+                });
+                renderAdminVolunteersTable(filtered);
+            });
+        }
+
+        // Register Volunteer Modal Handlers
+        const openRegVolBtn = document.getElementById('openRegisterVolunteerModalBtn');
+        const regVolModal = document.getElementById('registerVolunteerModal');
+        const closeRegVolBtn = document.getElementById('closeRegisterVolModalBtn');
+        const regVolForm = document.getElementById('registerVolunteerForm');
+        const volErrorNotice = document.getElementById('volErrorNotice');
+
+        function openRegisterVolModal() {
+            if (regVolForm) regVolForm.reset();
+            if (volErrorNotice) {
+                volErrorNotice.style.display = 'none';
+                volErrorNotice.textContent = '';
+            }
+            if (regVolModal) regVolModal.classList.add('show');
+        }
+
+        function closeRegisterVolModal() {
+            if (regVolModal) regVolModal.classList.remove('show');
+        }
+
+        if (openRegVolBtn) openRegVolBtn.addEventListener('click', openRegisterVolModal);
+        if (closeRegVolBtn) closeRegVolBtn.addEventListener('click', closeRegisterVolModal);
+        if (regVolModal) {
+            regVolModal.addEventListener('click', (e) => {
+                if (e.target === regVolModal) closeRegisterVolModal();
+            });
+        }
+
+        if (regVolForm) {
+            regVolForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('volName')?.value.trim();
+                const email = document.getElementById('volEmail')?.value.trim();
+                const contact = document.getElementById('volContact')?.value.trim();
+                const submitBtn = document.getElementById('submitRegisterVolBtn');
+
+                if (!name || !email || !contact) {
+                    if (volErrorNotice) {
+                        volErrorNotice.textContent = 'Please fill out all required fields.';
+                        volErrorNotice.style.display = 'block';
+                    }
+                    return;
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Enrolling Volunteer...';
+                }
+                if (volErrorNotice) volErrorNotice.style.display = 'none';
+
+                try {
+                    const res = await fetch(`${API_BASE}/dashboard/admin/volunteers`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({ name, email, contact })
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        if (volErrorNotice) {
+                            volErrorNotice.textContent = data.error || 'Failed to register volunteer.';
+                            volErrorNotice.style.display = 'block';
+                        }
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Enroll Volunteer';
+                        }
+                        return;
+                    }
+
+                    closeRegisterVolModal();
+                    alert(data.message || `Volunteer "${name}" registered successfully.`);
+                    await loadAdminDashboard();
+                } catch (err) {
+                    console.error('Error registering volunteer:', err);
+                    if (volErrorNotice) {
+                        volErrorNotice.textContent = 'Network error while registering volunteer.';
+                        volErrorNotice.style.display = 'block';
+                    }
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Enroll Volunteer';
+                    }
+                }
+            });
+        }
+
+        // Remove Volunteer Modal Handlers
+        let pendingRemoveVolId = null;
+
+        function openRemoveVolunteerModal(volId, volName) {
+            pendingRemoveVolId = volId;
+            const modal = document.getElementById('removeVolunteerModal');
+            const nameEl = document.getElementById('modalRemoveVolName');
+            if (nameEl) nameEl.textContent = volName;
+            if (modal) modal.classList.add('show');
+        }
+        window.openRemoveVolunteerModal = openRemoveVolunteerModal;
+
+        function closeRemoveVolunteerModal() {
+            pendingRemoveVolId = null;
+            const modal = document.getElementById('removeVolunteerModal');
+            if (modal) modal.classList.remove('show');
+            const btn = document.getElementById('confirmDeleteVolBtn');
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Remove Volunteer';
+            }
+        }
+        window.closeRemoveVolunteerModal = closeRemoveVolunteerModal;
+
+        const cancelRemoveVolBtn = document.getElementById('cancelRemoveVolBtn');
+        if (cancelRemoveVolBtn) cancelRemoveVolBtn.addEventListener('click', closeRemoveVolunteerModal);
+
+        const removeVolModalEl = document.getElementById('removeVolunteerModal');
+        if (removeVolModalEl) {
+            removeVolModalEl.addEventListener('click', (e) => {
+                if (e.target === removeVolModalEl) closeRemoveVolunteerModal();
+            });
+        }
+
+        const confirmRemoveVolBtn = document.getElementById('confirmDeleteVolBtn');
+        if (confirmRemoveVolBtn) {
+            confirmRemoveVolBtn.addEventListener('click', async () => {
+                if (!pendingRemoveVolId) return;
+                const btn = confirmRemoveVolBtn;
+                btn.disabled = true;
+                btn.textContent = 'Removing...';
+
+                try {
+                    const res = await fetch(`${API_BASE}/dashboard/admin/volunteers/${pendingRemoveVolId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        alert(data.error || 'Failed to remove volunteer.');
+                        btn.disabled = false;
+                        btn.textContent = 'Remove Volunteer';
+                        return;
+                    }
+
+                    closeRemoveVolunteerModal();
+                    alert(data.message || 'Volunteer removed successfully.');
+                    await loadAdminDashboard();
+                } catch (err) {
+                    console.error('Error removing volunteer:', err);
+                    alert('Network error while removing volunteer.');
+                    btn.disabled = false;
+                    btn.textContent = 'Remove Volunteer';
                 }
             });
         }

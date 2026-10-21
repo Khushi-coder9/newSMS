@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const ChatMessage = require('../models/ChatMessage');
 const Appointment = require('../models/Appointment');
+const Volunteer = require('../models/Volunteer');
 const authMiddleware = require('../middleware/auth');
 
 /**
@@ -642,6 +643,7 @@ router.get('/admin', authMiddleware, async (req, res) => {
     const totalStudents = await User.countDocuments({ role: 'student' });
     const totalCounsellors = await User.countDocuments({ role: 'counsellor' });
     const totalAdmins = await User.countDocuments({ role: 'admin' });
+    const totalVolunteers = await Volunteer.countDocuments();
 
     // 2. Chat Severity Cases
     const crisisCases = await ChatMessage.countDocuments({ severity: 'crisis', sender: 'user' });
@@ -699,12 +701,17 @@ router.get('/admin', authMiddleware, async (req, res) => {
       role: c.role || 'counsellor'
     }));
 
+    const volunteersList = await Volunteer.find()
+      .sort({ createdAt: -1 })
+      .lean();
+
     res.json({
       success: true,
       stats: {
         totalStudents: Math.max(totalStudents, 1),
         totalCounsellors: Math.max(totalCounsellors, 1),
         totalAdmins: Math.max(totalAdmins, 1),
+        totalVolunteers,
         totalAppointments,
         pendingAppointments,
         confirmedAppointments,
@@ -728,7 +735,8 @@ router.get('/admin', authMiddleware, async (req, res) => {
         }
       },
       students: studentsList,
-      counsellors: counsellorsList
+      counsellors: counsellorsList,
+      volunteers: volunteersList
     });
   } catch (error) {
     console.error('Error in admin dashboard API:', error);
@@ -807,6 +815,130 @@ router.delete('/admin/users/:id', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error removing user and purging records:', error);
     res.status(500).json({ error: 'Failed to remove user from database.' });
+  }
+});
+
+/**
+ * POST /api/dashboard/admin/volunteers
+ * Admin registers a new volunteer with Name, Email, and Contact Number
+ */
+router.post('/admin/volunteers', authMiddleware, async (req, res) => {
+  try {
+    const requesterRole = (req.user?.role || '').toLowerCase();
+    if (requesterRole !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Administrator privileges required.' });
+    }
+
+    const { name, email, contact } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Volunteer name is required.' });
+    }
+
+    if (!email || !email.trim()) {
+      return res.status(400).json({ error: 'Volunteer email is required.' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({ error: 'Please provide a valid email address.' });
+    }
+
+    if (!contact || !contact.trim()) {
+      return res.status(400).json({ error: 'Volunteer contact number is required.' });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check if volunteer already exists with this email
+    const existing = await Volunteer.findOne({ email: normalizedEmail });
+    if (existing) {
+      return res.status(400).json({ error: 'A volunteer with this email address is already registered.' });
+    }
+
+    // Get admin name
+    let adminName = 'Administrator';
+    if (req.user.name) {
+      adminName = req.user.name;
+    } else if (req.user.userId) {
+      const adminDoc = await User.findById(req.user.userId).select('name').lean();
+      if (adminDoc?.name) adminName = adminDoc.name;
+    }
+
+    const newVolunteer = new Volunteer({
+      name: name.trim(),
+      email: normalizedEmail,
+      contact: contact.trim(),
+      registeredBy: req.user.userId,
+      registeredByName: adminName
+    });
+
+    await newVolunteer.save();
+
+    res.status(201).json({
+      success: true,
+      message: `Volunteer "${newVolunteer.name}" registered successfully.`,
+      volunteer: newVolunteer
+    });
+  } catch (error) {
+    console.error('Error registering volunteer:', error);
+    if (error.code === 11000) {
+      return res.status(400).json({ error: 'A volunteer with this email address already exists.' });
+    }
+    res.status(500).json({ error: 'Failed to register volunteer.' });
+  }
+});
+
+/**
+ * GET /api/dashboard/admin/volunteers
+ * List all registered volunteers for admin
+ */
+router.get('/admin/volunteers', authMiddleware, async (req, res) => {
+  try {
+    const requesterRole = (req.user?.role || '').toLowerCase();
+    if (requesterRole !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Administrator privileges required.' });
+    }
+
+    const volunteers = await Volunteer.find().sort({ createdAt: -1 }).lean();
+    res.json({
+      success: true,
+      volunteers
+    });
+  } catch (error) {
+    console.error('Error fetching volunteers:', error);
+    res.status(500).json({ error: 'Failed to fetch volunteers.' });
+  }
+});
+
+/**
+ * DELETE /api/dashboard/admin/volunteers/:id
+ * Admin removes a registered volunteer
+ */
+router.delete('/admin/volunteers/:id', authMiddleware, async (req, res) => {
+  try {
+    const requesterRole = (req.user?.role || '').toLowerCase();
+    if (requesterRole !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Administrator privileges required.' });
+    }
+
+    const volunteerId = req.params.id;
+    if (!volunteerId || !volunteerId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ error: 'Invalid volunteer ID.' });
+    }
+
+    const deleted = await Volunteer.findByIdAndDelete(volunteerId);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Volunteer not found or already removed.' });
+    }
+
+    res.json({
+      success: true,
+      message: `Volunteer "${deleted.name}" has been removed successfully.`
+    });
+  } catch (error) {
+    console.error('Error removing volunteer:', error);
+    res.status(500).json({ error: 'Failed to remove volunteer.' });
   }
 });
 
