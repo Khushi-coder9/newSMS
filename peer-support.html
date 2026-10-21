@@ -3163,7 +3163,16 @@
                     if (buddyInputRow) buddyInputRow.style.display = 'none';
                     if (buddyWelcomeState) buddyWelcomeState.style.display = 'block';
                     if (buddySearchingState) buddySearchingState.style.display = 'none';
-                    if (chatPollInterval) clearInterval(chatPollInterval);
+                    if (chatPollInterval) {
+                        clearInterval(chatPollInterval);
+                        chatPollInterval = null;
+                    }
+                    if (btnFindBuddy) {
+                        btnFindBuddy.style.display = 'inline-flex';
+                        btnFindBuddy.innerHTML = '✨ Find My Peer Buddy';
+                        btnFindBuddy.style.background = '';
+                        btnFindBuddy.style.color = '';
+                    }
                 }
             } catch (e) {
                 console.error('Check buddy error:', e);
@@ -3200,10 +3209,21 @@
             } else {
                 if (btnFindBuddy) {
                     btnFindBuddy.style.display = 'inline-flex';
-                    btnFindBuddy.textContent = '✨ Find My Peer Buddy';
+                    if (activeBuddyMatch) {
+                        btnFindBuddy.innerHTML = `💬 Connected with ${escapeHtml(activeBuddyMatch.buddyPseudonym || 'Buddy')}`;
+                        btnFindBuddy.style.background = '#059669';
+                        btnFindBuddy.style.color = '#ffffff';
+                    } else {
+                        btnFindBuddy.innerHTML = '✨ Find My Peer Buddy';
+                        btnFindBuddy.style.background = '';
+                        btnFindBuddy.style.color = '';
+                    }
                 }
                 if (btnCancelSearch) btnCancelSearch.style.display = 'none';
                 if (buddySearchingState) buddySearchingState.style.display = 'none';
+                if (activeBuddyMatch && buddyInputRow) {
+                    buddyInputRow.style.display = 'flex';
+                }
 
                 if (matchPollInterval) {
                     clearInterval(matchPollInterval);
@@ -3217,6 +3237,14 @@
             if (buddyWelcomeState) buddyWelcomeState.style.display = 'none';
             if (buddySearchingState) buddySearchingState.style.display = 'none';
             if (buddyInputRow) buddyInputRow.style.display = 'flex';
+
+            if (btnFindBuddy) {
+                btnFindBuddy.style.display = 'inline-flex';
+                btnFindBuddy.innerHTML = `💬 Connected with ${escapeHtml(match.buddyPseudonym || 'Buddy')}`;
+                btnFindBuddy.style.background = '#059669';
+                btnFindBuddy.style.color = '#ffffff';
+            }
+            if (btnCancelSearch) btnCancelSearch.style.display = 'none';
 
             buddyNameDisplay.textContent = match.buddyPseudonym || 'Matched Classmate';
             buddyTagsDisplay.innerHTML = `
@@ -3351,6 +3379,17 @@
                 return;
             }
 
+            // If already matched, jump straight to chat input and continue!
+            if (activeBuddyMatch) {
+                if (buddyInputRow) buddyInputRow.style.display = 'flex';
+                const input = document.getElementById('buddyMsgInput');
+                if (input) {
+                    input.focus();
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
             setSearchingState(true);
 
             try {
@@ -3360,20 +3399,31 @@
                 });
                 const data = await res.json();
 
-                if (data.success && data.matched && data.match) {
+                if (data.success && (data.matched || data.alreadyMatched) && data.match) {
                     setSearchingState(false);
                     activeBuddyMatch = data.match;
                     renderBuddyMatch(data.match);
+                    const input = document.getElementById('buddyMsgInput');
+                    if (input) {
+                        input.focus();
+                        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                 } else if (data.success && data.searching) {
                     // Continue in searching state
                     setSearchingState(true);
                 } else {
                     setSearchingState(false);
-                    alert(data.error || 'Could not initiate matching.');
+                    if (activeBuddyMatch && buddyInputRow) {
+                        buddyInputRow.style.display = 'flex';
+                    }
+                    alert(data.error || data.message || 'Searching for an online classmate... You are in queue.');
                 }
             } catch (e) {
                 console.error('Match error:', e);
                 setSearchingState(false);
+                if (activeBuddyMatch && buddyInputRow) {
+                    buddyInputRow.style.display = 'flex';
+                }
                 alert('Failed to connect to matching service. Please try again.');
             }
         });

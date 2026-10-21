@@ -604,6 +604,43 @@ async function getUserPeerNotifications(userId) {
   }
 }
 
+// Helper: Format a PeerBuddyMatch document for client consumption
+async function formatMatchForUser(matchDoc, userId) {
+  if (!matchDoc || !userId) return null;
+  const match = matchDoc.toObject ? matchDoc.toObject() : matchDoc;
+  const isStudentA = match.studentA.toString() === userId.toString();
+  const otherStudentId = isStudentA ? match.studentB : match.studentA;
+  const buddyPseudonym = isStudentA ? match.pseudonymB : match.pseudonymA;
+  const myPseudonym = isStudentA ? match.pseudonymA : match.pseudonymB;
+
+  const otherProfile = await PeerBuddyProfile.findOne({ userId: otherStudentId })
+    .select('collegeYear preferredLanguage interests supportGoal availability bio lastSeen isOnline pseudonym')
+    .lean();
+
+  const isBuddyOnline = otherProfile && otherProfile.lastSeen
+    ? (Date.now() - new Date(otherProfile.lastSeen).getTime() < 180 * 1000)
+    : false;
+
+  return {
+    _id: match._id,
+    currentUserId: userId,
+    myPseudonym,
+    buddyPseudonym,
+    sharedGoal: match.sharedGoal,
+    compatibilityScore: match.compatibilityScore || 85,
+    matchedLanguage: match.matchedLanguage || otherProfile?.preferredLanguage || 'English',
+    matchedAt: match.matchedAt,
+    buddyDetails: {
+      collegeYear: otherProfile?.collegeYear || 'Classmate',
+      preferredLanguage: otherProfile?.preferredLanguage || 'English',
+      interests: otherProfile?.interests || ['Campus Life'],
+      supportGoal: otherProfile?.supportGoal || match.sharedGoal,
+      isOnline: isBuddyOnline
+    },
+    messages: match.messages || []
+  };
+}
+
 // POST /api/peer/buddy/heartbeat — updates online presence and checks live match status
 router.post('/buddy/heartbeat', async (req, res) => {
   try {
@@ -801,26 +838,10 @@ router.get('/buddy/active-match', async (req, res) => {
       }
     }
 
+    const formatted = await formatMatchForUser(activeMatch, authUser.userId);
     res.json({
       success: true,
-      match: {
-        _id: activeMatch._id,
-        currentUserId: authUser.userId,
-        myPseudonym,
-        buddyPseudonym,
-        sharedGoal: activeMatch.sharedGoal,
-        compatibilityScore: activeMatch.compatibilityScore || 85,
-        matchedLanguage: activeMatch.matchedLanguage || otherProfile?.preferredLanguage || 'English',
-        matchedAt: activeMatch.matchedAt,
-        buddyDetails: {
-          collegeYear: otherProfile?.collegeYear || 'Classmate',
-          preferredLanguage: otherProfile?.preferredLanguage || 'English',
-          interests: otherProfile?.interests || ['Campus Life'],
-          supportGoal: otherProfile?.supportGoal || activeMatch.sharedGoal,
-          isOnline: isBuddyOnline
-        },
-        messages: activeMatch.messages || []
-      }
+      match: formatted
     });
   } catch (error) {
     console.error('Error getting active match:', error);
@@ -838,19 +859,21 @@ router.post('/buddy/find', async (req, res) => {
 
     await cleanupLegacyBotMatches();
 
-    // Check if user already has an active real match with another registered student
-    const existingMatch = await PeerBuddyMatch.findOne({
+    // 1. If user already has an active match, format and return it so chat immediately continues!
+    const activeMatch = await PeerBuddyMatch.findOne({
       status: 'active',
       $expr: { $ne: ['$studentA', '$studentB'] },
       $or: [{ studentA: authUser.userId }, { studentB: authUser.userId }]
     });
 
-    if (existingMatch) {
+    if (activeMatch) {
+      const formatted = await formatMatchForUser(activeMatch, authUser.userId);
       return res.json({
         success: true,
+        matched: true,
         alreadyMatched: true,
-        message: 'You already have an active peer buddy match!',
-        match: existingMatch
+        message: 'Connected with your peer buddy!',
+        match: formatted
       });
     }
 
@@ -875,8 +898,8 @@ router.post('/buddy/find', async (req, res) => {
     });
     busyUserIds.add(authUser.userId.toString()); // exclude self
 
-    // Find eligible REGISTERED students who are currently online (within last 90 seconds)
-    const onlineThreshold = new Date(Date.now() - 90 * 1000);
+    // Find eligible REGISTERED students who are currently online (within last 3 minutes)
+    const onlineThreshold = new Date(Date.now() - 180 * 1000);
     const candidateProfiles = await PeerBuddyProfile.find({
       userId: { $nin: Array.from(busyUserIds) },
       lastSeen: { $gte: onlineThreshold }
@@ -898,53 +921,70 @@ router.post('/buddy/find', async (req, res) => {
         score += 25;
       }
 
+      // Bonus if they previously had a conversation so they can continue where they left off!
+      const hadPastMatch = await PeerBuddyMatch.findOne({
+        $or: [
+          { studentA: authUser.userId, studentB: cand.userId },
+          { studentA: cand.userId, studentB: authUser.userId }
+        ]
+      });
+      if (hadPastMatch) {
+        score += 30; // Encourage continued peer connections!
+      }
+
       if (score > highestScore) {
         highestScore = score;
         bestCandidate = cand;
       }
     }
 
-    // If suitable online student found, pair them in a private chat room!
+    // If suitable online student found, pair them in a private chat room or resume continued chat!
     if (bestCandidate && highestScore >= 35) {
-      const newMatch = new PeerBuddyMatch({
-        studentA: authUser.userId,
-        studentB: bestCandidate.userId,
-        pseudonymA: myProfile.pseudonym || 'Buddy A',
-        pseudonymB: bestCandidate.pseudonym || 'Buddy B',
-        sharedGoal: myProfile.supportGoal,
-        compatibilityScore: highestScore,
-        matchedLanguage: myProfile.preferredLanguage,
-        status: 'active',
-        messages: [] // Clean, real-time message thread between two actual students
-      });
+      // Check if they previously had a match together so we can continue their chat history!
+      let matchToUse = await PeerBuddyMatch.findOne({
+        $or: [
+          { studentA: authUser.userId, studentB: bestCandidate.userId },
+          { studentA: bestCandidate.userId, studentB: authUser.userId }
+        ]
+      }).sort({ matchedAt: -1 });
 
-      await newMatch.save();
+      if (matchToUse) {
+        // Resume existing match and continue chat!
+        matchToUse.status = 'active';
+        matchToUse.endedBy = null;
+        matchToUse.endReason = '';
+        matchToUse.compatibilityScore = highestScore;
+        await matchToUse.save();
+      } else {
+        // Create new peer match
+        matchToUse = new PeerBuddyMatch({
+          studentA: authUser.userId,
+          studentB: bestCandidate.userId,
+          pseudonymA: myProfile.pseudonym || 'Buddy A',
+          pseudonymB: bestCandidate.pseudonym || 'Buddy B',
+          sharedGoal: myProfile.supportGoal,
+          compatibilityScore: highestScore,
+          matchedLanguage: myProfile.preferredLanguage,
+          status: 'active',
+          messages: []
+        });
+        await matchToUse.save();
+      }
 
       // Clear search status for both
       myProfile.isSearching = false;
       await myProfile.save();
       await PeerBuddyProfile.updateOne({ userId: bestCandidate.userId }, { isSearching: false });
 
-      return res.status(201).json({
+      const formatted = await formatMatchForUser(matchToUse, authUser.userId);
+      return res.status(200).json({
         success: true,
         matched: true,
-        message: 'Connected with an online classmate!',
-        match: {
-          _id: newMatch._id,
-          buddyPseudonym: bestCandidate.pseudonym,
-          sharedGoal: newMatch.sharedGoal,
-          compatibilityScore: highestScore,
-          matchedLanguage: newMatch.matchedLanguage,
-          matchedAt: newMatch.matchedAt,
-          buddyDetails: {
-            collegeYear: bestCandidate.collegeYear,
-            preferredLanguage: bestCandidate.preferredLanguage,
-            interests: bestCandidate.interests,
-            supportGoal: bestCandidate.supportGoal,
-            isOnline: true
-          },
-          messages: []
-        }
+        isResumed: Boolean(matchToUse.messages && matchToUse.messages.length > 0),
+        message: matchToUse.messages && matchToUse.messages.length > 0
+          ? 'Reconnected with your classmate! Continuing chat...'
+          : 'Connected with an online classmate!',
+        match: formatted
       });
     }
 
