@@ -3076,6 +3076,12 @@
                 if (!data || !data.success) return;
 
                 cachedAdminData = data;
+                if (data.students) {
+                    data.students.forEach(s => { s.role = s.role || 'student'; });
+                }
+                if (data.counsellors) {
+                    data.counsellors.forEach(c => { c.role = c.role || 'counsellor'; });
+                }
 
                 // Update Metric KPIs
                 const stVal = document.getElementById('adminTotalStudents');
@@ -3216,12 +3222,21 @@
             }
 
             tbody.innerHTML = users.map(u => {
-                const isCounsellor = u.role === 'counsellor';
-                const roleBadge = isCounsellor
-                    ? '<span class="badge" style="background:#e0f7fa; color:#0e7490;">💼 Counsellor</span>'
-                    : '<span class="badge" style="background:#f3f0ff; color:#6d4dff;">🎓 Student</span>';
+                const roleLower = String(u.role || '').toLowerCase();
+                const isCounsellor = roleLower === 'counsellor' || (!roleLower && Boolean(u.designation));
+                const isAdmin = roleLower === 'admin';
 
-                const details = isCounsellor ? (u.designation || 'Specialist') : (u.age ? `Age: ${u.age}` : 'Student');
+                let roleBadge = '<span class="badge" style="background:#f3f0ff; color:#6d4dff; font-weight:700;">🎓 Student</span>';
+                let details = u.age ? `Age: ${u.age}` : 'Campus Student';
+
+                if (isCounsellor) {
+                    roleBadge = '<span class="badge" style="background:#e0f7fa; color:#0e7490; font-weight:700;">💼 Counsellor</span>';
+                    details = u.designation || 'Clinical / Campus Counsellor';
+                } else if (isAdmin) {
+                    roleBadge = '<span class="badge" style="background:#fef3c7; color:#b45309; font-weight:700;">🛡️ Admin</span>';
+                    details = 'System Administrator';
+                }
+
                 const regDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently';
 
                 return `
@@ -3243,11 +3258,14 @@
                 const q = e.target.value.toLowerCase().trim();
                 if (!cachedAdminData) return;
                 const combined = [...(cachedAdminData.students || []), ...(cachedAdminData.counsellors || [])];
-                const filtered = combined.filter(u =>
-                    (u.name && u.name.toLowerCase().includes(q)) ||
-                    (u.email && u.email.toLowerCase().includes(q)) ||
-                    (u.role && u.role.toLowerCase().includes(q))
-                );
+                const filtered = combined.filter(u => {
+                    const name = (u.name || '').toLowerCase();
+                    const email = (u.email || '').toLowerCase();
+                    const role = (u.role || (u.designation ? 'counsellor' : 'student')).toLowerCase();
+                    const designation = (u.designation || '').toLowerCase();
+                    const age = u.age ? String(u.age) : '';
+                    return name.includes(q) || email.includes(q) || role.includes(q) || designation.includes(q) || age.includes(q);
+                });
                 renderAdminRegistryTable(filtered);
             });
         }

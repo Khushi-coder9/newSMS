@@ -678,18 +678,26 @@ router.get('/admin', authMiddleware, async (req, res) => {
     }
 
     // 5. Fetch Students Registry (with detected difficulties)
-    const studentsList = await User.find({ role: 'student' })
-      .select('name email age createdAt')
+    const studentsListRaw = await User.find({ role: 'student' })
+      .select('name email age role createdAt')
       .sort({ createdAt: -1 })
-      .limit(30)
+      .limit(50)
       .lean();
+    const studentsList = studentsListRaw.map(s => ({
+      ...s,
+      role: s.role || 'student'
+    }));
 
     // 6. Fetch Counsellors Registry
-    const counsellorsList = await User.find({ role: 'counsellor' })
-      .select('name email designation createdAt')
+    const counsellorsListRaw = await User.find({ role: 'counsellor' })
+      .select('name email designation role createdAt')
       .sort({ createdAt: -1 })
-      .limit(20)
+      .limit(50)
       .lean();
+    const counsellorsList = counsellorsListRaw.map(c => ({
+      ...c,
+      role: c.role || 'counsellor'
+    }));
 
     res.json({
       success: true,
