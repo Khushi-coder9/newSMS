@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
 const appointmentRoutes = require('./routes/appointments');
 const dashboardRoutes = require('./routes/dashboard');
+const peerRoutes = require('./routes/peer');
 
 const path = require('path');
 const app = express();
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/peer', peerRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
