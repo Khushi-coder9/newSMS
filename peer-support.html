@@ -962,56 +962,110 @@
             border-radius: var(--radius-md);
             padding: 22px;
             box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
         }
 
         .buddy-sidebar-title {
-            font-size: 16px;
+            font-size: 16.5px;
             font-weight: 800;
             color: var(--forest-900);
-            margin-bottom: 6px;
+        }
+
+        .online-indicator-pill {
+            background: #e8f5f1;
+            border: 1px solid #bce4d6;
+            color: var(--forest-900);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .buddy-sidebar-desc {
             font-size: 12.5px;
             color: var(--text-muted);
-            margin-bottom: 18px;
             line-height: 1.45;
         }
 
-        .buddy-form-group {
-            margin-bottom: 14px;
+        /* Inferred Match Profile Card (Collected silently) */
+        .inferred-profile-card {
+            background: #f7faf8;
+            border: 1.5px solid #d4eae0;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .buddy-form-label {
-            display: block;
+        .inferred-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .inferred-badge {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary-green);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .inferred-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .profile-meta-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
             font-size: 12px;
+            gap: 8px;
+        }
+
+        .meta-label {
+            font-weight: 700;
+            color: #40524a;
+            white-space: nowrap;
+        }
+
+        .meta-value {
             font-weight: 700;
             color: var(--forest-900);
-            margin-bottom: 6px;
+            text-align: right;
         }
 
-        .interests-tags-picker {
+        .interests-pills {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 4px;
+            justify-content: flex-end;
         }
 
-        .tag-choice {
-            font-size: 11.5px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px solid var(--border-light);
-            background: var(--body-bg);
-            color: #40524a;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .interest-pill {
+            background: #ffffff;
+            border: 1px solid #cce2d8;
+            color: #2d5547;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
         }
 
-        .tag-choice.selected {
-            background: var(--forest-800);
-            color: #fff;
-            border-color: var(--forest-800);
+        .inferred-card-footer {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.35;
+            padding-top: 8px;
+            border-top: 1px dashed #dcece4;
         }
 
         .btn-match-buddy {
@@ -1022,14 +1076,64 @@
             font-weight: 700;
             padding: 12px;
             border-radius: 10px;
-            margin-top: 14px;
             box-shadow: 0 4px 14px rgba(45, 138, 107, 0.2);
             transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-match-buddy:hover {
             background: #237257;
             transform: translateY(-1px);
+        }
+
+        .btn-cancel-search {
+            width: 100%;
+            background: #fff;
+            border: 1.5px solid #e06d7e;
+            color: #c92a2a;
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 9px;
+            border-radius: 10px;
+            margin-top: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel-search:hover {
+            background: #fdf2f4;
+        }
+
+        .radar-pulse-ring {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #e8f5f1;
+            border: 2px solid var(--accent-mint);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 16px;
+            animation: radarPulse 1.8s infinite ease-in-out;
+        }
+
+        @keyframes radarPulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(72, 184, 148, 0.5); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 16px rgba(72, 184, 148, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(72, 184, 148, 0); }
+        }
+
+        .badge-status-online {
+            background: #e8f5f1;
+            border: 1px solid #bce4d6;
+            color: var(--forest-900);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 999px;
         }
 
         /* Buddy Match & Chat Container */
@@ -1841,86 +1945,101 @@
             <div class="buddy-layout">
                 <!-- Buddy Profile / Preferences Sidebar -->
                 <div class="buddy-sidebar-card">
-                    <h3 class="buddy-sidebar-title">Peer Buddy Matching</h3>
-                    <p class="buddy-sidebar-desc">Get matched 1-on-1 with another student who shares your goals, interests, and language for confidential text check-ins.</p>
-
-                    <div class="buddy-form-group">
-                        <label class="buddy-form-label">Primary Support Goal</label>
-                        <select class="form-select" id="buddyGoalSelect">
-                            <option value="Managing academic stress">Managing academic stress</option>
-                            <option value="Adjusting to college">Adjusting to college & hostel life</option>
-                            <option value="Making friends">Making friends & social connection</option>
-                            <option value="Staying motivated">Staying motivated with studies</option>
-                            <option value="General peer support">General daily check-ins</option>
-                        </select>
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                        <h3 class="buddy-sidebar-title" style="margin: 0;">Live Student Match</h3>
+                        <span class="online-indicator-pill" id="onlineStudentsCounter">🟢 1 Student Online</span>
                     </div>
+                    <p class="buddy-sidebar-desc">
+                        Connect 1-on-1 in a private chat room with an actual registered classmate who is active online right now. Zero bots, 100% peer-to-peer.
+                    </p>
 
-                    <div class="buddy-form-group">
-                        <label class="buddy-form-label">Preferred Language</label>
-                        <select class="form-select" id="buddyLangSelect">
-                            <option value="English">English</option>
-                            <option value="Hindi">Hindi</option>
-                            <option value="Bengali">Bengali</option>
-                            <option value="Tamil">Tamil</option>
-                            <option value="Telugu">Telugu</option>
-                            <option value="Marathi">Marathi</option>
-                        </select>
-                    </div>
-
-                    <div class="buddy-form-group">
-                        <label class="buddy-form-label">College Year</label>
-                        <select class="form-select" id="buddyYearSelect">
-                            <option value="1st Year">1st Year Student</option>
-                            <option value="2nd Year">2nd Year Student</option>
-                            <option value="3rd Year">3rd Year Student</option>
-                            <option value="4th Year / Postgrad">4th Year / Postgrad</option>
-                        </select>
-                    </div>
-
-                    <div class="buddy-form-group">
-                        <label class="buddy-form-label">Your Interests (Pick 2+)</label>
-                        <div class="interests-tags-picker" id="buddyInterestsPicker">
-                            <span class="tag-choice selected" data-val="Coding">Coding</span>
-                            <span class="tag-choice selected" data-val="Study Techniques">Study Techniques</span>
-                            <span class="tag-choice" data-val="Music">Music</span>
-                            <span class="tag-choice" data-val="Gaming">Gaming</span>
-                            <span class="tag-choice" data-val="Reading">Reading</span>
-                            <span class="tag-choice" data-val="Fitness">Fitness</span>
-                            <span class="tag-choice" data-val="Art & Creative">Art & Creative</span>
+                    <!-- Silently collected match profile card (No interrogating inputs!) -->
+                    <div class="inferred-profile-card" id="inferredProfileCard">
+                        <div class="inferred-card-header">
+                            <span class="inferred-badge">✨ Auto-Calibrated Profile</span>
+                        </div>
+                        <div class="inferred-card-body">
+                            <div class="profile-meta-row">
+                                <span class="meta-label">🎯 Support Focus:</span>
+                                <span class="meta-value" id="profileGoalDisplay">Managing academic stress</span>
+                            </div>
+                            <div class="profile-meta-row">
+                                <span class="meta-label">🌐 Preferred Language:</span>
+                                <span class="meta-value" id="profileLangDisplay">English</span>
+                            </div>
+                            <div class="profile-meta-row">
+                                <span class="meta-label">🎒 College Year:</span>
+                                <span class="meta-value" id="profileYearDisplay">1st Year Student</span>
+                            </div>
+                            <div class="profile-meta-row">
+                                <span class="meta-label">🏷️ Interests:</span>
+                                <div class="interests-pills" id="profileInterestsDisplay">
+                                    <span class="interest-pill">Study Techniques</span>
+                                    <span class="interest-pill">Coding</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="inferred-card-footer">
+                            <span>🛡️ Automatically analyzed from your AI chat & campus wellness interactions for pressure-free matching.</span>
                         </div>
                     </div>
 
-                    <button class="btn-match-buddy" id="btnFindBuddy">✨ Find My Peer Buddy</button>
+                    <!-- Match Action / Status Buttons -->
+                    <div id="matchingActionsContainer">
+                        <button class="btn-match-buddy" id="btnFindBuddy">
+                            ✨ Find My Peer Buddy
+                        </button>
+                        <button class="btn-cancel-search" id="btnCancelSearch" style="display: none;">
+                            ✕ Cancel Search
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Buddy Chat & Active Match Interface -->
                 <div class="buddy-chat-card" id="buddyChatContainer">
-                    <div class="buddy-chat-header">
+                    <!-- Header when matched -->
+                    <div class="buddy-chat-header" id="buddyChatHeader" style="display: none;">
                         <div class="matched-profile-summary">
-                            <div class="buddy-avatar-lg" id="buddyAvatarDisplay">🤝</div>
+                            <div class="buddy-avatar-lg" id="buddyAvatarDisplay">🎓</div>
                             <div>
-                                <h4 class="buddy-match-name" id="buddyNameDisplay">Looking for a Buddy...</h4>
+                                <h4 class="buddy-match-name" id="buddyNameDisplay">Matched Classmate</h4>
                                 <div class="buddy-match-tags" id="buddyTagsDisplay">
-                                    <span>Set your preferences on the left to connect</span>
+                                    <span class="meta-tag-topic">Managing academic stress</span>
+                                    <span>English</span>
                                 </div>
                             </div>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button id="btnEndMatch" style="font-size: 11px; color: #a33; font-weight: 700; display: none;">End Match</button>
-                            <button id="btnReportBuddy" style="font-size: 11px; color: #777; font-weight: 600; display: none;">Report</button>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge-status-online" id="buddyOnlineBadge">🟢 Online</span>
+                            <button id="btnEndMatch" style="font-size: 11.5px; color: #b91c1c; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: #fee2e2;">End Match</button>
+                            <button id="btnReportBuddy" style="font-size: 11.5px; color: #4b5563; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: #f3f4f6;">Report</button>
                         </div>
                     </div>
 
+                    <!-- Messages flow -->
                     <div class="buddy-messages-flow" id="buddyMessagesList">
-                        <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-                            <div style="font-size: 32px; margin-bottom: 10px;">👥</div>
-                            <h4 style="color: var(--forest-900); margin-bottom: 6px;">Peer Buddy Sanctuary</h4>
-                            <p style="font-size: 13px; max-width: 380px; margin: 0 auto;">Click "Find My Peer Buddy" to match with a compatible classmate for supportive, pressure-free daily check-ins.</p>
+                        <!-- Welcome State -->
+                        <div id="buddyWelcomeState" style="text-align: center; padding: 50px 20px; color: var(--text-muted);">
+                            <div style="font-size: 38px; margin-bottom: 12px;">🤝</div>
+                            <h4 style="color: var(--forest-900); font-size: 16px; margin-bottom: 6px;">Real-Time Student Peer Sanctuary</h4>
+                            <p style="font-size: 13px; max-width: 380px; margin: 0 auto; line-height: 1.5;">
+                                Click <strong>"Find My Peer Buddy"</strong> to connect directly with an active classmate currently online. You will both be joined to this private chat room in real time.
+                            </p>
+                        </div>
+
+                        <!-- Searching State -->
+                        <div id="buddySearchingState" style="display: none; text-align: center; padding: 50px 20px;">
+                            <div class="radar-pulse-ring">🔍</div>
+                            <h4 style="color: var(--forest-900); font-size: 16px; margin-bottom: 6px;">Searching for an online classmate...</h4>
+                            <p style="font-size: 13px; max-width: 380px; margin: 0 auto; color: var(--text-muted); line-height: 1.5;">
+                                Looking for another registered student currently online with compatible language and support goals. We'll connect you both the instant a classmate is ready!
+                            </p>
                         </div>
                     </div>
 
+                    <!-- Input row -->
                     <div class="buddy-input-row" id="buddyInputRow" style="display: none;">
-                        <input type="text" class="buddy-text-input" id="buddyMsgInput" placeholder="Send a supportive check-in message...">
+                        <input type="text" class="buddy-text-input" id="buddyMsgInput" placeholder="Send a message to your peer buddy...">
                         <button class="btn-send-buddy-msg" id="btnSendBuddyMsg">Send</button>
                     </div>
                 </div>
@@ -2150,7 +2269,10 @@
                     panel.classList.add('active');
                     currentActiveTab = targetTab;
                     if (targetTab === 'tab-community') loadPosts();
-                    if (targetTab === 'tab-buddy') checkBuddyMatch();
+                    if (targetTab === 'tab-buddy') {
+                        checkBuddyMatch();
+                        loadStudentPeerProfile();
+                    }
                     if (targetTab === 'tab-circles') loadCircles();
                     if (targetTab === 'tab-kindness') loadKindness();
                 }
@@ -2561,19 +2683,83 @@
             replyIdeasModal.style.display = 'none';
         }
 
-        // ------------------ FIND A PEER BUDDY (FEATURE #2) ------------------
+        // ------------------ FIND A PEER BUDDY (FEATURE #2: REAL-TIME STUDENT-TO-STUDENT) ------------------
         const btnFindBuddy = document.getElementById('btnFindBuddy');
+        const btnCancelSearch = document.getElementById('btnCancelSearch');
+        const buddyChatHeader = document.getElementById('buddyChatHeader');
+        const buddyWelcomeState = document.getElementById('buddyWelcomeState');
+        const buddySearchingState = document.getElementById('buddySearchingState');
         const buddyMessagesList = document.getElementById('buddyMessagesList');
         const buddyInputRow = document.getElementById('buddyInputRow');
         const buddyNameDisplay = document.getElementById('buddyNameDisplay');
         const buddyTagsDisplay = document.getElementById('buddyTagsDisplay');
+        const buddyOnlineBadge = document.getElementById('buddyOnlineBadge');
         const btnEndMatch = document.getElementById('btnEndMatch');
         const btnReportBuddy = document.getElementById('btnReportBuddy');
+        const onlineStudentsCounter = document.getElementById('onlineStudentsCounter');
 
-        // Tag picker logic
-        document.querySelectorAll('#buddyInterestsPicker .tag-choice').forEach(tag => {
-            tag.addEventListener('click', () => tag.classList.toggle('selected'));
-        });
+        let isSearchingBuddy = false;
+        let matchPollInterval = null;
+        let chatPollInterval = null;
+        let lastRenderedMsgCount = 0;
+
+        // Start heartbeat to maintain online status and detect matches in real time
+        function startHeartbeat() {
+            if (!authToken) return;
+            const ping = async () => {
+                try {
+                    const res = await fetch(`${API_BASE}/peer/buddy/heartbeat`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${authToken}` }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        if (onlineStudentsCounter) {
+                            onlineStudentsCounter.textContent = `🟢 ${data.onlineCount || 1} Student${data.onlineCount === 1 ? '' : 's'} Online`;
+                        }
+                        // If a match was formed while searching in another tab or background, load it!
+                        if (data.hasActiveMatch && !activeBuddyMatch) {
+                            checkBuddyMatch();
+                        }
+                    }
+                } catch (e) {
+                    // Ignore ping network hiccups
+                }
+            };
+            ping();
+            setInterval(ping, 15000); // every 15s
+        }
+
+        // Silently fetch and display the student's automatically collected matching profile
+        async function loadStudentPeerProfile() {
+            if (!authToken) return;
+            try {
+                const res = await fetch(`${API_BASE}/peer/buddy/profile`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                if (data.success && data.profile) {
+                    const p = data.profile;
+                    const goalEl = document.getElementById('profileGoalDisplay');
+                    const langEl = document.getElementById('profileLangDisplay');
+                    const yearEl = document.getElementById('profileYearDisplay');
+                    const intEl = document.getElementById('profileInterestsDisplay');
+
+                    if (goalEl) goalEl.textContent = p.supportGoal || 'Managing academic stress';
+                    if (langEl) langEl.textContent = p.preferredLanguage || 'English';
+                    if (yearEl) yearEl.textContent = `${p.collegeYear || '1st Year'} Student`;
+                    if (intEl && Array.isArray(p.interests)) {
+                        intEl.innerHTML = p.interests.map(i => `<span class="interest-pill">${escapeHtml(i)}</span>`).join('');
+                    }
+
+                    if (p.isSearching && !activeBuddyMatch) {
+                        setSearchingState(true);
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading peer profile:', e);
+            }
+        }
 
         async function checkBuddyMatch() {
             if (!authToken) {
@@ -2588,34 +2774,98 @@
                 });
                 const data = await res.json();
                 if (data.success && data.match) {
+                    setSearchingState(false);
                     activeBuddyMatch = data.match;
                     renderBuddyMatch(data.match);
+                } else if (data.success && data.isSearching) {
+                    setSearchingState(true);
+                } else {
+                    setSearchingState(false);
+                    activeBuddyMatch = null;
+                    if (buddyChatHeader) buddyChatHeader.style.display = 'none';
+                    if (buddyInputRow) buddyInputRow.style.display = 'none';
+                    if (buddyWelcomeState) buddyWelcomeState.style.display = 'block';
+                    if (buddySearchingState) buddySearchingState.style.display = 'none';
+                    if (chatPollInterval) clearInterval(chatPollInterval);
                 }
             } catch (e) {
                 console.error('Check buddy error:', e);
             }
         }
 
+        function setSearchingState(isSearching) {
+            isSearchingBuddy = isSearching;
+            if (isSearching) {
+                if (btnFindBuddy) btnFindBuddy.style.display = 'none';
+                if (btnCancelSearch) btnCancelSearch.style.display = 'block';
+                if (buddyChatHeader) buddyChatHeader.style.display = 'none';
+                if (buddyWelcomeState) buddyWelcomeState.style.display = 'none';
+                if (buddySearchingState) buddySearchingState.style.display = 'block';
+                if (buddyInputRow) buddyInputRow.style.display = 'none';
+
+                if (!matchPollInterval) {
+                    matchPollInterval = setInterval(async () => {
+                        try {
+                            const res = await fetch(`${API_BASE}/peer/buddy/active-match`, {
+                                headers: { 'Authorization': `Bearer ${authToken}` }
+                            });
+                            const data = await res.json();
+                            if (data.success && data.match) {
+                                clearInterval(matchPollInterval);
+                                matchPollInterval = null;
+                                setSearchingState(false);
+                                activeBuddyMatch = data.match;
+                                renderBuddyMatch(data.match);
+                            }
+                        } catch (e) {}
+                    }, 2500);
+                }
+            } else {
+                if (btnFindBuddy) {
+                    btnFindBuddy.style.display = 'inline-flex';
+                    btnFindBuddy.textContent = '✨ Find My Peer Buddy';
+                }
+                if (btnCancelSearch) btnCancelSearch.style.display = 'none';
+                if (buddySearchingState) buddySearchingState.style.display = 'none';
+
+                if (matchPollInterval) {
+                    clearInterval(matchPollInterval);
+                    matchPollInterval = null;
+                }
+            }
+        }
+
         function renderBuddyMatch(match) {
-            buddyNameDisplay.textContent = match.buddyPseudonym || 'Your Peer Buddy';
+            if (buddyChatHeader) buddyChatHeader.style.display = 'flex';
+            if (buddyWelcomeState) buddyWelcomeState.style.display = 'none';
+            if (buddySearchingState) buddySearchingState.style.display = 'none';
+            if (buddyInputRow) buddyInputRow.style.display = 'flex';
+
+            buddyNameDisplay.textContent = match.buddyPseudonym || 'Matched Classmate';
             buddyTagsDisplay.innerHTML = `
-                <span class="meta-tag-topic">${escapeHtml(match.sharedGoal || 'Mutual Support')}</span>
-                <span>${escapeHtml(match.buddyDetails?.preferredLanguage || 'English')}</span>
+                <span class="meta-tag-topic">🎯 ${escapeHtml(match.sharedGoal || 'Peer Support')}</span>
+                <span class="meta-tag-topic" style="background:#e0f2fe; color:#0369a1;">🌐 ${escapeHtml(match.buddyDetails?.preferredLanguage || match.matchedLanguage || 'English')}</span>
+                <span style="font-size: 11px; color: var(--text-muted);">🎒 ${escapeHtml(match.buddyDetails?.collegeYear || 'Classmate')}</span>
             `;
-            buddyInputRow.style.display = 'flex';
-            btnEndMatch.style.display = 'inline-block';
-            btnReportBuddy.style.display = 'inline-block';
+
+            if (buddyOnlineBadge) {
+                buddyOnlineBadge.textContent = match.buddyDetails?.isOnline ? '🟢 Online' : '⚪ Active recently';
+            }
 
             const msgs = match.messages || [];
+            lastRenderedMsgCount = msgs.length;
+
             if (msgs.length === 0) {
                 buddyMessagesList.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;">
-                        Say hello to your matched buddy! Text-based check-ins are private and supportive.
+                    <div style="text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 13px;">
+                        <div style="font-size: 26px; margin-bottom: 8px;">🎉</div>
+                        <h4 style="color: var(--forest-900); margin-bottom: 4px;">Connected with ${escapeHtml(match.buddyPseudonym)}!</h4>
+                        <p style="max-width: 340px; margin: 0 auto; line-height: 1.45;">Both of you are in this private chat room. Say hello and break the ice!</p>
                     </div>
                 `;
             } else {
                 buddyMessagesList.innerHTML = msgs.map(m => {
-                    const isMine = m.senderPseudonym !== match.buddyPseudonym;
+                    const isMine = m.senderId === (localStorage.getItem('userId') || '') || m.senderPseudonym !== match.buddyPseudonym;
                     return `
                         <div class="chat-msg ${isMine ? 'mine' : 'buddy'}">
                             <strong>${escapeHtml(m.senderPseudonym)}:</strong> ${escapeHtml(m.text)}
@@ -2625,59 +2875,117 @@
                 }).join('');
                 buddyMessagesList.scrollTop = buddyMessagesList.scrollHeight;
             }
+
+            // Real-time chat polling every 2s for instant message delivery between students
+            if (!chatPollInterval) {
+                chatPollInterval = setInterval(async () => {
+                    if (!activeBuddyMatch || !authToken) return;
+                    try {
+                        const res = await fetch(`${API_BASE}/peer/buddy/active-match`, {
+                            headers: { 'Authorization': `Bearer ${authToken}` }
+                        });
+                        const data = await res.json();
+                        if (data.success && data.match) {
+                            activeBuddyMatch = data.match;
+                            const newMsgs = data.match.messages || [];
+                            if (newMsgs.length !== lastRenderedMsgCount) {
+                                lastRenderedMsgCount = newMsgs.length;
+                                buddyMessagesList.innerHTML = newMsgs.map(m => {
+                                    const isMine = m.senderId === (localStorage.getItem('userId') || '') || m.senderPseudonym !== data.match.buddyPseudonym;
+                                    return `
+                                        <div class="chat-msg ${isMine ? 'mine' : 'buddy'}">
+                                            <strong>${escapeHtml(m.senderPseudonym)}:</strong> ${escapeHtml(m.text)}
+                                            <span class="msg-time">${formatRelativeTime(m.createdAt)}</span>
+                                        </div>
+                                    `;
+                                }).join('');
+                                buddyMessagesList.scrollTop = buddyMessagesList.scrollHeight;
+                            }
+                        } else if (data.success && !data.match) {
+                            // Match ended by partner
+                            clearInterval(chatPollInterval);
+                            chatPollInterval = null;
+                            activeBuddyMatch = null;
+                            alert('Your peer buddy concluded this check-in session.');
+                            checkBuddyMatch();
+                        }
+                    } catch (e) {}
+                }, 2000);
+            }
         }
 
+        // Find peer buddy button click
         btnFindBuddy.addEventListener('click', async () => {
             if (!authToken) {
                 alert('Please log in first to match with a peer buddy!');
                 return;
             }
 
-            btnFindBuddy.textContent = 'Matching... ⏳';
-
-            const selectedInterests = Array.from(document.querySelectorAll('#buddyInterestsPicker .tag-choice.selected')).map(el => el.getAttribute('data-val'));
-            const goal = document.getElementById('buddyGoalSelect').value;
-            const lang = document.getElementById('buddyLangSelect').value;
-            const year = document.getElementById('buddyYearSelect').value;
+            setSearchingState(true);
 
             try {
-                // Save profile first
-                await fetch(`${API_BASE}/peer/buddy/profile`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify({
-                        interests: selectedInterests,
-                        supportGoal: goal,
-                        preferredLanguage: lang,
-                        collegeYear: year
-                    })
-                });
-
-                // Request match
                 const res = await fetch(`${API_BASE}/peer/buddy/find`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${authToken}` }
                 });
                 const data = await res.json();
-                btnFindBuddy.textContent = '✨ Find My Peer Buddy';
 
-                if (data.success && data.match) {
+                if (data.success && data.matched && data.match) {
+                    setSearchingState(false);
                     activeBuddyMatch = data.match;
                     renderBuddyMatch(data.match);
+                } else if (data.success && data.searching) {
+                    // Continue in searching state
+                    setSearchingState(true);
+                } else {
+                    setSearchingState(false);
+                    alert(data.error || 'Could not initiate matching.');
                 }
             } catch (e) {
                 console.error('Match error:', e);
-                btnFindBuddy.textContent = '✨ Find My Peer Buddy';
+                setSearchingState(false);
+                alert('Failed to connect to matching service. Please try again.');
             }
         });
 
-        document.getElementById('btnSendBuddyMsg').addEventListener('click', async () => {
+        // Cancel search
+        btnCancelSearch.addEventListener('click', async () => {
+            setSearchingState(false);
+            try {
+                await fetch(`${API_BASE}/peer/buddy/cancel-search`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+            } catch (e) {}
+            if (buddyWelcomeState) buddyWelcomeState.style.display = 'block';
+        });
+
+        // Send check-in message to matched student
+        async function sendBuddyMessage() {
             const input = document.getElementById('buddyMsgInput');
             const text = input.value.trim();
             if (!text || !activeBuddyMatch) return;
+
+            // Optimistic render
+            input.value = '';
+            const tempMsg = {
+                senderPseudonym: activeBuddyMatch.myPseudonym || 'You',
+                text,
+                createdAt: new Date()
+            };
+
+            const existingHtml = buddyMessagesList.innerHTML;
+            if (lastRenderedMsgCount === 0) {
+                buddyMessagesList.innerHTML = '';
+            }
+            buddyMessagesList.innerHTML += `
+                <div class="chat-msg mine">
+                    <strong>${escapeHtml(tempMsg.senderPseudonym)}:</strong> ${escapeHtml(tempMsg.text)}
+                    <span class="msg-time">Just now</span>
+                </div>
+            `;
+            buddyMessagesList.scrollTop = buddyMessagesList.scrollHeight;
+            lastRenderedMsgCount++;
 
             try {
                 const res = await fetch(`${API_BASE}/peer/buddy/message`, {
@@ -2692,20 +3000,32 @@
                     })
                 });
                 const data = await res.json();
-                if (data.success) {
-                    input.value = '';
-                    checkBuddyMatch();
+                if (!data.success) {
+                    buddyMessagesList.innerHTML = existingHtml; // revert on failure
+                    alert(data.error || 'Failed to send message.');
                 }
             } catch (e) {
                 console.error('Send buddy msg error:', e);
+                buddyMessagesList.innerHTML = existingHtml;
+            }
+        }
+
+        document.getElementById('btnSendBuddyMsg').addEventListener('click', sendBuddyMessage);
+        document.getElementById('buddyMsgInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBuddyMessage();
             }
         });
 
         btnEndMatch.addEventListener('click', async () => {
             if (!activeBuddyMatch) return;
-            if (!confirm('Are you sure you want to respectfully conclude this buddy match?')) return;
+            if (!confirm('Are you sure you want to respectfully conclude this buddy chat?')) return;
 
             try {
+                if (chatPollInterval) clearInterval(chatPollInterval);
+                chatPollInterval = null;
+
                 await fetch(`${API_BASE}/peer/buddy/end-match`, {
                     method: 'POST',
                     headers: {
@@ -2719,6 +3039,31 @@
                 location.reload();
             } catch (e) {
                 console.error('End match error:', e);
+            }
+        });
+
+        btnReportBuddy.addEventListener('click', async () => {
+            if (!activeBuddyMatch) return;
+            const reason = prompt('Please describe why you are reporting this user:');
+            if (!reason) return;
+
+            try {
+                if (chatPollInterval) clearInterval(chatPollInterval);
+                chatPollInterval = null;
+
+                await fetch(`${API_BASE}/peer/buddy/report`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ matchId: activeBuddyMatch._id, reason })
+                });
+                activeBuddyMatch = null;
+                alert('Report submitted. The match has been safely disconnected.');
+                location.reload();
+            } catch (e) {
+                console.error('Report error:', e);
             }
         });
 
@@ -2997,6 +3342,11 @@
         updateAuthUI();
         loadCheckinSummary();
         loadPosts();
+        if (authToken) {
+            startHeartbeat();
+            loadStudentPeerProfile();
+            checkBuddyMatch();
+        }
     </script>
 </body>
 </html>

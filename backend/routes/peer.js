@@ -7,6 +7,7 @@ const KindnessPost = require('../models/KindnessPost');
 const DailyCheckIn = require('../models/DailyCheckIn');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { collectOrInferStudentProfile, calculateCompatibilityScore } = require('../utils/peerProfileCollector');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -535,79 +536,156 @@ router.post('/posts/:id/report', async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// 2. FIND A PEER BUDDY ENDPOINTS
+// 2. REAL-TIME STUDENT-TO-STUDENT PEER BUDDY MATCHING & CHAT
 // ---------------------------------------------------------------------------
 
-// GET /api/peer/buddy/profile — get user's buddy profile
+// Helper: Clean up legacy simulated bot matches
+async function cleanupLegacyBotMatches() {
+  try {
+    await PeerBuddyMatch.deleteMany({
+      $or: [
+        { $expr: { $eq: ['$studentA', '$studentB'] } },
+        { pseudonymA: 'Senior Buddy Alex' },
+        { pseudonymB: 'Senior Buddy Alex' }
+      ]
+    });
+  } catch (err) {
+    console.error('Error cleaning up legacy bot matches:', err);
+  }
+}
+
+// POST /api/peer/buddy/heartbeat — updates online presence and checks live match status
+router.post('/buddy/heartbeat', async (req, res) => {
+  try {
+    const authUser = getAuthUser(req);
+    if (!authUser) {
+      return res.json({ success: true, isOnline: false, onlineCount: 1 });
+    }
+
+    const now = new Date();
+    await cleanupLegacyBotMatches();
+
+    // Mark current user as online
+    let profile = await PeerBuddyProfile.findOne({ userId: authUser.userId });
+    if (!profile) {
+      profile = await collectOrInferStudentProfile(authUser.userId);
+    } else {
+      profile.lastSeen = now;
+      profile.isOnline = true;
+      await profile.save();
+    }
+
+    // Check if user has an active real match
+    const activeMatch = await PeerBuddyMatch.findOne({
+      status: 'active',
+      $expr: { $ne: ['$studentA', '$studentB'] },
+      $or: [{ studentA: authUser.userId }, { studentB: authUser.userId }]
+    }).lean();
+
+    // If student is actively searching and not matched, attempt background pairing with any waiting online student
+    if (!activeMatch && profile.isSearching) {
+      const busyMatches = await PeerBuddyMatch.find({
+        status: 'active',
+        $expr: { $ne: ['$studentA', '$studentB'] }
+      }).select('studentA studentB');
+      const busyUserIds = new Set();
+      busyMatches.forEach(m => {
+        busyUserIds.add(m.studentA.toString());
+        busyUserIds.add(m.studentB.toString());
+      });
+      busyUserIds.add(authUser.userId.toString());
+
+      const onlineThreshold = new Date(Date.now() - 90 * 1000);
+      const waitingPeer = await PeerBuddyProfile.findOne({
+        userId: { $nin: Array.from(busyUserIds) },
+        isSearching: true,
+        lastSeen: { $gte: onlineThreshold }
+      });
+
+      if (waitingPeer) {
+        const score = calculateCompatibilityScore(profile, waitingPeer);
+        if (score >= 35) {
+          const newMatch = new PeerBuddyMatch({
+            studentA: authUser.userId,
+            studentB: waitingPeer.userId,
+            pseudonymA: profile.pseudonym || 'Buddy A',
+            pseudonymB: waitingPeer.pseudonym || 'Buddy B',
+            sharedGoal: profile.supportGoal,
+            compatibilityScore: score,
+            matchedLanguage: profile.preferredLanguage,
+            status: 'active',
+            messages: []
+          });
+          await newMatch.save();
+
+          profile.isSearching = false;
+          await profile.save();
+          waitingPeer.isSearching = false;
+          await waitingPeer.save();
+
+          return res.json({
+            success: true,
+            isOnline: true,
+            isSearching: false,
+            hasActiveMatch: true,
+            activeMatchId: newMatch._id,
+            onlineCount: 2
+          });
+        }
+      }
+    }
+
+    // Count currently online students
+    const onlineThreshold = new Date(Date.now() - 90 * 1000);
+    const onlineCount = await PeerBuddyProfile.countDocuments({
+      lastSeen: { $gte: onlineThreshold }
+    });
+
+    res.json({
+      success: true,
+      isOnline: true,
+      isSearching: profile ? Boolean(profile.isSearching) : false,
+      hasActiveMatch: Boolean(activeMatch),
+      activeMatchId: activeMatch ? activeMatch._id : null,
+      onlineCount: Math.max(1, onlineCount)
+    });
+  } catch (error) {
+    console.error('Error in peer heartbeat:', error);
+    res.status(500).json({ error: 'Heartbeat error' });
+  }
+});
+
+// GET /api/peer/buddy/profile — get user's silently inferred matching profile
 router.get('/buddy/profile', async (req, res) => {
   try {
     const authUser = getAuthUser(req);
     if (!authUser) {
-      return res.status(401).json({ error: 'Please log in to manage your Peer Buddy profile' });
+      return res.status(401).json({ error: 'Please log in to view your Peer Buddy profile' });
     }
 
-    let profile = await PeerBuddyProfile.findOne({ userId: authUser.userId });
-    res.json({ success: true, profile: profile || null });
+    await cleanupLegacyBotMatches();
+
+    // Silently assemble profile from AI chat, counsellor notes, check-ins, and user record
+    const profile = await collectOrInferStudentProfile(authUser.userId);
+
+    // Online count
+    const onlineThreshold = new Date(Date.now() - 90 * 1000);
+    const onlineCount = await PeerBuddyProfile.countDocuments({
+      lastSeen: { $gte: onlineThreshold }
+    });
+
+    res.json({
+      success: true,
+      profile,
+      onlineCount: Math.max(1, onlineCount)
+    });
   } catch (error) {
     console.error('Error getting buddy profile:', error);
     res.status(500).json({ error: 'Failed to fetch buddy profile' });
   }
 });
 
-// POST /api/peer/buddy/profile — save or update buddy profile
-router.post('/buddy/profile', async (req, res) => {
-  try {
-    const authUser = getAuthUser(req);
-    if (!authUser) {
-      return res.status(401).json({ error: 'Please log in to create your Peer Buddy profile' });
-    }
-
-    const {
-      collegeYear = '1st Year',
-      preferredLanguage = 'English',
-      interests = [],
-      availability = 'Flexible',
-      supportGoal = 'Making friends',
-      bio = '',
-      isAvailable = true
-    } = req.body;
-
-    const userDoc = await User.findById(authUser.userId);
-    const defaultPseudonym = userDoc ? `Buddy (${userDoc.name.split(' ')[0]})` : generatePseudonym();
-
-    let profile = await PeerBuddyProfile.findOne({ userId: authUser.userId });
-    if (!profile) {
-      profile = new PeerBuddyProfile({
-        userId: authUser.userId,
-        pseudonym: defaultPseudonym,
-        collegeYear,
-        preferredLanguage,
-        interests: Array.isArray(interests) ? interests : [],
-        availability,
-        supportGoal,
-        bio: bio.trim(),
-        isAvailable: Boolean(isAvailable)
-      });
-    } else {
-      profile.collegeYear = collegeYear;
-      profile.preferredLanguage = preferredLanguage;
-      profile.interests = Array.isArray(interests) ? interests : profile.interests;
-      profile.availability = availability;
-      profile.supportGoal = supportGoal;
-      profile.bio = bio.trim();
-      profile.isAvailable = Boolean(isAvailable);
-      profile.updatedAt = new Date();
-    }
-
-    await profile.save();
-    res.json({ success: true, message: 'Buddy profile saved successfully!', profile });
-  } catch (error) {
-    console.error('Error saving buddy profile:', error);
-    res.status(500).json({ error: 'Failed to save buddy profile' });
-  }
-});
-
-// GET /api/peer/buddy/active-match — get current active match
+// GET /api/peer/buddy/active-match — get current active student-to-student match
 router.get('/buddy/active-match', async (req, res) => {
   try {
     const authUser = getAuthUser(req);
@@ -615,35 +693,55 @@ router.get('/buddy/active-match', async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
+    await cleanupLegacyBotMatches();
+
     const activeMatch = await PeerBuddyMatch.findOne({
       status: 'active',
+      $expr: { $ne: ['$studentA', '$studentB'] },
       $or: [{ studentA: authUser.userId }, { studentB: authUser.userId }]
     }).lean();
 
+    const profile = await PeerBuddyProfile.findOne({ userId: authUser.userId }).lean();
+
     if (!activeMatch) {
-      return res.json({ success: true, match: null });
+      return res.json({
+        success: true,
+        match: null,
+        isSearching: profile ? Boolean(profile.isSearching) : false
+      });
     }
 
     // Determine buddy's pseudonym for current user
     const isStudentA = activeMatch.studentA.toString() === authUser.userId.toString();
     const otherStudentId = isStudentA ? activeMatch.studentB : activeMatch.studentA;
     const buddyPseudonym = isStudentA ? activeMatch.pseudonymB : activeMatch.pseudonymA;
+    const myPseudonym = isStudentA ? activeMatch.pseudonymA : activeMatch.pseudonymB;
 
-    // Get buddy's profile metadata (interests, year)
-    const otherProfile = await PeerBuddyProfile.findOne({ userId: otherStudentId }).select('collegeYear preferredLanguage interests supportGoal availability bio').lean();
+    // Get buddy's profile metadata
+    const otherProfile = await PeerBuddyProfile.findOne({ userId: otherStudentId })
+      .select('collegeYear preferredLanguage interests supportGoal availability bio lastSeen isOnline')
+      .lean();
+
+    const isBuddyOnline = otherProfile && otherProfile.lastSeen
+      ? (Date.now() - new Date(otherProfile.lastSeen).getTime() < 90 * 1000)
+      : false;
 
     res.json({
       success: true,
       match: {
         _id: activeMatch._id,
+        myPseudonym,
         buddyPseudonym,
         sharedGoal: activeMatch.sharedGoal,
+        compatibilityScore: activeMatch.compatibilityScore || 85,
+        matchedLanguage: activeMatch.matchedLanguage || otherProfile?.preferredLanguage || 'English',
         matchedAt: activeMatch.matchedAt,
-        buddyDetails: otherProfile || {
-          collegeYear: 'Peer Student',
-          preferredLanguage: 'English',
-          interests: ['Mutual Support'],
-          supportGoal: activeMatch.sharedGoal
+        buddyDetails: {
+          collegeYear: otherProfile?.collegeYear || 'Classmate',
+          preferredLanguage: otherProfile?.preferredLanguage || 'English',
+          interests: otherProfile?.interests || ['Campus Life'],
+          supportGoal: otherProfile?.supportGoal || activeMatch.sharedGoal,
+          isOnline: isBuddyOnline
         },
         messages: activeMatch.messages || []
       }
@@ -654,75 +752,75 @@ router.get('/buddy/active-match', async (req, res) => {
   }
 });
 
-// POST /api/peer/buddy/find — find & match with a peer buddy
+// POST /api/peer/buddy/find — find & match with another registered student who is online
 router.post('/buddy/find', async (req, res) => {
   try {
     const authUser = getAuthUser(req);
     if (!authUser) {
-      return res.status(401).json({ error: 'Please log in to find a peer buddy' });
+      return res.status(401).json({ error: 'Please log in to connect with a peer buddy' });
     }
 
-    // Check if user already has an active match
-    let currentMatch = await PeerBuddyMatch.findOne({
+    await cleanupLegacyBotMatches();
+
+    // Check if user already has an active real match with another registered student
+    const existingMatch = await PeerBuddyMatch.findOne({
       status: 'active',
+      $expr: { $ne: ['$studentA', '$studentB'] },
       $or: [{ studentA: authUser.userId }, { studentB: authUser.userId }]
     });
 
-    if (currentMatch) {
+    if (existingMatch) {
       return res.json({
         success: true,
         alreadyMatched: true,
         message: 'You already have an active peer buddy match!',
-        match: currentMatch
+        match: existingMatch
       });
     }
 
-    // Ensure user has a profile
-    let myProfile = await PeerBuddyProfile.findOne({ userId: authUser.userId });
-    if (!myProfile) {
-      // Auto-create a starter profile from user record
-      const u = await User.findById(authUser.userId);
-      myProfile = new PeerBuddyProfile({
-        userId: authUser.userId,
-        pseudonym: u ? `Student ${u.name.split(' ')[0]}` : generatePseudonym(),
-        collegeYear: '1st Year',
-        interests: ['Managing academic stress', 'Study support'],
-        preferredLanguage: 'English',
-        supportGoal: 'Making friends'
-      });
-      await myProfile.save();
-    }
+    // Silently assemble current student's matching profile
+    const myProfile = await collectOrInferStudentProfile(authUser.userId);
+    myProfile.isSearching = true;
+    myProfile.searchingSince = new Date();
+    myProfile.isOnline = true;
+    myProfile.lastSeen = new Date();
+    await myProfile.save();
 
-    // Find candidates who are available, not current user, and not in an active match
-    const activeMatchPairs = await PeerBuddyMatch.find({ status: 'active' }).select('studentA studentB');
-    const matchedUserIds = new Set();
+    // Find busy students who are already in an active match
+    const activeMatchPairs = await PeerBuddyMatch.find({
+      status: 'active',
+      $expr: { $ne: ['$studentA', '$studentB'] }
+    }).select('studentA studentB');
+
+    const busyUserIds = new Set();
     activeMatchPairs.forEach(m => {
-      matchedUserIds.add(m.studentA.toString());
-      matchedUserIds.add(m.studentB.toString());
+      busyUserIds.add(m.studentA.toString());
+      busyUserIds.add(m.studentB.toString());
     });
-    matchedUserIds.add(authUser.userId.toString());
+    busyUserIds.add(authUser.userId.toString()); // exclude self
 
-    const candidates = await PeerBuddyProfile.find({
-      isAvailable: true,
-      userId: { $nin: Array.from(matchedUserIds) }
+    // Find eligible REGISTERED students who are currently online (within last 90 seconds)
+    const onlineThreshold = new Date(Date.now() - 90 * 1000);
+    const candidateProfiles = await PeerBuddyProfile.find({
+      userId: { $nin: Array.from(busyUserIds) },
+      lastSeen: { $gte: onlineThreshold }
     }).lean();
 
     let bestCandidate = null;
     let highestScore = -1;
 
-    for (const cand of candidates) {
-      let score = 0;
-      // Goal match (weight: 4)
-      if (cand.supportGoal === myProfile.supportGoal) score += 4;
-      // Language match (weight: 3)
-      if (cand.preferredLanguage === myProfile.preferredLanguage) score += 3;
-      // Shared interests (weight: 2 per interest)
-      const myInterests = myProfile.interests || [];
-      const candInterests = cand.interests || [];
-      const sharedInterests = myInterests.filter(i => candInterests.includes(i));
-      score += sharedInterests.length * 2;
-      // Availability match (weight: 2)
-      if (cand.availability === myProfile.availability) score += 2;
+    for (const cand of candidateProfiles) {
+      // Compatibility calculation:
+      // - Same primary support goal: High Priority (+50)
+      // - Same preferred language: High Priority (+40)
+      // - Shared interests: +10 per interest
+      // - Compatible college year: +5
+      let score = calculateCompatibilityScore(myProfile, cand);
+
+      // Prioritize classmates who are also actively searching right now
+      if (cand.isSearching) {
+        score += 25;
+      }
 
       if (score > highestScore) {
         highestScore = score;
@@ -730,83 +828,56 @@ router.post('/buddy/find', async (req, res) => {
       }
     }
 
-    // If no candidate exists in the database, match with a friendly peer volunteer or simulated buddy
-    if (!bestCandidate) {
-      // Create a virtual peer companion for instant connection so the student is never left hanging
-      const virtualBuddy = {
-        pseudonym: 'Senior Buddy Alex',
-        collegeYear: '2nd Year Mentor',
-        preferredLanguage: myProfile.preferredLanguage || 'English',
-        interests: myProfile.interests && myProfile.interests.length ? myProfile.interests : ['Study techniques', 'Campus life'],
-        supportGoal: myProfile.supportGoal || 'Managing academic stress'
-      };
-
+    // If suitable online student found, pair them in a private chat room!
+    if (bestCandidate && highestScore >= 35) {
       const newMatch = new PeerBuddyMatch({
         studentA: authUser.userId,
-        studentB: authUser.userId, // companion fallback
-        pseudonymA: myProfile.pseudonym || 'You',
-        pseudonymB: virtualBuddy.pseudonym,
+        studentB: bestCandidate.userId,
+        pseudonymA: myProfile.pseudonym || 'Buddy A',
+        pseudonymB: bestCandidate.pseudonym || 'Buddy B',
         sharedGoal: myProfile.supportGoal,
+        compatibilityScore: highestScore,
+        matchedLanguage: myProfile.preferredLanguage,
         status: 'active',
-        messages: [
-          {
-            senderId: authUser.userId,
-            senderPseudonym: virtualBuddy.pseudonym,
-            text: `Hi there! 👋 I'm ${virtualBuddy.pseudonym}. I saw that you're focusing on "${myProfile.supportGoal}". College can definitely feel overwhelming at times, but we’re in this together. How has your week been going so far?`,
-            createdAt: new Date()
-          }
-        ]
+        messages: [] // Clean, real-time message thread between two actual students
       });
 
       await newMatch.save();
 
+      // Clear search status for both
+      myProfile.isSearching = false;
+      await myProfile.save();
+      await PeerBuddyProfile.updateOne({ userId: bestCandidate.userId }, { isSearching: false });
+
       return res.status(201).json({
         success: true,
         matched: true,
-        message: 'Matched with a campus peer buddy!',
+        message: 'Connected with an online classmate!',
         match: {
           _id: newMatch._id,
-          buddyPseudonym: virtualBuddy.pseudonym,
+          buddyPseudonym: bestCandidate.pseudonym,
           sharedGoal: newMatch.sharedGoal,
+          compatibilityScore: highestScore,
+          matchedLanguage: newMatch.matchedLanguage,
           matchedAt: newMatch.matchedAt,
-          buddyDetails: virtualBuddy,
-          messages: newMatch.messages
+          buddyDetails: {
+            collegeYear: bestCandidate.collegeYear,
+            preferredLanguage: bestCandidate.preferredLanguage,
+            interests: bestCandidate.interests,
+            supportGoal: bestCandidate.supportGoal,
+            isOnline: true
+          },
+          messages: []
         }
       });
     }
 
-    // Real candidate match
-    const newMatch = new PeerBuddyMatch({
-      studentA: authUser.userId,
-      studentB: bestCandidate.userId,
-      pseudonymA: myProfile.pseudonym || 'Buddy A',
-      pseudonymB: bestCandidate.pseudonym || 'Buddy B',
-      sharedGoal: myProfile.supportGoal,
-      status: 'active',
-      messages: [
-        {
-          senderId: bestCandidate.userId,
-          senderPseudonym: bestCandidate.pseudonym,
-          text: `Hey! Excited to connect as peer buddies. Looking forward to supporting each other with ${myProfile.supportGoal}! 🌟`,
-          createdAt: new Date()
-        }
-      ]
-    });
-
-    await newMatch.save();
-
-    res.status(201).json({
+    // No online student available right now — place in search pool (NO BOTS!)
+    res.json({
       success: true,
-      matched: true,
-      message: 'Matched with a peer buddy!',
-      match: {
-        _id: newMatch._id,
-        buddyPseudonym: bestCandidate.pseudonym,
-        sharedGoal: newMatch.sharedGoal,
-        matchedAt: newMatch.matchedAt,
-        buddyDetails: bestCandidate,
-        messages: newMatch.messages
-      }
+      matched: false,
+      searching: true,
+      message: 'Searching for an online classmate... You are in the active match queue. We will connect you the moment another compatible student is online.'
     });
   } catch (error) {
     console.error('Error finding buddy:', error);
@@ -814,7 +885,27 @@ router.post('/buddy/find', async (req, res) => {
   }
 });
 
-// POST /api/peer/buddy/message — send check-in message to buddy
+// POST /api/peer/buddy/cancel-search — cancel waiting/searching state
+router.post('/buddy/cancel-search', async (req, res) => {
+  try {
+    const authUser = getAuthUser(req);
+    if (!authUser) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    await PeerBuddyProfile.updateOne(
+      { userId: authUser.userId },
+      { isSearching: false, searchingSince: null }
+    );
+
+    res.json({ success: true, message: 'Search cancelled.' });
+  } catch (error) {
+    console.error('Error cancelling search:', error);
+    res.status(500).json({ error: 'Failed to cancel search' });
+  }
+});
+
+// POST /api/peer/buddy/message — send real check-in message to matched student
 router.post('/buddy/message', async (req, res) => {
   try {
     const authUser = getAuthUser(req);
@@ -827,8 +918,14 @@ router.post('/buddy/message', async (req, res) => {
       return res.status(400).json({ error: 'Message cannot be empty' });
     }
 
-    const match = await PeerBuddyMatch.findById(matchId);
-    if (!match || match.status !== 'active') {
+    const match = await PeerBuddyMatch.findOne({
+      _id: matchId,
+      status: 'active',
+      $expr: { $ne: ['$studentA', '$studentB'] },
+      $or: [{ studentA: authUser.userId }, { studentB: authUser.userId }]
+    });
+
+    if (!match) {
       return res.status(404).json({ error: 'Active buddy match not found' });
     }
 
@@ -843,34 +940,6 @@ router.post('/buddy/message', async (req, res) => {
     };
 
     match.messages.push(messageObj);
-
-    // If it's a simulated companion match, generate a supportive response after 1s
-    if (match.studentA.toString() === match.studentB.toString()) {
-      const buddyReplies = [
-        "That totally makes sense. Thank you for sharing that with me. Remember to take things one day at a time!",
-        "I hear you! I went through a very similar phase last semester. Don't forget to take small breaks for yourself today.",
-        "That sounds like a solid step forward. Celebrating that with you! 🎉 Keep me posted on how it turns out.",
-        "I appreciate you checking in. Make sure you hydrate and get some solid rest tonight — you've got this!"
-      ];
-      const replyText = buddyReplies[Math.floor(Math.random() * buddyReplies.length)];
-      setTimeout(async () => {
-        try {
-          const freshMatch = await PeerBuddyMatch.findById(matchId);
-          if (freshMatch && freshMatch.status === 'active') {
-            freshMatch.messages.push({
-              senderId: authUser.userId,
-              senderPseudonym: match.pseudonymB,
-              text: replyText,
-              createdAt: new Date()
-            });
-            await freshMatch.save();
-          }
-        } catch (e) {
-          console.error('Auto buddy reply error:', e);
-        }
-      }, 1000);
-    }
-
     await match.save();
 
     res.status(201).json({
@@ -892,7 +961,10 @@ router.post('/buddy/end-match', async (req, res) => {
     }
 
     const { matchId, reason = 'Goal accomplished / friendly closure' } = req.body;
-    const match = await PeerBuddyMatch.findById(matchId);
+    const match = await PeerBuddyMatch.findOne({
+      _id: matchId,
+      $or: [{ studentA: authUser.userId }, { studentB: authUser.userId }]
+    });
 
     if (!match) {
       return res.status(404).json({ error: 'Match not found' });
@@ -919,7 +991,11 @@ router.post('/buddy/report', async (req, res) => {
     const authUser = getAuthUser(req);
     const { matchId, reason } = req.body;
 
-    const match = await PeerBuddyMatch.findById(matchId);
+    const match = await PeerBuddyMatch.findOne({
+      _id: matchId,
+      $or: [{ studentA: authUser?.userId }, { studentB: authUser?.userId }]
+    });
+
     if (!match) {
       return res.status(404).json({ error: 'Match not found' });
     }
@@ -929,7 +1005,7 @@ router.post('/buddy/report', async (req, res) => {
       reason: reason || 'Inappropriate conduct',
       createdAt: new Date()
     });
-    match.status = 'ended'; // Immediately disconnect upon safety report
+    match.status = 'ended';
     await match.save();
 
     res.json({

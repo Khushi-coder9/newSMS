@@ -16,12 +16,28 @@ const peerBuddyProfileSchema = new mongoose.Schema({
       'Staying motivated',
       'General peer support'
     ],
-    default: 'Making friends'
+    default: 'Managing academic stress'
   },
   bio: { type: String, maxlength: 400, default: '' },
   isAvailable: { type: Boolean, default: true },
+  isOnline: { type: Boolean, default: false },
+  lastSeen: { type: Date, default: Date.now },
+  isSearching: { type: Boolean, default: false },
+  searchingSince: { type: Date, default: null },
+  inferredFrom: {
+    type: mongoose.Schema.Types.Mixed,
+    default: () => ({
+      source: 'auto_collected',
+      aiChat: false,
+      counsellorFeedback: false,
+      dailyCheckIn: false,
+      lastAnalyzed: new Date()
+    })
+  },
   updatedAt: { type: Date, default: Date.now }
 });
+
+peerBuddyProfileSchema.index({ isOnline: 1, isSearching: 1, lastSeen: -1 });
 
 const buddyMessageSchema = new mongoose.Schema({
   senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -36,6 +52,8 @@ const peerBuddyMatchSchema = new mongoose.Schema({
   pseudonymA: { type: String, default: 'Buddy One' },
   pseudonymB: { type: String, default: 'Buddy Two' },
   sharedGoal: { type: String, default: 'Peer Support' },
+  compatibilityScore: { type: Number, default: 0 },
+  matchedLanguage: { type: String, default: 'English' },
   status: { type: String, enum: ['active', 'ended'], default: 'active' },
   endedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   endReason: { type: String, default: '' },
@@ -49,6 +67,9 @@ const peerBuddyMatchSchema = new mongoose.Schema({
   ],
   matchedAt: { type: Date, default: Date.now }
 });
+
+peerBuddyMatchSchema.index({ studentA: 1, status: 1 });
+peerBuddyMatchSchema.index({ studentB: 1, status: 1 });
 
 const PeerBuddyProfile = mongoose.model('PeerBuddyProfile', peerBuddyProfileSchema);
 const PeerBuddyMatch = mongoose.model('PeerBuddyMatch', peerBuddyMatchSchema);
