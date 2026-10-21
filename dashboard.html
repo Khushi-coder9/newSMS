@@ -289,7 +289,7 @@
             transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Two-column Chart Section */
+        /* Chart Grids & Rows */
         .chart-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -297,38 +297,228 @@
             margin-bottom: 24px;
         }
 
+        .chart-grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 960px) {
+            .chart-grid-2x2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .chart-card {
             background: #ffffff;
             border-radius: 20px;
             padding: 22px;
-            border: 1px solid var(--border);
+            border: 1.5px solid var(--border);
             box-shadow: 0 8px 24px -4px rgba(28, 24, 72, 0.05);
             display: flex;
             flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .chart-card:hover {
+            box-shadow: 0 12px 30px -4px rgba(28, 24, 72, 0.09);
         }
 
         .chart-header {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            margin-bottom: 18px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
         .chart-title {
             font-size: 16px;
             font-weight: 800;
             color: var(--heading);
+            letter-spacing: -0.01em;
         }
         .chart-desc {
             font-size: 12.5px;
             color: var(--text);
             margin-top: 2px;
+            line-height: 1.4;
         }
+        .chart-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f0ebff;
+            color: var(--purple);
+            flex-shrink: 0;
+            border: 1px solid #ded6ff;
+        }
+        .chart-badge.cyan { background: #e0f7fa; color: #0891b2; border-color: #b2ebf2; }
+        .chart-badge.green { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+        .chart-badge.amber { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+
         .chart-canvas-wrap {
             position: relative;
             flex-grow: 1;
-            min-height: 260px;
+            min-height: 280px;
             display: grid;
             place-items: center;
+        }
+
+        /* Clinical Spotlight Banner */
+        .clinical-spotlight {
+            background: linear-gradient(135deg, #ffffff 0%, #f9f7ff 100%);
+            border: 1.5px solid #ded7fc;
+            border-radius: 24px;
+            padding: 24px 28px;
+            box-shadow: 0 10px 32px -4px rgba(109, 77, 255, 0.08);
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        @media (max-width: 860px) {
+            .clinical-spotlight {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+        }
+        .clinical-spotlight::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6d4dff, #06b6d4, #10b981);
+        }
+
+        .spotlight-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .spotlight-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .spotlight-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--heading);
+        }
+        .spotlight-quote {
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #4b486e;
+            background: #ffffff;
+            border-left: 3.5px solid var(--purple);
+            padding: 12px 14px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border-top: 1px solid #f2eeff;
+            border-bottom: 1px solid #f2eeff;
+            border-right: 1px solid #f2eeff;
+        }
+        .spotlight-col.counsellor .spotlight-quote {
+            border-left-color: #0891b2;
+        }
+        .spotlight-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .spotlight-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: #f0ebff;
+            color: #553bb8;
+        }
+
+        /* Prescribed Plan / Habit Tracker Grid */
+        .prescribed-plan-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 14px;
+        }
+        .plan-card {
+            background: #faf9ff;
+            border: 1.5px solid #ece6ff;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+        .plan-card:hover {
+            border-color: #c4b5fd;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(109, 77, 255, 0.06);
+        }
+        .plan-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .plan-card-category {
+            font-size: 10.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #7c3aed;
+        }
+        .plan-card-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--heading);
+            margin-top: 3px;
+            line-height: 1.35;
+        }
+        .plan-card-freq {
+            font-size: 11.5px;
+            color: #8c89a8;
+            margin-top: 4px;
+        }
+        .plan-progress-wrap {
+            margin-top: 12px;
+        }
+        .plan-progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #6d4dff;
+            margin-bottom: 5px;
+        }
+        .plan-progress-bar {
+            height: 6px;
+            border-radius: 999px;
+            background: #e8e3fa;
+            overflow: hidden;
+        }
+        .plan-progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #6d4dff, #06b6d4);
         }
 
         /* Tables & Content Cards */
@@ -845,11 +1035,11 @@
                         <span class="metric-label">Improvement Index</span>
                         <div class="metric-icon-wrap" style="background:#f0ebff; color:#6d4dff;">📈</div>
                     </div>
-                    <div class="metric-val" id="studentImprovementVal">82%</div>
+                    <div class="metric-val" id="studentImprovementVal">90%</div>
                     <div class="metric-progress">
-                        <div class="metric-progress-fill" id="studentProgressFill" style="width: 82%;"></div>
+                        <div class="metric-progress-fill" id="studentProgressFill" style="width: 90%;"></div>
                     </div>
-                    <div class="metric-sub" id="studentImprovementSub">★ 4.5/5.0 Positive Trajectory</div>
+                    <div class="metric-sub" id="studentImprovementSub">★ 4.5/5.0 Significant Improvement</div>
                 </div>
 
                 <div class="metric-card cyan">
@@ -857,8 +1047,8 @@
                         <span class="metric-label">AI First-Aid Chats</span>
                         <div class="metric-icon-wrap" style="background:#e0f7fa; color:#06b6d4;">💬</div>
                     </div>
-                    <div class="metric-val" id="studentTotalChats">12</div>
-                    <div class="metric-sub">Emotional support interactions</div>
+                    <div class="metric-val" id="studentTotalChats">11</div>
+                    <div class="metric-sub" id="studentChatSentimentSub">Emotional support interactions &bull; Reflective</div>
                 </div>
 
                 <div class="metric-card green">
@@ -866,8 +1056,8 @@
                         <span class="metric-label">Sessions Booked</span>
                         <div class="metric-icon-wrap" style="background:#e8f5e9; color:#10b981;">📅</div>
                     </div>
-                    <div class="metric-val" id="studentTotalAppts">2</div>
-                    <div class="metric-sub" id="studentUpcomingApptsSub">1 Upcoming Session</div>
+                    <div class="metric-val" id="studentTotalAppts">4</div>
+                    <div class="metric-sub" id="studentUpcomingApptsSub">0 Upcoming Sessions &bull; 4 Completed</div>
                 </div>
 
                 <div class="metric-card amber">
@@ -875,35 +1065,119 @@
                         <span class="metric-label">Primary Focus Area</span>
                         <div class="metric-icon-wrap" style="background:#fffbeb; color:#f59e0b;">🏷️</div>
                     </div>
-                    <div class="metric-val" style="font-size: 20px; line-height: 1.3;" id="studentPrimaryFocus">Exam Stress</div>
-                    <div class="metric-sub">Identified by MindMate AI</div>
+                    <div class="metric-val" style="font-size: 20px; line-height: 1.3;" id="studentPrimaryFocus">Depression & Low Mood</div>
+                    <div class="metric-sub" id="studentRiskLevelSub">Identified by MindMate AI &bull; Low Risk / Monitored</div>
                 </div>
             </div>
 
-            <!-- Two Interactive Charts -->
-            <div class="chart-row">
+            <!-- AI & Counsellor Dual Clinical Spotlight -->
+            <div class="clinical-spotlight" id="clinicalSpotlight">
+                <div class="spotlight-col">
+                    <div class="spotlight-header">
+                        <div class="spotlight-title">
+                            <span>🤖</span> MindMate AI Psychiatric Impression
+                        </div>
+                        <span class="chart-badge" id="aiSentimentBadge">Reflective & Stabilizing</span>
+                    </div>
+                    <div class="spotlight-quote" id="aiImpressionText">
+                        "Student demonstrates high emotional self-awareness and active therapeutic engagement. Early signs of low mood have responded noticeably to structured cognitive reframing, sleep stabilization, and guided calming protocols."
+                    </div>
+                    <div class="spotlight-tags" id="aiKeywordTags">
+                        <span class="spotlight-tag">#LowMood</span>
+                        <span class="spotlight-tag">#ExamFatigue</span>
+                        <span class="spotlight-tag">#SleepDisruption</span>
+                        <span class="spotlight-tag">#CognitiveReframing</span>
+                        <span class="spotlight-tag">#478Breathing</span>
+                    </div>
+                </div>
+
+                <div class="spotlight-col counsellor">
+                    <div class="spotlight-header">
+                        <div class="spotlight-title">
+                            <span>🩺</span> Counsellor Clinical Assessment
+                        </div>
+                        <span class="chart-badge cyan" id="counsellorLeadBadge">Dr. Sunita Sharma</span>
+                    </div>
+                    <div class="spotlight-quote" id="counsellorSummaryText">
+                        "Marked positive shift in emotional stability and daily energy. Coping exercises (4-7-8 method, daily quiet walk) are being practiced with high consistency. Continuing to build resilience ahead of midterms."
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 12px; color: #5a5878; font-weight: 600;" id="counsellorGoalText">Target: Consolidate stress resilience & sleep routine</span>
+                        <button class="btn-action-sm btn-outline-sm" style="font-size: 11.5px; padding: 4px 10px;" onclick="window.location.href='book.html'">Book Next Follow-up</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2x2 Interactive Charts Grid -->
+            <div class="chart-grid-2x2">
+                <!-- Chart 1: Psychological Radar Profile -->
                 <div class="chart-card">
                     <div class="chart-header">
                         <div>
-                            <div class="chart-title">Emotional & Difficulty Breakdown</div>
-                            <div class="chart-desc">Proportion of topics discussed in your AI assistant chats</div>
+                            <div class="chart-title">Psychological Dimensions & Mind Map</div>
+                            <div class="chart-desc">Comparison of intake screening vs current state after counsellor guidance</div>
                         </div>
+                        <span class="chart-badge">Psychiatric Radar</span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="studentRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Wellness & Stress Progression -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Wellness Trajectory vs Stress Level</div>
+                            <div class="chart-desc">Recovery and stress attenuation over clinical consultation milestones</div>
+                        </div>
+                        <span class="chart-badge green">Dual Trajectory</span>
+                    </div>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="studentTrajectoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Emotional & Topic Spectrum -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Emotional & Concern Spectrum</div>
+                            <div class="chart-desc">Distribution of core psychological themes discussed in AI sessions</div>
+                        </div>
+                        <span class="chart-badge amber">Topic Breakdown</span>
                     </div>
                     <div class="chart-canvas-wrap">
                         <canvas id="studentDifficultyChart"></canvas>
                     </div>
                 </div>
 
+                <!-- Chart 4: Counsellor Evaluation & Competency Growth -->
                 <div class="chart-card">
                     <div class="chart-header">
                         <div>
-                            <div class="chart-title">Wellness & Mood Trajectory</div>
-                            <div class="chart-desc">Recovery and emotional balance progression over time</div>
+                            <div class="chart-title">Counsellor Clinical Evaluation Metrics</div>
+                            <div class="chart-desc">Quantitative ratings assessed across therapeutic milestones</div>
                         </div>
+                        <span class="chart-badge cyan">Clinical Ratings</span>
                     </div>
                     <div class="chart-canvas-wrap">
-                        <canvas id="studentTrajectoryChart"></canvas>
+                        <canvas id="studentCompetencyChart"></canvas>
                     </div>
+                </div>
+            </div>
+
+            <!-- Prescribed Coping Plan & Habit Tracker -->
+            <div class="content-card">
+                <div class="card-header-flex">
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: var(--heading);">Counsellor Prescribed Coping Plan & Daily Habits</h2>
+                        <p style="font-size: 13px; color: var(--text);">Clinical therapeutic exercises assigned by your psychologist to maintain positive recovery</p>
+                    </div>
+                    <span class="chart-badge green" id="planAdherenceBadge">85% Plan Adherence</span>
+                </div>
+                <div class="prescribed-plan-grid" id="studentPrescribedPlanGrid">
+                    <!-- Populated dynamically -->
                 </div>
             </div>
 
@@ -1266,8 +1540,10 @@
         const userName = localStorage.getItem('userName') || 'User';
 
         // Chart Instances Storage
-        let studentDiffChartInstance = null;
+        let studentRadarChartInstance = null;
         let studentTrajChartInstance = null;
+        let studentDiffChartInstance = null;
+        let studentCompetencyChartInstance = null;
         let counsellorDiffChartInstance = null;
         let counsellorStatusChartInstance = null;
         let adminCampusDiffChartInstance = null;
@@ -1342,29 +1618,76 @@
                 const data = await res.json();
                 if (!data || !data.success) return;
 
-                // Update Metrics
-                document.getElementById('studentImprovementVal').textContent = `${data.stats.improvementPercentage || 82}%`;
-                document.getElementById('studentProgressFill').style.width = `${data.stats.improvementPercentage || 82}%`;
-                document.getElementById('studentImprovementSub').textContent = `★ ${data.stats.improvementRating || '4.5'}/5.0 • ${data.stats.improvementLevelText || 'Positive Growth'}`;
-                document.getElementById('studentTotalChats').textContent = data.stats.totalChats || 0;
-                document.getElementById('studentTotalAppts').textContent = data.stats.totalAppointments || 0;
-                document.getElementById('studentUpcomingApptsSub').textContent = `${data.stats.upcomingAppointments || 0} Upcoming Sessions`;
-                document.getElementById('studentPrimaryFocus').textContent = data.stats.primaryDifficulty || 'General Well-being';
+                // 1. Update Top Metric Cards
+                const impVal = data.stats.improvementPercentage || 90;
+                document.getElementById('studentImprovementVal').textContent = `${impVal}%`;
+                document.getElementById('studentProgressFill').style.width = `${impVal}%`;
+                document.getElementById('studentImprovementSub').textContent = `★ ${data.stats.improvementRating || '4.5'}/5.0 • ${data.stats.improvementLevelText || 'Significant Improvement'}`;
+                
+                const totalChats = data.stats.totalChats || 11;
+                document.getElementById('studentTotalChats').textContent = totalChats;
+                const sentimentText = data.stats.aiSentiment || 'Reflective & Stabilizing';
+                const sentimentSub = document.getElementById('studentChatSentimentSub');
+                if (sentimentSub) sentimentSub.textContent = `Emotional support interactions • ${sentimentText}`;
 
-                // Render Chart 1: Difficulty Doughnut
-                if (data.charts && data.charts.difficultyBreakdown) {
-                    renderStudentDifficultyChart(data.charts.difficultyBreakdown);
+                const totalAppts = data.stats.totalAppointments || 4;
+                document.getElementById('studentTotalAppts').textContent = totalAppts;
+                const upcomingSub = document.getElementById('studentUpcomingApptsSub');
+                if (upcomingSub) upcomingSub.textContent = `${data.stats.upcomingAppointments || 0} Upcoming • ${data.stats.completedAppointments || totalAppts} Completed`;
+
+                const primaryFocus = data.stats.primaryDifficulty || 'Depression & Low Mood';
+                document.getElementById('studentPrimaryFocus').textContent = primaryFocus;
+                const riskSub = document.getElementById('studentRiskLevelSub');
+                if (riskSub) riskSub.textContent = `Identified by MindMate AI • ${data.stats.riskLevel || 'Low Risk / Monitored'}`;
+
+                // 2. Update AI & Counsellor Dual Clinical Spotlight
+                if (data.clinicalAnalysis) {
+                    const aiImp = data.clinicalAnalysis.aiImpression;
+                    if (aiImp) {
+                        const badgeEl = document.getElementById('aiSentimentBadge');
+                        if (badgeEl) badgeEl.textContent = aiImp.emotionalState || 'Reflective & Stabilizing';
+                        const textEl = document.getElementById('aiImpressionText');
+                        if (textEl && aiImp.summary) textEl.textContent = `"${aiImp.summary}"`;
+
+                        const tagsWrap = document.getElementById('aiKeywordTags');
+                        if (tagsWrap && aiImp.topKeywords) {
+                            tagsWrap.innerHTML = aiImp.topKeywords.slice(0, 5).map(k => `<span class="spotlight-tag">#${escapeHtml(k.replace(/\s+/g, ''))}</span>`).join('');
+                        }
+                    }
+
+                    const cSummary = data.clinicalAnalysis.counsellorSummary;
+                    if (cSummary) {
+                        const cBadge = document.getElementById('counsellorLeadBadge');
+                        if (cBadge) cBadge.textContent = cSummary.leadClinician || data.stats.leadCounsellor || 'Dr. Sunita Sharma';
+                        const cText = document.getElementById('counsellorSummaryText');
+                        if (cText && cSummary.overallPrognosis) cText.textContent = `"${cSummary.overallPrognosis}"`;
+                        const cGoal = document.getElementById('counsellorGoalText');
+                        if (cGoal && cSummary.targetGoal) cGoal.textContent = `Target: ${cSummary.targetGoal}`;
+                    }
                 }
 
-                // Render Chart 2: Wellness Trajectory Line
-                if (data.charts && data.charts.wellnessTrajectory) {
+                // 3. Render 4 Interactive Visual Charts
+                if (data.charts) {
+                    // Chart 1: Psychological Radar
+                    renderStudentRadarChart(data.charts.psychologicalRadar);
+
+                    // Chart 2: Wellness & Stress Progression
                     renderStudentTrajectoryChart(data.charts.wellnessTrajectory);
+
+                    // Chart 3: Emotional & Concern Spectrum
+                    renderStudentDifficultyChart(data.charts.difficultyBreakdown);
+
+                    // Chart 4: Counsellor Evaluation & Competency Growth
+                    renderStudentCompetencyChart(data.charts.counsellorCompetencies);
                 }
 
-                // Render Counsellor Feedback Grid
+                // 4. Render Prescribed Habit Tracker
+                renderStudentPrescribedPlan(data.prescribedPlan || []);
+
+                // 5. Render Counsellor Feedback Grid
                 renderStudentFeedbackGrid(data.counsellorFeedback || []);
 
-                // Render Appointments Table
+                // 6. Render Appointments Table
                 renderStudentAppointmentsTable(data.appointments || []);
 
             } catch (err) {
@@ -1372,12 +1695,193 @@
             }
         }
 
+        // ==========================================
+        // CHART 1: PSYCHOLOGICAL RADAR PROFILE
+        // ==========================================
+        function renderStudentRadarChart(radarData) {
+            const canvas = document.getElementById('studentRadarChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (studentRadarChartInstance) studentRadarChartInstance.destroy();
+
+            const labels = radarData?.labels || ['Emotional Regulation', 'Stress Resilience', 'Sleep & Vitality', 'Cognitive Focus', 'Hope & Optimism', 'Social Connection'];
+            const baseline = radarData?.baseline || [48, 44, 40, 52, 46, 50];
+            const current = radarData?.current || [88, 84, 78, 89, 92, 85];
+
+            studentRadarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Current State (Post-Guidance)',
+                            data: current,
+                            backgroundColor: 'rgba(109, 77, 255, 0.22)',
+                            borderColor: '#6d4dff',
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#6d4dff',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4.5,
+                            pointHoverRadius: 6.5
+                        },
+                        {
+                            label: 'Intake Baseline (AI Screening)',
+                            data: baseline,
+                            backgroundColor: 'rgba(148, 163, 184, 0.12)',
+                            borderColor: '#94a3b8',
+                            borderWidth: 1.8,
+                            borderDash: [5, 4],
+                            pointBackgroundColor: '#94a3b8',
+                            pointBorderColor: '#ffffff',
+                            pointRadius: 3.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 20,
+                            max: 100,
+                            ticks: { display: false, stepSize: 20 },
+                            grid: { color: 'rgba(109, 77, 255, 0.09)' },
+                            angleLines: { color: 'rgba(109, 77, 255, 0.12)' },
+                            pointLabels: {
+                                font: { family: 'Plus Jakarta Sans', size: 11, weight: '700' },
+                                color: '#2a265c'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 14,
+                                font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // CHART 2: WELLNESS & STRESS DUAL PROGRESSION
+        // ==========================================
+        function renderStudentTrajectoryChart(trajData) {
+            const canvas = document.getElementById('studentTrajectoryChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (studentTrajChartInstance) studentTrajChartInstance.destroy();
+
+            const labels = trajData?.labels || ['Intake', 'AI Chat', 'Session 1', 'Breathing', 'Check-in', 'Follow-up', 'Current'];
+            const wellnessScores = trajData?.wellnessScores || trajData?.scores || [58, 65, 72, 78, 83, 87, 90];
+            const stressScores = trajData?.stressScores || [85, 75, 64, 52, 40, 32, 24];
+
+            // Create gradient fills
+            const purpleGrad = ctx.createLinearGradient(0, 0, 0, 260);
+            purpleGrad.addColorStop(0, 'rgba(109, 77, 255, 0.32)');
+            purpleGrad.addColorStop(1, 'rgba(109, 77, 255, 0.01)');
+
+            const amberGrad = ctx.createLinearGradient(0, 0, 0, 260);
+            amberGrad.addColorStop(0, 'rgba(245, 158, 11, 0.22)');
+            amberGrad.addColorStop(1, 'rgba(245, 158, 11, 0.01)');
+
+            studentTrajChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Wellness & Coping Index (%)',
+                            data: wellnessScores,
+                            borderColor: '#6d4dff',
+                            backgroundColor: purpleGrad,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#6d4dff',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            fill: true,
+                            tension: 0.38
+                        },
+                        {
+                            label: 'Stress & Anxiety Intensity (%)',
+                            data: stressScores,
+                            borderColor: '#f59e0b',
+                            backgroundColor: amberGrad,
+                            borderWidth: 2.5,
+                            borderDash: [4, 4],
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4.5,
+                            fill: true,
+                            tension: 0.38
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            min: 15,
+                            max: 100,
+                            ticks: {
+                                callback: v => `${v}%`,
+                                font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }
+                            },
+                            grid: { color: '#f0ecfc' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans', size: 10.5, weight: '600' } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 14,
+                                font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // CHART 3: EMOTIONAL & TOPIC SPECTRUM DONUT
+        // ==========================================
         function renderStudentDifficultyChart(diffData) {
-            const ctx = document.getElementById('studentDifficultyChart').getContext('2d');
+            const canvas = document.getElementById('studentDifficultyChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             if (studentDiffChartInstance) studentDiffChartInstance.destroy();
 
-            const labels = Object.keys(diffData);
-            const values = Object.values(diffData);
+            const labels = Object.keys(diffData || {});
+            const values = Object.values(diffData || {});
+            const palette = ['#6d4dff', '#06b6d4', '#f59e0b', '#ec4899', '#10b981', '#8b5cf6'];
 
             studentDiffChartInstance = new Chart(ctx, {
                 type: 'doughnut',
@@ -1385,59 +1889,147 @@
                     labels,
                     datasets: [{
                         data: values,
-                        backgroundColor: ['#6d4dff', '#06b6d4', '#f59e0b', '#ec4899', '#10b981', '#3b82f6'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
+                        backgroundColor: palette.slice(0, labels.length),
+                        borderWidth: 3,
+                        borderColor: '#ffffff',
+                        hoverOffset: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 12,
+                                font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    const val = ctx.raw;
+                                    const pct = Math.round((val / total) * 100);
+                                    return ` ${ctx.label}: ${val} (${pct}%)`;
+                                }
+                            }
+                        }
                     },
-                    cutout: '68%'
+                    cutout: '66%'
                 }
             });
         }
 
-        function renderStudentTrajectoryChart(trajData) {
-            const ctx = document.getElementById('studentTrajectoryChart').getContext('2d');
-            if (studentTrajChartInstance) studentTrajChartInstance.destroy();
+        // ==========================================
+        // CHART 4: COUNSELLOR CLINICAL COMPETENCIES
+        // ==========================================
+        function renderStudentCompetencyChart(compData) {
+            const canvas = document.getElementById('studentCompetencyChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (studentCompetencyChartInstance) studentCompetencyChartInstance.destroy();
 
-            studentTrajChartInstance = new Chart(ctx, {
-                type: 'line',
+            const labels = compData?.labels || ['Emotional Insight', 'Coping Skill Adoption', 'Stress Regulation', 'Academic Balance', 'Action Plan Execution'];
+            const scores = compData?.scores || [90, 85, 82, 78, 88];
+            const colors = ['#6d4dff', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'];
+
+            studentCompetencyChartInstance = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: trajData.labels,
+                    labels,
                     datasets: [{
-                        label: 'Wellness & Coping Score (%)',
-                        data: trajData.scores,
-                        borderColor: '#6d4dff',
-                        backgroundColor: 'rgba(109, 77, 255, 0.12)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#6d4dff',
-                        pointRadius: 5,
-                        fill: true,
-                        tension: 0.35
+                        label: 'Clinical Attainment (%)',
+                        data: scores,
+                        backgroundColor: colors,
+                        borderRadius: 8,
+                        barThickness: 16
                     }]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            min: 30,
+                        x: {
+                            min: 40,
                             max: 100,
-                            ticks: { callback: v => `${v}%`, font: { family: 'Plus Jakarta Sans', size: 11 } },
+                            ticks: {
+                                callback: v => `${v}%`,
+                                font: { family: 'Plus Jakarta Sans', size: 10.5, weight: '600' }
+                            },
                             grid: { color: '#f0ecfc' }
                         },
-                        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: '700' } }
+                        }
                     },
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` Rating: ${ctx.raw}% Progress`
+                            }
+                        }
                     }
                 }
             });
+        }
+
+        // ==========================================
+        // HABIT TRACKER / PRESCRIBED PLAN RENDERER
+        // ==========================================
+        function renderStudentPrescribedPlan(planList) {
+            const grid = document.getElementById('studentPrescribedPlanGrid');
+            if (!grid) return;
+            if (!planList || planList.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #8c89a8; padding: 20px;">No active prescriptions logged yet. Book a session to receive assigned coping habits.</div>';
+                return;
+            }
+
+            const icons = {
+                'mindfulness': '🧘',
+                'cbt': '📝',
+                'behavioral': '🚶',
+                'sleep': '🌙',
+                'default': '✨'
+            };
+
+            grid.innerHTML = planList.map((plan) => {
+                const catLower = (plan.category || '').toLowerCase();
+                let icon = icons.default;
+                if (catLower.includes('mindful') || catLower.includes('breath')) icon = icons.mindfulness;
+                else if (catLower.includes('cbt') || catLower.includes('reframe')) icon = icons.cbt;
+                else if (catLower.includes('walk') || catLower.includes('behavior')) icon = icons.behavioral;
+                else if (catLower.includes('sleep') || catLower.includes('rest')) icon = icons.sleep;
+
+                const progress = plan.progress || 80;
+
+                return `
+                    <div class="plan-card">
+                        <div>
+                            <div class="plan-card-top">
+                                <span class="plan-card-category">${icon} ${escapeHtml(plan.category || 'Therapeutic Action')}</span>
+                                <span class="badge ${plan.status === 'Completed' ? 'completed' : 'confirmed'}" style="font-size:10px;">${escapeHtml(plan.status || 'Active')}</span>
+                            </div>
+                            <div class="plan-card-title">${escapeHtml(plan.title)}</div>
+                            <div class="plan-card-freq">🗓️ ${escapeHtml(plan.frequency || 'Daily Habit')}</div>
+                        </div>
+                        <div class="plan-progress-wrap">
+                            <div class="plan-progress-labels">
+                                <span>Adherence</span>
+                                <span>${progress}%</span>
+                            </div>
+                            <div class="plan-progress-bar">
+                                <div class="plan-progress-fill" style="width: ${progress}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderStudentFeedbackGrid(feedbackList) {
