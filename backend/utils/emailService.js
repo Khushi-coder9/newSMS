@@ -5,8 +5,8 @@ const nodemailer = require('nodemailer');
  */
 
 // Base URLs
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:8080';
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://studentmindsupport.duckdns.org';
+const BACKEND_URL  = process.env.BACKEND_URL  || 'https://studentmindsupport.duckdns.org';
 
 /**
  * Creates Nodemailer Transporter for Brevo SMTP
@@ -90,8 +90,9 @@ function wrapEmailHtml(title, preheader, bodyContent) {
 async function sendCounsellorNotification(appointment) {
   const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.BREVO_SMTP_USER || 'appointments@studentmindsupport.com';
   const senderName = process.env.BREVO_SENDER_NAME || 'Student Mind Support';
-  const confirmUrl = `${BACKEND_URL}/api/appointments/confirm/${appointment.confirmationToken}`;
-  const declineUrl = `${BACKEND_URL}/api/appointments/decline/${appointment.confirmationToken}`;
+  // Email links point to confirm.html frontend page (served by nginx) so they work on any device
+  const confirmUrl = `${FRONTEND_URL}/confirm.html?action=confirm&token=${appointment.confirmationToken}`;
+  const declineUrl = `${FRONTEND_URL}/confirm.html?action=decline&token=${appointment.confirmationToken}`;
 
   const isMeet = appointment.sessionType === 'meet';
   const modeText = isMeet ? '📹 Video Meet' : '💬 Private 1-on-1 Chat';
@@ -265,7 +266,73 @@ async function sendStudentConfirmation(appointment) {
   }
 }
 
+/**
+ * 3. Send Notification to Student if Counsellor declines the request
+ */
+async function sendStudentDeclinedNotification(appointment) {
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.BREVO_SMTP_USER || 'appointments@studentmindsupport.com';
+  const senderName = process.env.BREVO_SENDER_NAME || 'Student Mind Support';
+
+  const bodyContent = `
+    <h1>Session Request Update</h1>
+    <p>Hello <strong>${appointment.studentName}</strong>,</p>
+    <p>We are reaching out to inform you that your counsellor, <strong>${appointment.counsellorName}</strong>, was unable to accept your counselling appointment request for <strong>${appointment.date} at ${appointment.time}</strong> due to an unexpected scheduling conflict.</p>
+
+    <div class="card">
+      <div class="row">
+        <span class="row-label">Counsellor:</span>
+        <span class="row-val">${appointment.counsellorName}</span>
+      </div>
+      <div class="row">
+        <span class="row-label">Requested Date:</span>
+        <span class="row-val">${appointment.date}</span>
+      </div>
+      <div class="row">
+        <span class="row-label">Requested Time:</span>
+        <span class="row-val">${appointment.time}</span>
+      </div>
+      <div class="row">
+        <span class="row-label">Status:</span>
+        <span class="row-val" style="color: #dc2626;">Declined / Slot Unavailable</span>
+      </div>
+    </div>
+
+    <p style="font-size: 14px; color: #5a5878;">
+      Please do not worry! Our team has other available campus counsellors and flexible slots ready to support you. You can easily select another convenient date or counsellor anytime.
+    </p>
+
+    <div class="cta-container">
+      <a href="${FRONTEND_URL}/book.html" class="btn">
+        📅 Choose Another Slot or Counsellor
+      </a>
+    </div>
+  `;
+
+  const html = wrapEmailHtml('Session Request Update', 'Update regarding your counselling request', bodyContent);
+  const mailOptions = {
+    from: `"${senderName}" <${senderEmail}>`,
+    to: appointment.studentEmail,
+    subject: `Update regarding your appointment request with ${appointment.counsellorName}`,
+    html
+  };
+
+  const transporter = getBrevoTransporter();
+  if (transporter) {
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`[Brevo SMTP] Decline notification sent to student (${appointment.studentEmail}). Message ID: ${info.messageId}`);
+      return { success: true, messageId: info.messageId, mode: 'brevo_smtp' };
+    } catch (err) {
+      console.error('[Brevo SMTP Error] Failed to send decline email to student:', err.message);
+      return { success: false, error: err.message, mode: 'fallback_logged' };
+    }
+  } else {
+    return { success: true, mode: 'simulated_logged' };
+  }
+}
+
 module.exports = {
   sendCounsellorNotification,
-  sendStudentConfirmation
+  sendStudentConfirmation,
+  sendStudentDeclinedNotification
 };

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointment Action • Student Mind Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple: #6d4dff;
+      --purple-hover: #5937ee;
+      --purple-light: #f4f0ff;
+      --green: #16a34a;
+      --green-light: #dcfce7;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+      --amber: #d97706;
+      --amber-light: #fef3c7;
+      --navy: #1c1848;
+      --text: #5a5878;
+      --border: #ece8fc;
+      --white: #ffffff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f7f4ff 0%, #eef4fe 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 84px 20px 32px;
+      color: var(--navy);
+    }
+    .brand-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      z-index: 50;
+    }
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .brand-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .brand-tag {
+      font-size: 10.5px;
+      color: var(--purple);
+      font-weight: 700;
+      display: block;
+      letter-spacing: 0.04em;
+    }
+    .nav-quick-link {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--purple);
+      text-decoration: none;
+      padding: 6px 14px;
+      background: var(--purple-light);
+      border-radius: 999px;
+      transition: all 0.2s;
+    }
+    .nav-quick-link:hover {
+      background: #e9e1ff;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 28px;
+      padding: 40px 36px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 24px 60px rgba(109, 77, 255, 0.12);
+      border: 1.5px solid var(--border);
+      text-align: center;
+      animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .icon-ring {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      margin: 0 auto 20px;
+      transition: all 0.3s ease;
+    }
+    .icon-ring.loading {
+      background: var(--purple-light);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .icon-ring.success {
+      background: var(--green-light);
+      color: var(--green);
+      box-shadow: 0 0 0 10px rgba(34, 197, 94, 0.12);
+    }
+    .icon-ring.declined {
+      background: var(--red-light);
+      color: var(--red);
+      box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.12);
+    }
+    .icon-ring.warning {
+      background: var(--amber-light);
+      color: var(--amber);
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.95); opacity: 0.75; }
+    }
+
+    .card h1 {
+      font-size: 23px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .card p.sub {
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: var(--text);
+      margin-bottom: 22px;
+    }
+
+    .details-box {
+      background: #faf9ff;
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 22px;
+      text-align: left;
+      margin: 20px 0;
+    }
+    .dr {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 8px 0;
+      font-size: 13.5px;
+      border-bottom: 1px dashed var(--border);
+      gap: 12px;
+    }
+    .dr:last-child { border-bottom: none; }
+    .dr .lbl {
+      color: #7b7899;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .dr .val {
+      color: var(--navy);
+      font-weight: 700;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .notice-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .notice-pill.green {
+      background: var(--green-light);
+      color: var(--green);
+    }
+    .notice-pill.red {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .btn-group-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .btn-group-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 26px;
+      border-radius: 999px;
+      font-size: 14.5px;
+      font-weight: 800;
+      font-family: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(109, 77, 255, 0.25);
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-purple {
+      background: var(--purple);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(109, 77, 255, 0.3);
+    }
+    .btn-purple:hover:not(:disabled) {
+      background: var(--purple-hover);
+    }
+    .btn-red {
+      background: var(--red);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.25);
+    }
+    .btn-red:hover:not(:disabled) {
+      background: #b91c1c;
+      box-shadow: 0 8px 22px rgba(220, 38, 38, 0.35);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid #d4cbf7;
+    }
+    .btn-outline:hover:not(:disabled) {
+      background: #f7f4ff;
+      border-color: var(--purple);
+      color: var(--purple);
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 540px) {
+      body { padding: 76px 16px 24px; }
+      .card { padding: 30px 22px; border-radius: 22px; }
+      .card h1 { font-size: 20px; }
+      .btn { width: 100%; }
+      .btn-group-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Brand Navigation -->
+  <header class="brand-bar">
+    <a href="/index.html" class="brand-link">
+      <svg width="30" height="26" viewBox="0 0 48 42" aria-hidden="true">
+        <path fill="#4ecdc4" d="M14.8 3.2c-6.2 0-11.1 5-11.1 11.4 0 10.1 10.6 17.8 20.6 23.4C14.3 32.4 3.7 24.7 3.7 14.6 3.7 8.2 8.6 3.2 14.8 3.2z"/>
+        <path fill="#6d4dff" d="M32.6 4.4c-5.8 0-10.4 4.8-10.4 11 0 9.6 10.4 17 19.2 22.2C41.6 32.4 22.2 25 22.2 15.4c0-6.2 4.6-11 10.4-11z"/>
+      </svg>
+      <span>
+        <span class="brand-name">Student Mind Support</span>
+        <span class="brand-tag">Talk • Heal • Grow</span>
+      </span>
+    </a>
+    <a href="/dashboard.html" class="nav-quick-link">Go to Dashboard &rarr;</a>
+  </header>
+
+  <!-- Main Action Card -->
+  <main class="card" id="mainCard">
+    <div class="icon-ring loading" id="iconRing">⏳</div>
+    <h1 id="titleText">Processing Request…</h1>
+    <p class="sub" id="subText">Please wait while we communicate with the system.</p>
+    <div id="dynamicBody"></div>
+  </main>
+
+  <script>
+    // Robust API base URL resolution
+    const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:5000/api'
+      : '/api';
+
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get('token') || '';
+    const action = (params.get('action') || '').toLowerCase();
+    const statusParam = (params.get('status') || '').toLowerCase();
+    const customMsg   = params.get('msg') || '';
+
+    const iconRing    = document.getElementById('iconRing');
+    const titleText   = document.getElementById('titleText');
+    const subText     = document.getElementById('subText');
+    const dynamicBody = document.getElementById('dynamicBody');
+
+    function esc(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderSummaryBox(a) {
+      if (!a) return '';
+      const mode = a.sessionType === 'meet' ? '📹 Video Meet' : '💬 Private Chat';
+      return `
+        <div class="details-box">
+          <div class="dr">
+            <span class="lbl">Student</span>
+            <span class="val">${esc(a.studentName)}</span>
+          </div>
+          ${a.studentEmail ? `<div class="dr"><span class="lbl">Email</span><span class="val">${esc(a.studentEmail)}</span></div>` : ''}
+          <div class="dr">
+            <span class="lbl">Date &amp; Time</span>
+            <span class="val">${esc(a.date)} at ${esc(a.time)}</span>
+          </div>
+          <div class="dr">
+            <span class="lbl">Mode</span>
+            <span class="val" style="color: var(--purple);">${mode}</span>
+          </div>
+          <div class="dr">
+            <span class="lbl">Topic</span>
+            <span class="val">${esc(a.concern || 'General Wellness Support')}</span>
+          </div>
+          ${a.notes ? `<div class="dr"><span class="lbl">Notes</span><span class="val">${esc(a.notes)}</span></div>` : ''}
+        </div>
+      `;
+    }
+
+    function setCardState(emoji, ringClass, title, subtitle, contentHtml) {
+      iconRing.textContent = emoji;
+      iconRing.className = 'icon-ring ' + ringClass;
+      titleText.textContent = title;
+      subText.textContent = subtitle;
+      dynamicBody.innerHTML = contentHtml;
+    }
+
+    // 1. Success (Confirmed) State
+    function showConfirmedState(appt) {
+      setCardState(
+        '✓',
+        'success',
+        'Appointment Confirmed!',
+        'The counselling session is officially confirmed on the portal.',
+        `
+          <div class="notice-pill green">
+            📧 Official confirmation email dispatched to ${esc(appt ? appt.studentEmail : 'the student')}
+          </div>
+          ${renderSummaryBox(appt)}
+          <div class="btn-group-row">
+            <a href="/dashboard.html" class="btn btn-purple">📊 Open Counsellor Dashboard</a>
+            <a href="/book.html" class="btn btn-outline">📅 View All Bookings</a>
+          </div>
+        `
+      );
+    }
+
+    // 2. Already Confirmed State
+    function showAlreadyConfirmedState(appt) {
+      setCardState(
+        '✓',
+        'success',
+        'Already Confirmed',
+        'This appointment was already confirmed previously.',
+        `
+          ${renderSummaryBox(appt)}
+          <div class="btn-group-row">
+            <a href="/dashboard.html" class="btn btn-purple">📊 Counsellor Dashboard</a>
+            <a href="/book.html" class="btn btn-outline">📅 View Appointments</a>
+          </div>
+        `
+      );
+    }
+
+    // 3. Declined State
+    function showDeclinedState(appt) {
+      setCardState(
+        '✕',
+        'declined',
+        'Appointment Declined',
+        'The appointment request has been declined. The student has been notified.',
+        `
+          <div class="notice-pill red">
+            ✓ Status updated to Declined / Cancelled
+          </div>
+          ${renderSummaryBox(appt)}
+          <div class="btn-group-row">
+            <a href="/dashboard.html" class="btn btn-purple">📊 Counsellor Dashboard</a>
+            <a href="/book.html" class="btn btn-outline">Return to Portal</a>
+          </div>
+        `
+      );
+    }
+
+    // 4. Decline Prompt State (asks confirmation before cancelling)
+    function showDeclinePromptState(appt) {
+      setCardState(
+        '⚠',
+        'warning',
+        'Decline Appointment Request?',
+        `Please confirm if you want to decline this booking request from ${esc(appt ? appt.studentName : 'the student')}.`,
+        `
+          ${renderSummaryBox(appt)}
+          <div class="btn-group-vertical">
+            <button class="btn btn-red" id="confirmDeclineBtn">✕ Yes, Decline This Appointment</button>
+            <a href="/dashboard.html" class="btn btn-outline">Keep Session &amp; Return to Dashboard</a>
+          </div>
+        `
+      );
+
+      const btn = document.getElementById('confirmDeclineBtn');
+      if (btn) {
+        btn.onclick = async () => {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner"></span> Declining…';
+          await executeDecline(appt);
+        };
+      }
+    }
+
+    // 5. Link Expired / Not Found State
+    function showNotFoundState() {
+      setCardState(
+        '🔍',
+        'warning',
+        'Appointment Not Found or Link Expired',
+        'This appointment confirmation link is invalid, has expired, or was already completed.',
+        `
+          <div class="btn-group-row">
+            <a href="/dashboard.html" class="btn btn-purple">📊 Open Dashboard</a>
+            <a href="/book.html" class="btn btn-outline">Return to Portal</a>
+          </div>
+        `
+      );
+    }
+
+    // 6. Generic Error State
+    function showErrorState(message) {
+      setCardState(
+        '⚠',
+        'warning',
+        'Something Went Wrong',
+        message || 'An unexpected error occurred while processing your request.',
+        `
+          <div class="btn-group-row">
+            <a href="/dashboard.html" class="btn btn-purple">📊 Go to Dashboard</a>
+            <a href="/book.html" class="btn btn-outline">Return to Portal</a>
+          </div>
+        `
+      );
+    }
+
+    // API Call: Execute Confirmation
+    async function executeConfirm(apptHint) {
+      try {
+        const res = await fetch(`${API_BASE}/appointments/confirm/${token}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok && data.success) {
+          if (data.alreadyConfirmed) {
+            showAlreadyConfirmedState(data.appointment || apptHint);
+          } else {
+            showConfirmedState(data.appointment || apptHint);
+          }
+        } else if (res.status === 404) {
+          showNotFoundState();
+        } else {
+          showErrorState(data.error || 'Failed to confirm appointment. Please try again or log into the dashboard.');
+        }
+      } catch (err) {
+        console.error('Confirmation network error:', err);
+        showErrorState('Network error communicating with the server. Please check your connection.');
+      }
+    }
+
+    // API Call: Execute Decline
+    async function executeDecline(apptHint) {
+      try {
+        const res = await fetch(`${API_BASE}/appointments/decline/${token}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok && data.success) {
+          showDeclinedState(data.appointment || apptHint);
+        } else if (res.status === 404) {
+          showNotFoundState();
+        } else {
+          showErrorState(data.error || 'Failed to decline appointment.');
+        }
+      } catch (err) {
+        console.error('Decline network error:', err);
+        showErrorState('Network error communicating with the server.');
+      }
+    }
+
+    // MAIN ROUTER
+    async function init() {
+      // Direct status passed in URL
+      if (statusParam === 'not_found') {
+        showNotFoundState();
+        return;
+      }
+      if (statusParam === 'error') {
+        showErrorState(customMsg || 'Error processing request.');
+        return;
+      }
+
+      if (!token) {
+        showNotFoundState();
+        return;
+      }
+
+      // Fetch appointment details first
+      let appt = null;
+      try {
+        const res = await fetch(`${API_BASE}/appointments/by-token/${token}`);
+        if (res.ok) {
+          const data = await res.json();
+          appt = data.appointment;
+        }
+      } catch (e) {
+        console.warn('Could not prefetch appointment details:', e);
+      }
+
+      // If status parameter already indicates result (from redirect):
+      if (statusParam === 'success') {
+        showConfirmedState(appt);
+        return;
+      }
+      if (statusParam === 'already') {
+        showAlreadyConfirmedState(appt);
+        return;
+      }
+      if (statusParam === 'declined') {
+        showDeclinedState(appt);
+        return;
+      }
+
+      // If appointment was found and is already confirmed / cancelled:
+      if (appt && appt.status === 'confirmed') {
+        showAlreadyConfirmedState(appt);
+        return;
+      }
+      if (appt && appt.status === 'cancelled') {
+        showDeclinedState(appt);
+        return;
+      }
+
+      // Based on action parameter from email link
+      if (action === 'confirm') {
+        titleText.textContent = 'Confirming Appointment…';
+        subText.textContent = 'Recording your confirmation and notifying the student…';
+        await executeConfirm(appt);
+      } else if (action === 'decline') {
+        showDeclinePromptState(appt);
+      } else {
+        // No action specified — show summary with both options
+        setCardState(
+          '📋',
+          'loading',
+          'Appointment Request',
+          'Review the session details and choose an action below.',
+          `
+            ${renderSummaryBox(appt)}
+            <div class="btn-group-vertical">
+              <button class="btn btn-purple" id="autoConfirmBtn">✓ Confirm Appointment</button>
+              <button class="btn btn-red" id="autoDeclineBtn">✕ Decline Request</button>
+            </div>
+          `
+        );
+        document.getElementById('autoConfirmBtn').onclick = () => executeConfirm(appt);
+        document.getElementById('autoDeclineBtn').onclick = () => showDeclinePromptState(appt);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -4,9 +4,9 @@ const crypto = require('crypto');
 const Appointment = require('../models/Appointment');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
-const { sendCounsellorNotification, sendStudentConfirmation } = require('../utils/emailService');
+const { sendCounsellorNotification, sendStudentConfirmation, sendStudentDeclinedNotification } = require('../utils/emailService');
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:8080';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://studentmindsupport.duckdns.org';
 
 /**
  * Default fallback counsellors if database is empty or new
@@ -186,56 +186,64 @@ router.post('/book', authMiddleware, async (req, res) => {
 });
 
 /**
+ * GET /api/appointments/by-token/:token
+ * Returns appointment details (no auth needed) — used by confirm.html frontend
+ */
+router.get('/by-token/:token', async (req, res) => {
+  try {
+    const appointment = await Appointment.findOne({ confirmationToken: req.params.token }).lean();
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found or link expired.' });
+    }
+    res.json({ success: true, appointment });
+  } catch (error) {
+    console.error('Error fetching appointment by token:', error);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
+
+/**
  * GET /api/appointments/confirm/:token
- * Counsellor clicks the Confirm link in their Brevo notification email.
- * Marks appointment as 'confirmed' and sends confirmation email to the student!
+ * Counsellor confirms the appointment.
+ * Supports:
+ * 1. Direct browser clicks from email (redirects to confirm.html)
+ * 2. AJAX fetch calls from confirm.html (returns JSON)
  */
 router.get('/confirm/:token', async (req, res) => {
-  try {
-    const { token } = req.params;
+  const { token } = req.params;
+  const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
 
+  try {
     const appointment = await Appointment.findOne({ confirmationToken: token });
+
     if (!appointment) {
-      return res.status(404).send(`
-        <!DOCTYPE html>
-        <html>
-        <head><title>Appointment Not Found</title><style>body { font-family: sans-serif; display: grid; place-items: center; height: 90vh; background: #f7f4ff; color: #1c1848; } .card { background: white; padding: 36px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; max-width: 440px; }</style></head>
-        <body>
-          <div class="card">
-            <h2 style="color: #dc2626;">Invalid or Expired Link</h2>
-            <p>This appointment confirmation link is invalid or has already been used.</p>
-            <a href="${FRONTEND_URL}/book.html" style="color: #6d4dff; font-weight: 700; text-decoration: none;">Return to Appointments</a>
-          </div>
-        </body>
-        </html>
-      `);
+      if (isHtml) {
+        return res.redirect(`/confirm.html?status=not_found&token=${token}`);
+      }
+      return res.status(404).json({ error: 'Appointment not found or link expired.' });
     }
 
     if (appointment.status === 'confirmed') {
-      return res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head><title>Already Confirmed</title><style>body { font-family: sans-serif; display: grid; place-items: center; height: 90vh; background: #f7f4ff; color: #1c1848; } .card { background: white; padding: 36px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; max-width: 440px; }</style></head>
-        <body>
-          <div class="card">
-            <h2 style="color: #16a34a;">Already Confirmed ✓</h2>
-            <p>This appointment with <strong>${appointment.studentName}</strong> was already confirmed on ${new Date(appointment.confirmedAt || appointment.createdAt).toLocaleDateString()}.</p>
-            <a href="${FRONTEND_URL}/book.html" style="background: #6d4dff; color: white; padding: 10px 24px; border-radius: 999px; text-decoration: none; font-weight: 700; display: inline-block; margin-top: 14px;">View Appointments</a>
-          </div>
-        </body>
-        </html>
-      `);
+      if (isHtml) {
+        return res.redirect(`/confirm.html?status=already&token=${token}`);
+      }
+      return res.status(200).json({
+        success: true,
+        alreadyConfirmed: true,
+        message: 'This appointment was already confirmed.',
+        appointment
+      });
     }
 
-    // Update appointment status to 'confirmed'
+    // Mark as confirmed
     appointment.status = 'confirmed';
     appointment.confirmedAt = new Date();
     await appointment.save();
 
-    // Send confirmation email to student via Brevo SMTP!
+    // Send confirmation email to student
     try {
       const studentMailResult = await sendStudentConfirmation(appointment);
-      if (studentMailResult.success) {
+      if (studentMailResult && studentMailResult.success) {
         appointment.mailSentToStudent = true;
         await appointment.save();
       }
@@ -243,81 +251,79 @@ router.get('/confirm/:token', async (req, res) => {
       console.error('Error sending confirmation email to student:', err);
     }
 
-    // Return branded success page to counsellor
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Appointment Confirmed • Student Mind Support</title>
-        <style>
-          body { font-family: 'Segoe UI', sans-serif; background: #f7f4ff; margin: 0; display: grid; place-items: center; min-height: 90vh; color: #1c1848; }
-          .card { background: #ffffff; padding: 38px 32px; border-radius: 24px; box-shadow: 0 20px 45px rgba(109, 77, 255, 0.12); text-align: center; max-width: 480px; width: 90%; border: 1.5px solid #ece8fc; }
-          .icon { width: 64px; height: 64px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 30px; display: grid; place-items: center; margin: 0 auto 18px; }
-          h2 { font-size: 24px; font-weight: 800; margin: 0 0 10px; color: #1c1848; }
-          p { font-size: 14px; color: #5a5878; line-height: 1.55; margin: 0 0 20px; }
-          .details { background: #faf9ff; border: 1.5px solid #ece8fc; border-radius: 14px; padding: 16px; text-align: left; font-size: 13.5px; margin-bottom: 24px; }
-          .detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #ede8fc; }
-          .detail-row:last-child { border-bottom: none; }
-          .btn { background: #6d4dff; color: white; padding: 12px 28px; border-radius: 999px; text-decoration: none; font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 4px 14px rgba(109, 77, 255, 0.3); }
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <div class="icon">✓</div>
-          <h2>Appointment Confirmed!</h2>
-          <p>Thank you, <strong>${appointment.counsellorName}</strong>. You have confirmed the counselling session with <strong>${appointment.studentName}</strong>.</p>
-          <div class="details">
-            <div class="detail-row"><span>Student:</span><strong>${appointment.studentName}</strong></div>
-            <div class="detail-row"><span>Date &amp; Time:</span><strong>${appointment.date} at ${appointment.time}</strong></div>
-            <div class="detail-row"><span>Mode:</span><strong style="color: #6d4dff;">${appointment.sessionType === 'meet' ? '📹 Video Meet' : '💬 1-on-1 Chat'}</strong></div>
-            <div class="detail-row"><span>Topic:</span><span>${appointment.concern}</span></div>
-          </div>
-          <p style="font-size: 12.5px; color: #16a34a; font-weight: 600;">
-            📧 A confirmation email has been dispatched to <strong>${appointment.studentEmail}</strong> via Brevo SMTP.
-          </p>
-          <a href="${FRONTEND_URL}/book.html" class="btn">View Bookings on Portal</a>
-        </div>
-      </body>
-      </html>
-    `);
+    if (isHtml) {
+      return res.redirect(`/confirm.html?status=success&token=${token}`);
+    }
+
+    return res.json({
+      success: true,
+      message: 'Appointment confirmed! Confirmation email sent to student.',
+      appointment
+    });
   } catch (error) {
     console.error('Error in appointment confirmation:', error);
-    res.status(500).send('Internal server error during confirmation.');
+    if (isHtml) {
+      return res.redirect(`/confirm.html?status=error&msg=${encodeURIComponent('Internal server error during confirmation.')}`);
+    }
+    res.status(500).json({ error: 'Internal server error during confirmation.' });
   }
 });
 
 /**
  * GET /api/appointments/decline/:token
- * Counsellor declines the appointment
+ * Counsellor declines the appointment.
+ * Supports direct browser clicks and AJAX calls.
  */
 router.get('/decline/:token', async (req, res) => {
+  const { token } = req.params;
+  const isHtml = req.headers.accept && req.headers.accept.includes('text/html');
+
   try {
-    const { token } = req.params;
     const appointment = await Appointment.findOne({ confirmationToken: token });
+
     if (!appointment) {
-      return res.status(404).send('Appointment not found or link expired.');
+      if (isHtml) {
+        return res.redirect(`/confirm.html?status=not_found&token=${token}`);
+      }
+      return res.status(404).json({ error: 'Appointment not found or link expired.' });
+    }
+
+    if (appointment.status === 'cancelled') {
+      if (isHtml) {
+        return res.redirect(`/confirm.html?status=declined&token=${token}`);
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'Appointment was already declined.',
+        appointment
+      });
     }
 
     appointment.status = 'cancelled';
     await appointment.save();
 
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-      <head><title>Appointment Declined</title><style>body { font-family: sans-serif; display: grid; place-items: center; height: 90vh; background: #f7f4ff; color: #1c1848; } .card { background: white; padding: 36px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; max-width: 440px; }</style></head>
-      <body>
-        <div class="card">
-          <h2>Appointment Declined</h2>
-          <p>The appointment request from <strong>${appointment.studentName}</strong> has been declined.</p>
-          <a href="${FRONTEND_URL}/book.html" style="color: #6d4dff; font-weight: 700; text-decoration: none;">Return to Portal</a>
-        </div>
-      </body>
-      </html>
-    `);
+    // Send decline notification email to student
+    try {
+      await sendStudentDeclinedNotification(appointment);
+    } catch (err) {
+      console.error('Error sending decline email to student:', err);
+    }
+
+    if (isHtml) {
+      return res.redirect(`/confirm.html?status=declined&token=${token}`);
+    }
+
+    res.json({
+      success: true,
+      message: 'Appointment has been declined.',
+      appointment
+    });
   } catch (error) {
     console.error('Error declining appointment:', error);
-    res.status(500).send('Server error');
+    if (isHtml) {
+      return res.redirect(`/confirm.html?status=error&msg=${encodeURIComponent('Server error during decline.')}`);
+    }
+    res.status(500).json({ error: 'Server error.' });
   }
 });
 
@@ -362,6 +368,45 @@ router.patch('/:id/confirm', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error confirming appointment from UI:', error);
     res.status(500).json({ error: 'Failed to confirm appointment.' });
+  }
+});
+
+/**
+ * PATCH /api/appointments/:id/decline
+ * Counsellor declines directly from the dashboard/UI
+ */
+router.patch('/:id/decline', authMiddleware, async (req, res) => {
+  try {
+    const appointmentId = req.params.id;
+    const userId = req.user.userId;
+
+    const appointment = await Appointment.findOne({
+      _id: appointmentId,
+      counsellor: userId
+    });
+
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found or unauthorized.' });
+    }
+
+    appointment.status = 'cancelled';
+    await appointment.save();
+
+    // Send decline notification email to student
+    try {
+      await sendStudentDeclinedNotification(appointment);
+    } catch (mailErr) {
+      console.error('Error sending decline email to student:', mailErr);
+    }
+
+    res.json({
+      success: true,
+      message: 'Appointment declined.',
+      appointment
+    });
+  } catch (error) {
+    console.error('Error declining appointment from UI:', error);
+    res.status(500).json({ error: 'Failed to decline appointment.' });
   }
 });
 

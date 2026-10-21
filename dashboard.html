@@ -1485,6 +1485,9 @@
                     actionBtn = `<a href="chat.html" class="btn-action-sm btn-primary-sm">💬 Open Chat</a>`;
                 } else if (a.status === 'pending') {
                     actionBtn = `<span style="font-size:12px; color:#b45309; font-weight:600;">Awaiting confirmation</span>`;
+                } else if (a.status === 'cancelled') {
+                    statusBadge = `<span class="badge" style="background:#fee2e2; color:#dc2626;">Declined</span>`;
+                    actionBtn = `<a href="book.html" class="btn-action-sm btn-outline-sm">📅 Book Again</a>`;
                 } else {
                     actionBtn = `<span style="font-size:12px; color:#8c89a8;">Completed</span>`;
                 }
@@ -1641,6 +1644,7 @@
                 let actions = '';
                 if (a.status === 'pending') {
                     actions += `<button class="btn-action-sm btn-green-sm" onclick="confirmAppointment('${a._id}')">✓ Confirm</button> `;
+                    actions += `<button class="btn-action-sm btn-outline-sm" style="color:#dc2626; border-color:#fca5a5;" onclick="declineAppointment('${a._id}')">✗ Decline</button> `;
                 }
                 if (a.sessionType === 'meet' && a.meetingLink && a.status === 'confirmed') {
                     actions += `<a href="${a.meetingLink}" target="_blank" class="btn-action-sm btn-outline-sm">🎥 Meet</a> `;
@@ -1719,6 +1723,31 @@
             } catch (err) {
                 console.error(err);
                 alert('Network error confirming appointment.');
+            }
+        }
+
+        // 1-Click Counsellor Decline
+        async function declineAppointment(id) {
+            if (!confirm('Are you sure you want to decline this appointment request? The student will be notified.')) return;
+            if (!authToken) {
+                alert('Please log in with your counsellor credentials to decline.');
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/appointments/${id}/decline`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Appointment declined. The student has been notified.');
+                    loadCounsellorDashboard();
+                } else {
+                    alert(data.error || 'Failed to decline appointment.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error declining appointment.');
             }
         }
 

@@ -1761,7 +1761,7 @@
                             if (isPending) {
                                 actionBtnHtml = `
                                     <button type="button" class="btn-confirm-portal" onclick="confirmAppointmentByCounsellor('${app._id}')">✓ Confirm Appointment</button>
-                                    <button type="button" class="btn-cancel-app" onclick="cancelAppointment('${app._id}')">Decline</button>
+                                    <button type="button" class="btn-cancel-app" onclick="declineAppointmentByCounsellor('${app._id}')">Decline</button>
                                 `;
                             } else if (isConfirmed) {
                                 if (isMeet) {
@@ -1826,6 +1826,25 @@
                 }
             } catch (err) {
                 console.error('Confirmation error:', err);
+            }
+        };
+
+        window.declineAppointmentByCounsellor = async function(id) {
+            if (!confirm('Decline this appointment request? An email update will be sent to the student.')) return;
+            try {
+                const res = await fetch(`${API_BASE}/appointments/${id}/decline`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Appointment declined. The student has been notified.');
+                    loadMyAppointments();
+                } else {
+                    alert(data.error || 'Failed to decline appointment.');
+                }
+            } catch (err) {
+                console.error('Decline error:', err);
             }
         };
 
