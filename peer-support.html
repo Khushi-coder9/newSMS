@@ -704,6 +704,20 @@
             border-color: var(--forest-800);
         }
 
+        .for-you-pill {
+            background: linear-gradient(135deg, rgba(72,184,148,0.15), rgba(45,138,107,0.25));
+            color: #1b5e48;
+            border: 1.5px solid #38a37f !important;
+            font-weight: 700;
+        }
+
+        .for-you-pill:hover, .for-you-pill.active {
+            background: linear-gradient(135deg, #38a37f, #1e694e) !important;
+            color: #ffffff !important;
+            border-color: #1e694e !important;
+            box-shadow: 0 4px 14px rgba(45,138,107,0.35);
+        }
+
         .feed-actions {
             display: flex;
             align-items: center;
@@ -2039,6 +2053,7 @@
             <div class="feed-controls-card">
                 <div class="feed-controls-top">
                     <div class="topic-filters" id="topicFilters">
+                        <button class="topic-pill for-you-pill" data-topic="__recommended" id="forYouPill" style="display:none;">✨ Recommended For You</button>
                         <button class="topic-pill active" data-topic="All">All Topics</button>
                         <button class="topic-pill" data-topic="Exam Stress">Exam Stress</button>
                         <button class="topic-pill" data-topic="Loneliness & Social">Loneliness & Social</button>
@@ -2053,6 +2068,9 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Recommended topics banner (shown when For You tab is active) -->
+                <div id="recommendedTopicsBanner" style="display:none;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 16px;background:linear-gradient(90deg,#f2f9f6,#e8f5f1);border-radius:12px;margin-top:8px;border:1px solid #c8e6da;"></div>
 
                 <!-- Create Post Expandable Form -->
                 <div class="create-post-card" id="createPostCard">
@@ -2362,6 +2380,7 @@
         let authToken = localStorage.getItem('authToken');
         let currentActiveTab = 'tab-community';
         let currentActiveTopic = 'All';
+        let isForYouMode = false;
         let activeBuddyMatch = null;
         let selectedMood = 'Overwhelmed';
         let selectedSupportIntent = 'I need someone to listen.';
@@ -2535,11 +2554,30 @@
         });
 
         // Topic filters
+        // Show 'For You' pill only for logged-in students and set as default
+        if (authToken && (localStorage.getItem('userRole') || 'student') === 'student') {
+            const pill = document.getElementById('forYouPill');
+            if (pill) {
+                pill.style.display = 'inline-flex';
+                document.querySelectorAll('.topic-pill[data-topic]').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                isForYouMode = true;
+                currentActiveTopic = 'All';
+            }
+        }
+
         document.querySelectorAll('.topic-pill[data-topic]').forEach(pill => {
             pill.addEventListener('click', () => {
                 document.querySelectorAll('.topic-pill[data-topic]').forEach(p => p.classList.remove('active'));
                 pill.classList.add('active');
-                currentActiveTopic = pill.getAttribute('data-topic');
+                const topic = pill.getAttribute('data-topic');
+                if (topic === '__recommended') {
+                    isForYouMode = true;
+                    currentActiveTopic = 'All';
+                } else {
+                    isForYouMode = false;
+                    currentActiveTopic = topic;
+                }
                 loadPosts();
             });
         });
@@ -2595,21 +2633,41 @@
 
         async function loadPosts() {
             try {
-                const url = currentActiveTopic === 'All'
-                    ? `${API_BASE}/peer/posts`
-                    : `${API_BASE}/peer/posts?topic=${encodeURIComponent(currentActiveTopic)}`;
+                let url, headers;
+                headers = authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
 
-                const res = await fetch(url, {
-                    headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {}
-                });
+                if (isForYouMode && authToken) {
+                    // Personalized recommendation feed
+                    url = `${API_BASE}/peer/posts/recommended`;
+                } else {
+                    url = currentActiveTopic === 'All'
+                        ? `${API_BASE}/peer/posts`
+                        : `${API_BASE}/peer/posts?topic=${encodeURIComponent(currentActiveTopic)}`;
+                }
+
+                const res = await fetch(url, { headers });
                 const data = await res.json();
                 if (data.success && data.posts && data.posts.length > 0) {
+                    // Show recommended topics banner
+                    if (isForYouMode && data.topInferredTopics && data.topInferredTopics.length > 0) {
+                        const banner = document.getElementById('recommendedTopicsBanner');
+                        if (banner) {
+                            banner.style.display = 'flex';
+                            banner.innerHTML = `<span style="font-size:13px;font-weight:700;color:#1b4d40;">✨ Recommended for you based on:</span> ${data.topInferredTopics.map(t => `<span style="display:inline-block;background:#e8f5f1;color:#266b59;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">${t}</span>`).join('')}`;
+                        }
+                    } else {
+                        const banner = document.getElementById('recommendedTopicsBanner');
+                        if (banner) banner.style.display = 'none';
+                    }
                     renderPosts(data.posts);
                     return;
                 }
             } catch (e) {
                 console.warn('API offline or error, displaying default community posts:', e);
             }
+
+            const banner = document.getElementById('recommendedTopicsBanner');
+            if (banner) banner.style.display = 'none';
 
             // Fallback default posts filtered by topic
             const filtered = currentActiveTopic === 'All'

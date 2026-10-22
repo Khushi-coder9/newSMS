@@ -4,6 +4,8 @@ const User = require('../models/User');
 const ChatMessage = require('../models/ChatMessage');
 const Appointment = require('../models/Appointment');
 const Volunteer = require('../models/Volunteer');
+const DailyCheckIn = require('../models/DailyCheckIn');
+const StudentSurvey = require('../models/StudentSurvey');
 const authMiddleware = require('../middleware/auth');
 
 /**
@@ -84,6 +86,29 @@ router.get('/student', authMiddleware, async (req, res) => {
     const appointments = await Appointment.find({ student: userId })
       .sort({ createdAt: -1 })
       .lean();
+
+    // 3b. Fetch daily check-ins & latest survey for multi-source analytics
+    const dailyCheckIns = await DailyCheckIn.find({ student: userId }).sort({ createdAt: -1 }).limit(30).lean();
+    const latestSurvey = await StudentSurvey.findOne({ student: userId }).sort({ createdAt: -1 }).lean();
+
+    // Build survey-based enrichment signals
+    const surveySignals = {
+      sleepIssue: latestSurvey && latestSurvey.sleepHours <= 5,
+      highStress: latestSurvey && latestSurvey.academicStressLevel >= 7,
+      lowMotivation: latestSurvey && latestSurvey.motivationLevel <= 4,
+      lonely: latestSurvey && ['often', 'always'].includes(latestSurvey.lonelinessLevel),
+      overwhelmed: latestSurvey && ['often', 'always'].includes(latestSurvey.feelingOverwhelmed),
+      poorCoping: latestSurvey && latestSurvey.copingMethods && latestSurvey.copingMethods.includes('nothing'),
+      hasSurvey: !!latestSurvey
+    };
+
+    // Build check-in mood trend (last 7 days)
+    const moodMap = { 'very_low': 10, 'low': 25, 'neutral': 50, 'okay': 65, 'good': 80, 'great': 95 };
+    const checkInTrend = dailyCheckIns.slice(0, 7).reverse().map(ci => ({
+      date: ci.createdAt,
+      moodScore: moodMap[ci.mood] || 50,
+      mood: ci.mood || 'neutral'
+    }));
 
     const feedbackList = [];
     let ratingSum = 0;
@@ -170,6 +195,39 @@ router.get('/student', authMiddleware, async (req, res) => {
     const leadCounsellor = appointments[0]?.counsellorName || 'Dr. Sunita Sharma';
     const counsellorDesignation = appointments[0]?.counsellorDesignation || 'Senior Clinical Psychologist';
 
+    // ── Survey-informed adjustments to radar scores ──────────────────────────
+    // If survey signals indicate issues, lower the relevant radar dimensions
+    let adjustedRadarCurrent = [...radarCurrent];
+    if (surveySignals.hasSurvey) {
+      // [Emotional, Stress, Sleep, Cognitive, Hope, Social]
+      if (surveySignals.sleepIssue) adjustedRadarCurrent[2] = Math.max(30, adjustedRadarCurrent[2] - 20);
+      if (surveySignals.highStress) adjustedRadarCurrent[1] = Math.max(25, adjustedRadarCurrent[1] - 18);
+      if (surveySignals.lowMotivation) adjustedRadarCurrent[3] = Math.max(28, adjustedRadarCurrent[3] - 16);
+      if (surveySignals.lonely) adjustedRadarCurrent[5] = Math.max(22, adjustedRadarCurrent[5] - 18);
+      if (surveySignals.overwhelmed) adjustedRadarCurrent[0] = Math.max(24, adjustedRadarCurrent[0] - 16);
+    }
+
+    // ── Survey-informed enrichment of difficulty breakdown ───────────────────
+    if (latestSurvey && latestSurvey.primaryConcerns && latestSurvey.primaryConcerns.length > 0) {
+      const concernMap = {
+        'academic_pressure': 'Academic Stress & Burnout',
+        'exam_anxiety': 'Generalized / Exam Anxiety',
+        'depression_low_mood': 'Depression & Low Mood',
+        'social_isolation': 'Social & Peer Stress',
+        'sleep_disorder': 'Sleep Disruption & Fatigue',
+        'family_pressure': 'Family & Relationship Pressure',
+        'financial_stress': 'Financial Stress',
+        'career_uncertainty': 'Career Uncertainty',
+        'identity_self_esteem': 'Identity & Self-Esteem',
+        'homesickness': 'Homesickness & Adjustment'
+      };
+      latestSurvey.primaryConcerns.forEach(c => {
+        const label = concernMap[c] || c;
+        enrichedBreakdown[label] = (enrichedBreakdown[label] || 0) + 3;
+      });
+      if (surveySignals.sleepIssue) enrichedBreakdown['Sleep Disruption & Fatigue'] = (enrichedBreakdown['Sleep Disruption & Fatigue'] || 0) + 4;
+    }
+
     res.json({
       success: true,
       student: {
@@ -222,17 +280,32 @@ router.get('/student', authMiddleware, async (req, res) => {
         psychologicalRadar: {
           labels: radarLabels,
           baseline: radarBaseline,
-          current: radarCurrent
+          current: adjustedRadarCurrent
         },
         counsellorCompetencies: {
           labels: competencyLabels,
           scores: competencyScores
-        }
+        },
+        checkInMoodTrend: checkInTrend
       },
       prescribedPlan,
       appointments,
-      counsellorFeedback: feedbackList
+      counsellorFeedback: feedbackList,
+      surveyInsights: latestSurvey ? {
+        hasSurvey: true,
+        lastSubmitted: latestSurvey.createdAt,
+        sleepHours: latestSurvey.sleepHours,
+        sleepQuality: latestSurvey.sleepQuality,
+        academicStressLevel: latestSurvey.academicStressLevel,
+        motivationLevel: latestSurvey.motivationLevel,
+        moodFrequency: latestSurvey.moodFrequency,
+        primaryConcerns: latestSurvey.primaryConcerns,
+        copingMethods: latestSurvey.copingMethods,
+        hasSupport: latestSurvey.hasSupport,
+        signals: surveySignals
+      } : { hasSurvey: false }
     });
+
   } catch (error) {
     console.error('Error in student dashboard API:', error);
     res.status(500).json({ error: 'Failed to generate student dashboard.' });

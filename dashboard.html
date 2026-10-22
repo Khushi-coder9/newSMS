@@ -1204,6 +1204,9 @@
                 </div>
             </div>
 
+            <!-- Wellness Survey Insights -->
+            <div class="content-card" id="surveyInsightsCard" style="display: none; margin-bottom: 24px;"></div>
+
             <!-- Prescribed Coping Plan & Habit Tracker -->
             <div class="content-card">
                 <div class="card-header-flex">
@@ -2082,9 +2085,85 @@
                 // 6. Render Appointments Table
                 renderStudentAppointmentsTable(data.appointments || []);
 
+                // 7. Render Survey Insights card (if available)
+                renderSurveyInsights(data.surveyInsights);
+
             } catch (err) {
                 console.error('Error loading student dashboard:', err);
             }
+        }
+
+        // ==========================================
+        // SURVEY INSIGHTS RENDERER
+        // ==========================================
+        function renderSurveyInsights(insights) {
+            const container = document.getElementById('surveyInsightsCard');
+            if (!container) return;
+            if (!insights) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'block';
+
+            // Sleep pill color
+            const sleepHr = insights.sleepHours || 0;
+            const sleepColor = sleepHr >= 7 ? '#16a34a' : (sleepHr >= 5 ? '#d97706' : '#dc2626');
+            const sleepBg = sleepHr >= 7 ? '#f0fdf4' : (sleepHr >= 5 ? '#fffbeb' : '#fef2f2');
+
+            // Stress color
+            const stress = insights.academicStressLevel || 0;
+            const stressColor = stress <= 4 ? '#16a34a' : (stress <= 7 ? '#d97706' : '#dc2626');
+
+            // Concerns
+            const concerns = (insights.primaryConcerns || []).slice(0, 5);
+            const concernsHtml = concerns.length > 0
+                ? concerns.map(c => `<span style="display:inline-block;background:#f4f0ff;color:#6d4dff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin:2px;">${escapeHtml(c.replace(/_/g,' '))}</span>`).join('')
+                : '<span style="color:#9ca3af;font-size:12px;">Not specified</span>';
+
+            // Coping
+            const coping = (insights.copingMethods || []).slice(0, 4);
+            const copingHtml = coping.length > 0
+                ? coping.map(c => `<span style="display:inline-block;background:#e8f5f1;color:#16a34a;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin:2px;">${escapeHtml(c.replace(/_/g,' '))}</span>`).join('')
+                : '<span style="color:#9ca3af;font-size:12px;">Not provided</span>';
+
+            container.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <div style="font-size:24px;">📋</div>
+                    <div>
+                        <div style="font-weight:800;font-size:15px;color:#1c1848;">Wellness Survey Snapshot</div>
+                        <div style="font-size:12px;color:#8c89a8;">From your latest intake survey · Influencing your dashboard insights</div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
+                    <div style="background:${sleepBg};border-radius:12px;padding:12px;text-align:center;">
+                        <div style="font-size:22px;margin-bottom:4px;">😴</div>
+                        <div style="font-size:22px;font-weight:800;color:${sleepColor};">${sleepHr}h</div>
+                        <div style="font-size:11px;color:#6b7a8d;font-weight:600;">Avg Sleep</div>
+                    </div>
+                    <div style="background:#fef3f2;border-radius:12px;padding:12px;text-align:center;">
+                        <div style="font-size:22px;margin-bottom:4px;">🧠</div>
+                        <div style="font-size:22px;font-weight:800;color:${stressColor};">${stress}/10</div>
+                        <div style="font-size:11px;color:#6b7a8d;font-weight:600;">Stress Level</div>
+                    </div>
+                    <div style="background:#f0f9ff;border-radius:12px;padding:12px;text-align:center;">
+                        <div style="font-size:22px;margin-bottom:4px;">💪</div>
+                        <div style="font-size:22px;font-weight:800;color:#0ea5e9;">${insights.motivationLevel || '?'}/10</div>
+                        <div style="font-size:11px;color:#6b7a8d;font-weight:600;">Motivation</div>
+                    </div>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <div style="font-size:12px;font-weight:700;color:#3b3563;margin-bottom:6px;">🎯 Primary Concerns</div>
+                    <div>${concernsHtml}</div>
+                </div>
+                <div>
+                    <div style="font-size:12px;font-weight:700;color:#3b3563;margin-bottom:6px;">🛡️ Coping Methods You Use</div>
+                    <div>${copingHtml}</div>
+                </div>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0ecff;display:flex;align-items:center;justify-content:space-between;">
+                    <span style="font-size:11.5px;color:#8c89a8;">Survey taken on ${insights.createdAt ? new Date(insights.createdAt).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}) : 'recently'}</span>
+                    <a href="index.html" style="font-size:11.5px;color:#6d4dff;font-weight:700;text-decoration:underline;">Update Survey →</a>
+                </div>
+            `;
         }
 
         // ==========================================

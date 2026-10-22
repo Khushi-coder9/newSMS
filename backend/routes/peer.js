@@ -5,6 +5,9 @@ const { PeerBuddyProfile, PeerBuddyMatch } = require('../models/PeerBuddy');
 const PeerCircle = require('../models/PeerCircle');
 const KindnessPost = require('../models/KindnessPost');
 const DailyCheckIn = require('../models/DailyCheckIn');
+const StudentSurvey = require('../models/StudentSurvey');
+const ChatMessage = require('../models/ChatMessage');
+const Appointment = require('../models/Appointment');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { collectOrInferStudentProfile, calculateCompatibilityScore } = require('../utils/peerProfileCollector');
@@ -354,6 +357,197 @@ router.get('/posts', async (req, res) => {
   } catch (error) {
     console.error('Error fetching peer posts:', error);
     res.status(500).json({ error: 'Failed to fetch community posts' });
+  }
+});
+
+// GET /api/peer/posts/recommended — AI-powered personalized post recommendations
+// Aggregates signals from: AI chat, counsellor feedback, buddy chats, daily check-ins, and survey
+router.get('/posts/recommended', async (req, res) => {
+  try {
+    const authUser = getAuthUser(req);
+    if (!authUser) {
+      // Return popular posts for unauthenticated users
+      const popular = await PeerPost.find({ isFlagged: { $ne: true } }).sort({ createdAt: -1 }).limit(15).lean();
+      return res.json({ success: true, posts: popular, isPersonalized: false });
+    }
+
+    const userId = authUser.userId;
+
+    // ── 1. Collect multi-source signals ─────────────────────────────────────
+    const topicInterest = {}; // topic -> score
+    const addScore = (topic, points) => {
+      topicInterest[topic] = (topicInterest[topic] || 0) + points;
+    };
+
+    // Source A: AI chat detected difficulties
+    const chatMessages = await ChatMessage.find({ user: userId, sender: 'user' })
+      .sort({ createdAt: -1 }).limit(50).lean();
+
+    chatMessages.forEach(msg => {
+      (msg.detectedDifficulties || []).forEach(diff => {
+        const d = diff.toLowerCase();
+        if (d.includes('anxiety') || d.includes('exam')) addScore('Exam Stress', 5);
+        if (d.includes('depress') || d.includes('mood')) addScore('Mental Health', 5);
+        if (d.includes('sleep')) addScore('Sleep & Wellness', 5);
+        if (d.includes('academic') || d.includes('burnout')) addScore('Academic Life', 5);
+        if (d.includes('social') || d.includes('lonely')) addScore('Relationships & Loneliness', 5);
+        if (d.includes('family')) addScore('Family Pressure', 5);
+        if (d.includes('grief')) addScore('Loss & Grief', 5);
+        if (d.includes('identity') || d.includes('self')) addScore('Identity & Self-Worth', 5);
+      });
+      if (msg.severity === 'crisis') {
+        addScore('Mental Health', 8);
+        addScore('Getting Help', 6);
+      } else if (msg.severity === 'moderate') {
+        addScore('Mental Health', 4);
+      }
+    });
+
+    // Source B: Counsellor appointment feedback
+    const appointments = await Appointment.find({ student: userId }).lean();
+    appointments.forEach(appt => {
+      if (appt.counsellorFeedback) {
+        const fb = appt.counsellorFeedback.toLowerCase();
+        if (fb.includes('anxiety') || fb.includes('stress')) addScore('Exam Stress', 4);
+        if (fb.includes('sleep')) addScore('Sleep & Wellness', 4);
+        if (fb.includes('depression') || fb.includes('mood')) addScore('Mental Health', 4);
+        if (fb.includes('academic') || fb.includes('study')) addScore('Academic Life', 4);
+        if (fb.includes('social') || fb.includes('friends')) addScore('Relationships & Loneliness', 3);
+      }
+      (appt.actionItems || []).forEach(item => {
+        const i = (item || '').toLowerCase();
+        if (i.includes('sleep') || i.includes('rest')) addScore('Sleep & Wellness', 3);
+        if (i.includes('breath') || i.includes('mindful')) addScore('Mental Health', 2);
+        if (i.includes('social') || i.includes('talk')) addScore('Relationships & Loneliness', 2);
+      });
+    });
+
+    // Source C: Daily check-ins (last 14 days)
+    const checkIns = await DailyCheckIn.find({ student: userId }).sort({ createdAt: -1 }).limit(14).lean();
+    checkIns.forEach(ci => {
+      if (['very_low', 'low'].includes(ci.mood)) addScore('Mental Health', 3);
+      if (ci.wantsSupport) addScore('Getting Help', 3);
+    });
+
+    // Source D: Latest survey responses
+    const survey = await StudentSurvey.findOne({ student: userId }).sort({ createdAt: -1 }).lean();
+    if (survey) {
+      if (survey.sleepHours <= 5) addScore('Sleep & Wellness', 8);
+      if (survey.academicStressLevel >= 7) addScore('Exam Stress', 7);
+      if (['often_sad', 'very_low'].includes(survey.moodFrequency)) addScore('Mental Health', 7);
+      if (['often', 'always'].includes(survey.lonelinessLevel)) addScore('Relationships & Loneliness', 7);
+      if (['often', 'always'].includes(survey.feelingOverwhelmed)) addScore('Mental Health', 5);
+      if (survey.motivationLevel <= 4) addScore('Academic Life', 5);
+      (survey.primaryConcerns || []).forEach(concern => {
+        const c = concern.toLowerCase();
+        if (c.includes('academic') || c.includes('exam')) addScore('Exam Stress', 6);
+        if (c.includes('depress') || c.includes('mood')) addScore('Mental Health', 6);
+        if (c.includes('sleep')) addScore('Sleep & Wellness', 6);
+        if (c.includes('social') || c.includes('isolated')) addScore('Relationships & Loneliness', 6);
+        if (c.includes('family')) addScore('Family Pressure', 6);
+        if (c.includes('career')) addScore('Future & Career', 5);
+        if (c.includes('identity') || c.includes('self_esteem')) addScore('Identity & Self-Worth', 5);
+        if (c.includes('homesick')) addScore('New Student Life', 5);
+        if (c.includes('financial')) addScore('Financial Stress', 5);
+      });
+    }
+
+    // Source E: Buddy chat sentiment (via PeerBuddyMatch messages)
+    const buddyMatches = await PeerBuddyMatch.find({
+      $or: [{ requester: userId }, { matched: userId }],
+      status: 'active'
+    }).lean();
+
+    buddyMatches.forEach(match => {
+      const myMessages = (match.messages || []).filter(m =>
+        m.sender && m.sender.toString() === userId.toString()
+      ).slice(-20);
+      myMessages.forEach(m => {
+        const text = (m.content || '').toLowerCase();
+        if (text.includes('exam') || text.includes('study')) addScore('Exam Stress', 2);
+        if (text.includes('sleep') || text.includes('tired')) addScore('Sleep & Wellness', 2);
+        if (text.includes('sad') || text.includes('depress')) addScore('Mental Health', 2);
+        if (text.includes('alone') || text.includes('lonely')) addScore('Relationships & Loneliness', 2);
+        if (text.includes('family') || text.includes('home')) addScore('Family Pressure', 2);
+      });
+    });
+
+    // ── 2. Sort topics by score ───────────────────────────────────────────────
+    const sortedTopics = Object.entries(topicInterest)
+      .sort((a, b) => b[1] - a[1])
+      .map(([topic]) => topic);
+
+    const topTopics = sortedTopics.slice(0, 4);
+
+    // ── 3. Fetch matching posts ───────────────────────────────────────────────
+    let recommendedPosts = [];
+
+    if (topTopics.length > 0) {
+      // Try to find posts matching the top inferred topics
+      const topicMatched = await PeerPost.find({
+        isFlagged: { $ne: true },
+        topic: { $in: topTopics }
+      }).sort({ createdAt: -1 }).limit(20).lean();
+
+      recommendedPosts = topicMatched;
+    }
+
+    // Backfill with recent popular posts if not enough
+    if (recommendedPosts.length < 10) {
+      const backfill = await PeerPost.find({
+        isFlagged: { $ne: true },
+        _id: { $nin: recommendedPosts.map(p => p._id) }
+      }).sort({ createdAt: -1 }).limit(15).lean();
+      recommendedPosts = [...recommendedPosts, ...backfill].slice(0, 20);
+    }
+
+    // ── 4. Format posts (same as GET /posts) ─────────────────────────────────
+    const userIdStr = userId.toString();
+    const formattedPosts = recommendedPosts.map(p => {
+      const hearYouCount = (p.reactions?.hearYou || []).length;
+      const notAloneCount = (p.reactions?.notAlone || []).length;
+      const strongCount = (p.reactions?.strongForYou || []).length;
+      const meTooCount = (p.reactions?.meToo || []).length;
+
+      return {
+        _id: p._id,
+        authorPseudonym: p.authorPseudonym,
+        authorAvatar: p.authorAvatar || '🌱',
+        content: p.content,
+        topic: p.topic,
+        supportIntent: p.supportIntent,
+        mood: p.mood,
+        isAnonymous: p.isAnonymous,
+        reactions: {
+          hearYou: hearYouCount,
+          notAlone: notAloneCount,
+          strongForYou: strongCount,
+          meToo: meTooCount,
+          total: hearYouCount + notAloneCount + strongCount + meTooCount
+        },
+        userReactions: {
+          hearYou: (p.reactions?.hearYou || []).some(id => id && id.toString() === userIdStr),
+          notAlone: (p.reactions?.notAlone || []).some(id => id && id.toString() === userIdStr),
+          strongForYou: (p.reactions?.strongForYou || []).some(id => id && id.toString() === userIdStr),
+          meToo: (p.reactions?.meToo || []).some(id => id && id.toString() === userIdStr)
+        },
+        commentsCount: (p.comments || []).length,
+        comments: (p.comments || []).slice(-5),
+        createdAt: p.createdAt,
+        isRecommended: topTopics.includes(p.topic)
+      };
+    });
+
+    res.json({
+      success: true,
+      posts: formattedPosts,
+      isPersonalized: true,
+      topInferredTopics: topTopics,
+      topicScores: topicInterest
+    });
+  } catch (error) {
+    console.error('Error fetching recommended posts:', error);
+    res.status(500).json({ error: 'Failed to fetch recommended posts' });
   }
 });
 

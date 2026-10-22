@@ -2006,7 +2006,468 @@
             .table-header-row { flex-direction: column; align-items: stretch; }
             .table-search { width: 100%; }
         }
+
+        /* ===== WELLNESS SURVEY MODAL ===== */
+        #surveyModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 10, 50, 0.72);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        #surveyModal.show { display: flex; }
+
+        .survey-card {
+            background: #ffffff;
+            border-radius: 24px;
+            width: min(640px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 32px 80px rgba(109, 77, 255, 0.22);
+            position: relative;
+            scrollbar-width: thin;
+        }
+
+        .survey-hero {
+            background: linear-gradient(135deg, #6d4dff 0%, #a78bfa 60%, #c4b5fd 100%);
+            border-radius: 24px 24px 0 0;
+            padding: 32px 32px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .survey-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='28'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            opacity: 0.4;
+        }
+
+        .survey-hero-icon { font-size: 48px; margin-bottom: 12px; position: relative; }
+        .survey-hero h2 { color: #fff; font-size: 22px; font-weight: 800; margin-bottom: 6px; position: relative; }
+        .survey-hero p { color: rgba(255,255,255,0.88); font-size: 13.5px; position: relative; line-height: 1.5; }
+
+        .survey-step-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            position: relative;
+        }
+        .step-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: #fff; width: 22px; border-radius: 4px; }
+        .step-dot.done { background: rgba(255,255,255,0.75); }
+
+        .survey-body { padding: 28px 32px; }
+
+        .survey-step { display: none; }
+        .survey-step.active { display: block; animation: fadeSlideIn 0.3s ease; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .survey-step-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: #1c1848;
+            margin-bottom: 4px;
+        }
+        .survey-step-sub {
+            font-size: 13px;
+            color: #6b7a8d;
+            margin-bottom: 22px;
+        }
+
+        .survey-field { margin-bottom: 18px; }
+        .survey-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #3b3563;
+            margin-bottom: 8px;
+        }
+
+        .survey-emoji-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .survey-emoji-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 14px;
+            border: 2px solid #e8e2ff;
+            border-radius: 12px;
+            background: #faf8ff;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #5a4fa0;
+            min-width: 64px;
+            text-align: center;
+            user-select: none;
+        }
+        .survey-emoji-btn .em { font-size: 22px; }
+        .survey-emoji-btn:hover { border-color: #a78bfa; background: #f0eaff; }
+        .survey-emoji-btn.selected { border-color: #6d4dff; background: #6d4dff; color: #fff; }
+
+        .survey-range-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .survey-range {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 999px;
+            background: linear-gradient(to right, #6d4dff var(--pct, 50%), #e4dcff var(--pct, 50%));
+            outline: none;
+        }
+        .survey-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: #6d4dff;
+            box-shadow: 0 2px 8px rgba(109,77,255,0.35);
+            cursor: pointer;
+        }
+        .survey-range-val {
+            font-size: 18px;
+            font-weight: 800;
+            color: #6d4dff;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .survey-checkbox-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .survey-check-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: 2px solid #e8e2ff;
+            border-radius: 10px;
+            background: #faf8ff;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3b3563;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .survey-check-item input { display: none; }
+        .survey-check-item:hover { border-color: #a78bfa; }
+        .survey-check-item.checked { border-color: #6d4dff; background: #6d4dff; color: #fff; }
+
+        .survey-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 32px 28px;
+            border-top: 1px solid #f0eaff;
+            gap: 12px;
+        }
+
+        .survey-btn-prev {
+            background: transparent;
+            border: 2px solid #d4c8f5;
+            color: #6b5ea8;
+            padding: 11px 22px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .survey-btn-prev:hover { border-color: #6d4dff; color: #6d4dff; }
+
+        .survey-btn-next {
+            background: linear-gradient(135deg, #6d4dff, #9168ff);
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(109,77,255,0.32);
+            transition: all 0.2s;
+        }
+        .survey-btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(109,77,255,0.4); }
+
+        .survey-skip-link {
+            font-size: 12px;
+            color: #9b93c8;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .survey-skip-link:hover { color: #6d4dff; }
+
+        .survey-complete-screen {
+            padding: 40px 32px;
+            text-align: center;
+            display: none;
+        }
+        .survey-complete-screen.show { display: block; }
+        .survey-complete-icon { font-size: 64px; margin-bottom: 16px; }
+        .survey-complete-screen h3 { font-size: 24px; font-weight: 800; color: #1c1848; margin-bottom: 8px; }
+        .survey-complete-screen p { font-size: 14px; color: #6b7a8d; margin-bottom: 24px; line-height: 1.6; }
+        .survey-complete-btn {
+            background: linear-gradient(135deg, #6d4dff, #9168ff);
+            color: #fff; border: none; padding: 14px 32px;
+            border-radius: 14px; font-size: 15px; font-weight: 700;
+            cursor: pointer; box-shadow: 0 4px 16px rgba(109,77,255,0.32);
+        }
     </style>
+
+    <!-- ═══ WELLNESS SURVEY MODAL ═══ -->
+    <div id="surveyModal" role="dialog" aria-modal="true" aria-labelledby="surveyTitle">
+        <div class="survey-card" id="surveyCard">
+
+            <!-- Hero header -->
+            <div class="survey-hero">
+                <div class="survey-hero-icon" id="surveyHeroIcon">🌱</div>
+                <h2 id="surveyTitle">Your Wellness Check-In</h2>
+                <p id="surveySubtitle">Help us understand you better so we can personalise your support experience</p>
+                <div class="survey-step-dots" id="surveyDots"></div>
+            </div>
+
+            <!-- Multi-step form -->
+            <div class="survey-body" id="surveyFormBody">
+
+                <!-- STEP 1: Sleep & Physical Health -->
+                <div class="survey-step active" data-step="1">
+                    <div class="survey-step-title">😴 Sleep & Physical Health</div>
+                    <div class="survey-step-sub">Tell us about your rest and activity patterns this week.</div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How many hours do you sleep on average per night?</label>
+                        <div class="survey-range-wrap">
+                            <input type="range" class="survey-range" id="sv_sleep" min="2" max="12" value="7"
+                                oninput="updateRange(this,'sv_sleepVal');" style="--pct:62.5%">
+                            <span class="survey-range-val" id="sv_sleepVal">7</span>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How would you rate your sleep quality?</label>
+                        <div class="survey-emoji-group" id="sv_sleepQuality" data-key="sleepQuality">
+                            <button class="survey-emoji-btn" data-val="very_poor"><span class="em">😫</span>Very Poor</button>
+                            <button class="survey-emoji-btn" data-val="poor"><span class="em">😔</span>Poor</button>
+                            <button class="survey-emoji-btn" data-val="fair"><span class="em">😐</span>Fair</button>
+                            <button class="survey-emoji-btn" data-val="good"><span class="em">🙂</span>Good</button>
+                            <button class="survey-emoji-btn" data-val="excellent"><span class="em">😊</span>Excellent</button>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How often do you engage in physical activity?</label>
+                        <div class="survey-emoji-group" id="sv_physActivity" data-key="physicalActivity">
+                            <button class="survey-emoji-btn" data-val="none"><span class="em">🛋️</span>None</button>
+                            <button class="survey-emoji-btn" data-val="rarely"><span class="em">🚶</span>Rarely</button>
+                            <button class="survey-emoji-btn" data-val="sometimes"><span class="em">🏃</span>Sometimes</button>
+                            <button class="survey-emoji-btn" data-val="regularly"><span class="em">💪</span>Regularly</button>
+                            <button class="survey-emoji-btn" data-val="daily"><span class="em">🏋️</span>Daily</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Academic Stress -->
+                <div class="survey-step" data-step="2">
+                    <div class="survey-step-title">📚 Academic Stress</div>
+                    <div class="survey-step-sub">Be honest — your responses are private and confidential.</div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">Rate your academic stress level (1 = very low, 10 = overwhelming)</label>
+                        <div class="survey-range-wrap">
+                            <input type="range" class="survey-range" id="sv_stress" min="1" max="10" value="5"
+                                oninput="updateRange(this,'sv_stressVal');" style="--pct:44%">
+                            <span class="survey-range-val" id="sv_stressVal">5</span>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How often do you feel exam anxiety?</label>
+                        <div class="survey-emoji-group" id="sv_examAnxiety" data-key="examAnxiety">
+                            <button class="survey-emoji-btn" data-val="never"><span class="em">✨</span>Never</button>
+                            <button class="survey-emoji-btn" data-val="rarely"><span class="em">🌤</span>Rarely</button>
+                            <button class="survey-emoji-btn" data-val="sometimes"><span class="em">⛅</span>Sometimes</button>
+                            <button class="survey-emoji-btn" data-val="often"><span class="em">🌧</span>Often</button>
+                            <button class="survey-emoji-btn" data-val="always"><span class="em">⛈</span>Always</button>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How much deadline/assignment pressure do you feel?</label>
+                        <div class="survey-emoji-group" id="sv_deadline" data-key="deadlinePressure">
+                            <button class="survey-emoji-btn" data-val="never"><span class="em">😌</span>None</button>
+                            <button class="survey-emoji-btn" data-val="rarely"><span class="em">🙂</span>A little</button>
+                            <button class="survey-emoji-btn" data-val="sometimes"><span class="em">😐</span>Moderate</button>
+                            <button class="survey-emoji-btn" data-val="often"><span class="em">😰</span>A lot</button>
+                            <button class="survey-emoji-btn" data-val="always"><span class="em">😱</span>Overwhelming</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Emotional Wellbeing -->
+                <div class="survey-step" data-step="3">
+                    <div class="survey-step-title">💙 Emotional Wellbeing</div>
+                    <div class="survey-step-sub">Understanding your emotions helps us recommend the right community posts & support circles for you.</div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How would you describe your recent mood?</label>
+                        <div class="survey-emoji-group" id="sv_mood" data-key="moodFrequency">
+                            <button class="survey-emoji-btn" data-val="mostly_positive"><span class="em">😄</span>Mostly good</button>
+                            <button class="survey-emoji-btn" data-val="balanced"><span class="em">😐</span>Balanced</button>
+                            <button class="survey-emoji-btn" data-val="often_sad"><span class="em">😢</span>Often sad</button>
+                            <button class="survey-emoji-btn" data-val="often_anxious"><span class="em">😟</span>Often anxious</button>
+                            <button class="survey-emoji-btn" data-val="very_low"><span class="em">😞</span>Very low</button>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How often do you feel overwhelmed?</label>
+                        <div class="survey-emoji-group" id="sv_overwhelmed" data-key="feelingOverwhelmed">
+                            <button class="survey-emoji-btn" data-val="never"><span class="em">✅</span>Never</button>
+                            <button class="survey-emoji-btn" data-val="rarely"><span class="em">🌤</span>Rarely</button>
+                            <button class="survey-emoji-btn" data-val="sometimes"><span class="em">⛅</span>Sometimes</button>
+                            <button class="survey-emoji-btn" data-val="often"><span class="em">🌧</span>Often</button>
+                            <button class="survey-emoji-btn" data-val="always"><span class="em">⛈</span>Always</button>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How lonely or isolated do you feel?</label>
+                        <div class="survey-emoji-group" id="sv_lonely" data-key="lonelinessLevel">
+                            <button class="survey-emoji-btn" data-val="never"><span class="em">🤝</span>Never</button>
+                            <button class="survey-emoji-btn" data-val="rarely"><span class="em">💛</span>Rarely</button>
+                            <button class="survey-emoji-btn" data-val="sometimes"><span class="em">🌙</span>Sometimes</button>
+                            <button class="survey-emoji-btn" data-val="often"><span class="em">💤</span>Often</button>
+                            <button class="survey-emoji-btn" data-val="always"><span class="em">🏝️</span>Always</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Coping & Support -->
+                <div class="survey-step" data-step="4">
+                    <div class="survey-step-title">🛡 Coping & Support</div>
+                    <div class="survey-step-sub">Select all coping methods you currently use and rate your motivation.</div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">What coping methods do you use? (select all that apply)</label>
+                        <div class="survey-checkbox-grid" id="sv_coping">
+                            <label class="survey-check-item"><input type="checkbox" value="talking_to_friends"> 🗣 Talk to friends</label>
+                            <label class="survey-check-item"><input type="checkbox" value="exercise"> 🏃 Exercise</label>
+                            <label class="survey-check-item"><input type="checkbox" value="meditation"> 🧘 Meditation</label>
+                            <label class="survey-check-item"><input type="checkbox" value="journaling"> 📝 Journaling</label>
+                            <label class="survey-check-item"><input type="checkbox" value="music_art"> 🎵 Music / Art</label>
+                            <label class="survey-check-item"><input type="checkbox" value="eating"> 🍕 Comfort eating</label>
+                            <label class="survey-check-item"><input type="checkbox" value="social_media"> 📱 Social media</label>
+                            <label class="survey-check-item"><input type="checkbox" value="seeking_professional_help"> 🏥 Professional help</label>
+                            <label class="survey-check-item"><input type="checkbox" value="nothing"> ❌ Nothing / Not coping</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">Do you have emotional support from people around you?</label>
+                        <div class="survey-emoji-group" id="sv_support" data-key="hasSupport">
+                            <button class="survey-emoji-btn" data-val="yes_strong"><span class="em">💪</span>Yes, strong</button>
+                            <button class="survey-emoji-btn" data-val="yes_some"><span class="em">💛</span>Some support</button>
+                            <button class="survey-emoji-btn" data-val="limited"><span class="em">🌫</span>Very limited</button>
+                            <button class="survey-emoji-btn" data-val="none"><span class="em">🏝️</span>No support</button>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">Rate your current motivation level (1 = very low, 10 = very high)</label>
+                        <div class="survey-range-wrap">
+                            <input type="range" class="survey-range" id="sv_motivation" min="1" max="10" value="5"
+                                oninput="updateRange(this,'sv_motivationVal');" style="--pct:44%">
+                            <span class="survey-range-val" id="sv_motivationVal">5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 5: Primary Concerns -->
+                <div class="survey-step" data-step="5">
+                    <div class="survey-step-title">🎯 What's on your mind?</div>
+                    <div class="survey-step-sub">Select all areas you are currently struggling with. This helps us recommend the most relevant community posts and support resources.</div>
+
+                    <div class="survey-field">
+                        <div class="survey-checkbox-grid" id="sv_concerns">
+                            <label class="survey-check-item"><input type="checkbox" value="academic_pressure"> 📚 Academic pressure</label>
+                            <label class="survey-check-item"><input type="checkbox" value="exam_anxiety"> 📝 Exam anxiety</label>
+                            <label class="survey-check-item"><input type="checkbox" value="depression_low_mood"> 💙 Low mood / Depression</label>
+                            <label class="survey-check-item"><input type="checkbox" value="social_isolation"> 🏝 Social isolation</label>
+                            <label class="survey-check-item"><input type="checkbox" value="relationship_issues"> 💔 Relationship issues</label>
+                            <label class="survey-check-item"><input type="checkbox" value="family_pressure"> 🏠 Family pressure</label>
+                            <label class="survey-check-item"><input type="checkbox" value="financial_stress"> 💸 Financial stress</label>
+                            <label class="survey-check-item"><input type="checkbox" value="sleep_disorder"> 😴 Sleep problems</label>
+                            <label class="survey-check-item"><input type="checkbox" value="career_uncertainty"> 🎯 Career uncertainty</label>
+                            <label class="survey-check-item"><input type="checkbox" value="homesickness"> 🏡 Homesickness</label>
+                            <label class="survey-check-item"><input type="checkbox" value="identity_self_esteem"> 🪞 Identity / Self-esteem</label>
+                            <label class="survey-check-item"><input type="checkbox" value="bullying_ragging"> 🚫 Bullying / Ragging</label>
+                        </div>
+                    </div>
+
+                    <div class="survey-field">
+                        <label class="survey-label">How often do you have difficulty concentrating?</label>
+                        <div class="survey-emoji-group" id="sv_concentration" data-key="concentrationDifficulty">
+                            <button class="survey-emoji-btn" data-val="never"><span class="em">🎯</span>Never</button>
+                            <button class="survey-emoji-btn" data-val="rarely"><span class="em">🙂</span>Rarely</button>
+                            <button class="survey-emoji-btn" data-val="sometimes"><span class="em">😐</span>Sometimes</button>
+                            <button class="survey-emoji-btn" data-val="often"><span class="em">😵</span>Often</button>
+                            <button class="survey-emoji-btn" data-val="always"><span class="em">🌀</span>Always</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- /survey-body -->
+
+            <!-- Complete screen -->
+            <div class="survey-complete-screen" id="surveyCompleteScreen">
+                <div class="survey-complete-icon">🌟</div>
+                <h3>Thank you for sharing!</h3>
+                <p>Your responses will help us personalise community feed recommendations, analytics on your dashboard, and connect you with the most relevant support resources. Your data is private and confidential.</p>
+                <button class="survey-complete-btn" id="surveyCompleteBtn">Continue to App →</button>
+            </div>
+
+            <!-- Footer nav -->
+            <div class="survey-footer" id="surveyFooter">
+                <button class="survey-skip-link" id="surveySkipBtn" type="button">Skip for now</button>
+                <div style="display:flex;gap:10px;">
+                    <button class="survey-btn-prev" id="surveyPrevBtn" style="display:none;" type="button">← Back</button>
+                    <button class="survey-btn-next" id="surveyNextBtn" type="button">Next →</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- ═══ END SURVEY MODAL ═══ -->
 
     <script>
         const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '80' && window.location.port !== ''
@@ -2332,9 +2793,16 @@
                     signupForm.reset();
                     setSignupRole('student');
                     updateAuthUI();
-                    alert(`Account created successfully as ${data.user.role.toUpperCase()}!`);
-                    // Redirect to chat page
-                    window.location.href = 'chat.html';
+
+                    // For new students: show mandatory survey before redirecting
+                    if ((data.user.role || 'student') === 'student') {
+                        window._postSurveyRedirect = 'chat.html';
+                        window._surveyMandatory = true;
+                        openSurveyModal(true);
+                    } else {
+                        alert(`Account created successfully as ${data.user.role.toUpperCase()}!`);
+                        window.location.href = 'chat.html';
+                    }
                 } else {
                     signupError.textContent = data.error || 'Signup failed';
                     signupError.classList.add('show');
@@ -2435,8 +2903,27 @@
                         alert(`Login successful! Welcome back, Counsellor ${data.user.name || ''}`);
                         window.location.href = 'book.html';
                     } else {
-                        alert(`Login successful! Welcome back, ${data.user.name || 'Student'}`);
-                        window.location.href = 'chat.html';
+                        // Student: check if they've filled survey before (optional re-fill)
+                        try {
+                            const surveyStatus = await fetch(`${API_BASE}/survey/status`, {
+                                headers: { 'Authorization': `Bearer ${authToken}` }
+                            });
+                            const statusData = await surveyStatus.json();
+                            if (!statusData.hasSurvey) {
+                                // First time ever — treat as mandatory
+                                window._postSurveyRedirect = 'chat.html';
+                                window._surveyMandatory = true;
+                                openSurveyModal(true);
+                            } else {
+                                // Returning student — offer optional update
+                                window._postSurveyRedirect = 'chat.html';
+                                window._surveyMandatory = false;
+                                openSurveyModal(false);
+                            }
+                        } catch(_) {
+                            alert(`Login successful! Welcome back, ${data.user.name || 'Student'}`);
+                            window.location.href = 'chat.html';
+                        }
                     }
                 } else {
                     loginError.textContent = data.error || 'Login failed';
@@ -2688,7 +3175,222 @@
                 if (emailInput) emailInput.focus();
             }
         }
+        // ═════════════════════════════════════════════════════════════
+        // SURVEY MODAL CONTROLLER
+        // ═════════════════════════════════════════════════════════════
+        (function() {
+            const TOTAL_STEPS = 5;
+            let currentStep = 1;
+            let surveyMandatory = true;
+            const surveyData = {};
+
+            // Slider range track fill
+            window.updateRange = function(input, valId) {
+                const min = Number(input.min);
+                const max = Number(input.max);
+                const val = Number(input.value);
+                const pct = ((val - min) / (max - min)) * 100;
+                input.style.setProperty('--pct', pct + '%');
+                const el = document.getElementById(valId);
+                if (el) el.textContent = val;
+            };
+
+            function buildDots() {
+                const container = document.getElementById('surveyDots');
+                if (!container) return;
+                container.innerHTML = '';
+                for (let i = 1; i <= TOTAL_STEPS; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'step-dot' + (i === currentStep ? ' active' : (i < currentStep ? ' done' : ''));
+                    container.appendChild(dot);
+                }
+            }
+
+            function showStep(n) {
+                document.querySelectorAll('.survey-step').forEach(s => s.classList.remove('active'));
+                const target = document.querySelector(`.survey-step[data-step="${n}"]`);
+                if (target) target.classList.add('active');
+
+                const prevBtn = document.getElementById('surveyPrevBtn');
+                const nextBtn = document.getElementById('surveyNextBtn');
+                if (prevBtn) prevBtn.style.display = n > 1 ? 'inline-block' : 'none';
+                if (nextBtn) nextBtn.textContent = n === TOTAL_STEPS ? 'Submit ✓' : 'Next →';
+
+                buildDots();
+
+                const icons = ['🌱', '😴', '📚', '💙', '🛡️', '🎯'];
+                const heroIcon = document.getElementById('surveyHeroIcon');
+                if (heroIcon) heroIcon.textContent = icons[n] || '🌟';
+            }
+
+            function collectStep(n) {
+                // Emoji groups (single select)
+                document.querySelectorAll(`.survey-step[data-step="${n}"] .survey-emoji-group`).forEach(group => {
+                    const key = group.getAttribute('data-key');
+                    const selected = group.querySelector('.survey-emoji-btn.selected');
+                    if (key && selected) surveyData[key] = selected.getAttribute('data-val');
+                });
+
+                // Ranges
+                const sleepEl = document.getElementById('sv_sleep');
+                if (sleepEl && n === 1) surveyData.sleepHours = Number(sleepEl.value);
+                const stressEl = document.getElementById('sv_stress');
+                if (stressEl && n === 2) surveyData.academicStressLevel = Number(stressEl.value);
+                const motEl = document.getElementById('sv_motivation');
+                if (motEl && n === 4) surveyData.motivationLevel = Number(motEl.value);
+
+                // Multi-select checkboxes
+                if (n === 4) {
+                    const checked = [];
+                    document.querySelectorAll('#sv_coping input[type=checkbox]:checked').forEach(c => checked.push(c.value));
+                    surveyData.copingMethods = checked;
+                }
+                if (n === 5) {
+                    const checked = [];
+                    document.querySelectorAll('#sv_concerns input[type=checkbox]:checked').forEach(c => checked.push(c.value));
+                    surveyData.primaryConcerns = checked;
+                }
+            }
+
+            async function submitSurvey() {
+                const token = localStorage.getItem('authToken');
+                if (!token) return;
+                try {
+                    await fetch((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port
+                        ? 'http://localhost:5000/api/survey/submit'
+                        : '/api/survey/submit',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(surveyData)
+                    });
+                } catch(e) {
+                    console.error('Survey submission error:', e);
+                }
+            }
+
+            function goToComplete() {
+                const body = document.getElementById('surveyFormBody');
+                const footer = document.getElementById('surveyFooter');
+                const complete = document.getElementById('surveyCompleteScreen');
+                if (body) body.style.display = 'none';
+                if (footer) footer.style.display = 'none';
+                if (complete) complete.classList.add('show');
+                submitSurvey();
+            }
+
+            function closeSurveyAndRedirect() {
+                const modal = document.getElementById('surveyModal');
+                if (modal) modal.classList.remove('show');
+                const dest = window._postSurveyRedirect || 'chat.html';
+                window.location.href = dest;
+            }
+
+            // Expose openSurveyModal globally for login/signup handlers
+            window.openSurveyModal = function(mandatory) {
+                surveyMandatory = !!mandatory;
+                currentStep = 1;
+                // Reset steps
+                const body = document.getElementById('surveyFormBody');
+                const footer = document.getElementById('surveyFooter');
+                const complete = document.getElementById('surveyCompleteScreen');
+                if (body) body.style.display = '';
+                if (footer) footer.style.display = '';
+                if (complete) complete.classList.remove('show');
+                // Reset all selections
+                document.querySelectorAll('.survey-emoji-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('.survey-check-item').forEach(l => l.classList.remove('checked'));
+                document.querySelectorAll('.survey-check-item input[type=checkbox]').forEach(c => { c.checked = false; });
+
+                const skipBtn = document.getElementById('surveySkipBtn');
+                if (skipBtn) {
+                    skipBtn.textContent = mandatory ? 'I\'ll fill this later' : 'Skip for now';
+                    // If mandatory: still allow skip but warn
+                    skipBtn.onclick = () => {
+                        if (mandatory) {
+                            if (confirm('This survey helps us personalise your experience. Are you sure you want to skip?')) {
+                                closeSurveyAndRedirect();
+                            }
+                        } else {
+                            closeSurveyAndRedirect();
+                        }
+                    };
+                }
+
+                showStep(1);
+                const heroTitle = document.getElementById('surveyTitle');
+                const heroPara = document.getElementById('surveySubtitle');
+                if (heroTitle) heroTitle.textContent = mandatory ? 'Welcome! Quick Wellness Check-In 🌿' : 'Update Your Wellness Profile';
+                if (heroPara) heroPara.textContent = mandatory
+                    ? 'Help us personalise your support experience (takes ~2 minutes)'
+                    : 'Updating helps us give you better recommendations. Optional – takes ~2 minutes.';
+
+                const modal = document.getElementById('surveyModal');
+                if (modal) modal.classList.add('show');
+            };
+
+            // Emoji single-select toggle
+            document.querySelectorAll('.survey-emoji-group').forEach(group => {
+                group.querySelectorAll('.survey-emoji-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        group.querySelectorAll('.survey-emoji-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                    });
+                });
+            });
+
+            // Multi-select checkbox toggle styling
+            document.querySelectorAll('.survey-check-item input[type=checkbox]').forEach(input => {
+                input.addEventListener('change', () => {
+                    const label = input.closest('.survey-check-item');
+                    if (label) label.classList.toggle('checked', input.checked);
+                });
+            });
+
+            // Next button
+            const nextBtn = document.getElementById('surveyNextBtn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', async () => {
+                    collectStep(currentStep);
+                    if (currentStep < TOTAL_STEPS) {
+                        currentStep++;
+                        showStep(currentStep);
+                    } else {
+                        // Final step — submit and show complete screen
+                        collectStep(currentStep);
+                        goToComplete();
+                    }
+                });
+            }
+
+            // Prev button
+            const prevBtn = document.getElementById('surveyPrevBtn');
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    if (currentStep > 1) {
+                        currentStep--;
+                        showStep(currentStep);
+                    }
+                });
+            }
+
+            // Complete button → redirect
+            const completeBtn = document.getElementById('surveyCompleteBtn');
+            if (completeBtn) {
+                completeBtn.addEventListener('click', closeSurveyAndRedirect);
+            }
+
+            buildDots();
+        })();
+        // ═════════════════════════════════════════════════════════════
+        // END SURVEY CONTROLLER
+        // ═════════════════════════════════════════════════════════════
+
     </script>
+
     <script src="site-presence.js"></script>
 </body>
 </html>
