@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psychoeducational Resource Hub | Student Mind Support</title>
+    <meta name="description" content="Watch inspirational speeches, psychological coping guides, and wisdom shorts inside Student Mind Support. Play directly on-site without any external redirection.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6d4dff;
+            --primary-hover: #5835f5;
+            --primary-light: #f2efff;
+            --primary-glow: rgba(109, 77, 255, 0.25);
+            --emerald: #10b981;
+            --emerald-light: #ecfdf5;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --heading: #1c1848;
+            --text: #4a4668;
+            --text-muted: #7c789d;
+            --bg: #f8f7fc;
+            --card-bg: #ffffff;
+            --border: #e8e5f2;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 4px 12px rgba(28, 24, 72, 0.04);
+            --shadow-md: 0 10px 25px rgba(28, 24, 72, 0.08);
+            --shadow-lg: 0 20px 40px rgba(28, 24, 72, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Top Navigation Bar ────────────────────────────────────────── */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--heading);
+        }
+
+        .brand-mark {
+            width: 36px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .brand-name {
+            display: block;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--heading);
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+        }
+
+        .brand-tag {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .nav-links a.active {
+            color: #ffffff;
+            background: var(--primary);
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-greeting-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f4f1ff;
+            color: var(--heading);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid #e0d8ff;
+        }
+
+        .role-pill {
+            background: var(--primary);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 99px;
+            text-transform: uppercase;
+        }
+
+        .btn-auth {
+            border: none;
+            background: #ede9fe;
+            color: var(--primary);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 13.5px;
+            padding: 8px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-auth:hover {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            padding: 6px;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .mobile-menu-btn span {
+            display: block;
+            width: 22px;
+            height: 2.5px;
+            background: var(--heading);
+            border-radius: 99px;
+        }
+
+        /* ── Mobile Nav Drawer ────────────────────────────────────────── */
+        .mobile-nav-drawer {
+            display: none;
+            position: fixed;
+            top: 61px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(28, 24, 72, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+        }
+
+        .mobile-nav-drawer.open {
+            display: block;
+        }
+
+        .mobile-nav-content {
+            background: #ffffff;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--heading);
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.15s ease;
+        }
+
+        .mobile-nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* ── Hero Banner ──────────────────────────────────────────────── */
+        .resources-hero {
+            background: linear-gradient(135deg, #f6f3ff 0%, #ede8ff 50%, #f4fbff 100%);
+            border-bottom: 1px solid #e7e2fa;
+            padding: 48px 24px 36px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resources-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(109, 77, 255, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 999px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 14px;
+            border: 1px solid #e5dfff;
+        }
+
+        .hero-pill-badge .dot {
+            width: 7px;
+            height: 7px;
+            background: var(--emerald);
+            border-radius: 50%;
+            animation: pulseDot 1.8s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .hero-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--heading);
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #6d4dff 0%, #9061ff 50%, #f43f5e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 760px;
+            line-height: 1.6;
+            margin-bottom: 26px;
+        }
+
+        .hero-features-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--heading);
+        }
+
+        .hero-feat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(220, 213, 255, 0.7);
+        }
+
+        /* ── Controls Section (Search & Filter Pills) ─────────────────── */
+        .controls-section {
+            max-width: 1240px;
+            margin: 28px auto 0;
+            padding: 0 24px;
+        }
+
+        .search-and-stats {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .search-box-wrap {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+            min-width: 260px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            font-family: inherit;
+            font-size: 14.5px;
+            border-radius: 999px;
+            border: 1.5px solid var(--border);
+            background: #ffffff;
+            color: var(--heading);
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .search-clear-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+
+        .results-count-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .filter-pills-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: none;
+        }
+
+        .filter-pills-wrap::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-pill {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .filter-pill.active {
+            background: var(--heading);
+            color: #ffffff;
+            border-color: var(--heading);
+            box-shadow: 0 4px 12px rgba(28, 24, 72, 0.18);
+        }
+
+        .filter-pill .count {
+            background: rgba(0, 0, 0, 0.08);
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 99px;
+        }
+
+        .filter-pill.active .count {
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+        }
+
+        /* ── Videos Grid ──────────────────────────────────────────────── */
+        .videos-main-wrap {
+            max-width: 1240px;
+            margin: 24px auto 60px;
+            padding: 0 24px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
+        .video-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: #d8d0f8;
+        }
+
+        /* Card Thumbnail Wrapper */
+        .thumb-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 ratio */
+            background: #110e26;
+            overflow: hidden;
+        }
+
+        /* Shorts card has slightly taller preview indicator */
+        .video-card.is-short .thumb-wrap {
+            padding-top: 70%;
+        }
+
+        .thumb-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.35s ease;
+        }
+
+        .video-card:hover .thumb-img {
+            transform: scale(1.06);
+        }
+
+        /* Play Button Overlay */
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(18, 14, 46, 0.35);
+            transition: background 0.2s ease;
+        }
+
+        .video-card:hover .play-overlay {
+            background: rgba(18, 14, 46, 0.5);
+        }
+
+        .play-btn-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding-left: 3px; /* visual center for play arrow */
+        }
+
+        .video-card:hover .play-btn-circle {
+            transform: scale(1.16);
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .badge-format {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            z-index: 2;
+        }
+
+        .badge-format.short {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: #ffffff;
+        }
+
+        .badge-format.video {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+        }
+
+        .badge-onsite {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(4px);
+            color: #ffffff;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Card Content */
+        .card-content {
+            padding: 16px 18px 18px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .card-topic-tag {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--heading);
+            line-height: 1.35;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-channel {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-channel::before {
+            content: '🎙️';
+            font-size: 12px;
+        }
+
+        .card-footer-action {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid #f2effa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-watch-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 999px;
+            transition: all 0.2s ease;
+        }
+
+        .video-card:hover .btn-watch-card {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .no-results-box {
+            text-align: center;
+            padding: 60px 20px;
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            grid-column: 1 / -1;
+            display: none;
+        }
+
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .no-results-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--heading);
+            margin-bottom: 6px;
+        }
+
+        .no-results-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* ── IN-SITE CINEMA VIDEO PLAYER MODAL ───────────────────────── */
+        .cinema-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 8, 30, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .cinema-modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .cinema-player-card {
+            background: #17142b;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 900px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .cinema-modal-overlay.open .cinema-player-card {
+            transform: scale(1);
+        }
+
+        /* Modal adapted for YouTube Shorts (Vertical 9:16 layout) */
+        .cinema-player-card.is-short-mode {
+            max-width: 440px;
+        }
+
+        .player-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: #121024;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+
+        .player-badge-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #d1c8ff;
+        }
+
+        .player-badge-type.short {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: #fff;
+        }
+
+        .player-badge-type.video {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+        }
+
+        .player-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #ffffff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .player-close-btn:hover {
+            background: #f43f5e;
+            transform: scale(1.08);
+        }
+
+        /* Video Frame Box */
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            background: #000000;
+            padding-top: 56.25%; /* 16:9 widescreen */
+        }
+
+        /* Shorts Container ratio */
+        .cinema-player-card.is-short-mode .iframe-container {
+            padding-top: 155%; /* 9:16 vertical ratio */
+            max-height: 72vh;
+        }
+
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Player Details & Navigation Footer */
+        .player-info-footer {
+            padding: 16px 20px;
+            background: #17142b;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .player-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .player-video-title {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #ffffff;
+        }
+
+        .player-video-meta {
+            font-size: 13px;
+            color: #9d96c9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .player-nav-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-player-nav {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 7px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-player-nav:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .player-shortcut-hint {
+            font-size: 11px;
+            color: #7b749d;
+        }
+
+        /* ── Site Footer ──────────────────────────────────────────────── */
+        .site-footer {
+            background: #ffffff;
+            border-top: 1px solid var(--border);
+            padding: 36px 24px 24px;
+            margin-top: auto;
+        }
+
+        .footer-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-left {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 18px;
+            list-style: none;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* ── Responsive Queries ───────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .nav-links { display: none; }
+            .mobile-menu-btn { display: flex; }
+            .hero-title { font-size: 28px; }
+            .video-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+        }
+
+        @media (max-width: 600px) {
+            .hero-title { font-size: 24px; }
+            .video-grid { grid-template-columns: 1fr; }
+            .search-and-stats { flex-direction: column; align-items: stretch; }
+            .search-box-wrap { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Site Header & Navigation -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="index.html">
+                <svg class="brand-mark" viewBox="0 0 48 42" aria-hidden="true">
+                    <path fill="#4ecdc4" d="M14.8 3.2c-6.2 0-11.1 5-11.1 11.4 0 10.1 10.6 17.8 20.6 23.4C14.3 32.4 3.7 24.7 3.7 14.6 3.7 8.2 8.6 3.2 14.8 3.2c2.4 0 4.6.9 6.3 2.4C19.4 4.1 17.2 3.2 14.8 3.2z"/>
+                    <path fill="#4ecdc4" d="M16.2 5.8c-5 0-9 4.2-9 9.8 0 8.6 8.6 15.1 17.2 20.1-8.6-5-17.2-11.5-17.2-20.1 0-5.6 4-9.8 9-9.8 2.1 0 4 .8 5.4 2.2-1.6-1.4-3.6-2.2-5.4-2.2z"/>
+                    <path fill="#6d4dff" d="M32.6 4.4c-5.8 0-10.4 4.8-10.4 11 0 9.6 10.4 17 19.2 22.2C41.6 32.4 22.2 25 22.2 15.4c0-6.2 4.6-11 10.4-11 2.4 0 4.6.9 6.2 2.5-1.7-1.5-3.9-2.5-6.2-2.5z"/>
+                    <path fill="#7b5cff" d="M33.4 7c-4.6 0-8.3 3.9-8.3 9 0 7.8 8.3 13.8 15.6 18.2C40.4 29.8 25.1 23.8 25.1 16 25.1 10.9 28.8 7 33.4 7c2 0 3.8.8 5.1 2.1C37.2 7.8 35.4 7 33.4 7z"/>
+                </svg>
+                <span>
+                    <span class="brand-name">Student Mind Support</span>
+                    <span class="brand-tag">Talk • Heal • Grow</span>
+                </span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a href="book.html">Book Appointment</a></li>
+                <li><a class="active" href="resources.html">Resources</a></li>
+                <li><a href="peer-support.html">Peer Support</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <div id="userBadge" class="user-greeting-badge" style="display: none;"></div>
+                <button class="btn-auth" id="authBtn" onclick="handleAuthClick()">Login</button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div class="mobile-nav-drawer" id="mobileNavDrawer">
+            <div class="mobile-nav-content">
+                <a href="index.html" class="mobile-nav-item">🏠 Home</a>
+                <a href="chat.html" class="mobile-nav-item">💬 AI First-Aid Chat</a>
+                <a href="book.html" class="mobile-nav-item">📅 Book Appointment</a>
+                <a href="resources.html" class="mobile-nav-item active">📚 Resource Hub (25 Videos)</a>
+                <a href="peer-support.html" class="mobile-nav-item">🤝 Peer Support & Community</a>
+                <a href="dashboard.html" class="mobile-nav-item">📊 Wellness Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="resources-hero">
+        <div class="hero-inner">
+            <div class="hero-pill-badge">
+                <span class="dot"></span>
+                <span>Psychoeducational Video Hub • 25 Curated Videos</span>
+            </div>
+            <h1 class="hero-title">Mindset, Resilience & <span>Growth Library</span></h1>
+            <p class="hero-subtitle">Handpicked motivational speeches, psychological coping guides, and student wisdom shorts. Watch directly inside Student Mind Support without any external redirection.</p>
+
+            <div class="hero-features-bar">
+                <div class="hero-feat-item">✨ <strong>100% In-Site Player</strong> (No YouTube redirect)</div>
+                <div class="hero-feat-item">⚡ <strong>16 Inspiring Shorts</strong> (Quick 60s bursts)</div>
+                <div class="hero-feat-item">🎥 <strong>9 Deep-Dive Speeches</strong> (Life-changing stories)</div>
+                <div class="hero-feat-item">🌿 <strong>Hindi & English</strong> Support</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search & Filter Controls -->
+    <section class="controls-section">
+        <div class="search-and-stats">
+            <div class="search-box-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search videos, speakers (e.g. 12th Fail, Einstein, Jaya Kishori)...">
+                <button id="clearSearchBtn" class="search-clear-btn">✕</button>
+            </div>
+            <div class="results-count-text" id="resultsCount">Showing 25 resources</div>
+        </div>
+
+        <!-- Filter Pills Bar -->
+        <div class="filter-pills-wrap" id="filterPills">
+            <button class="filter-pill active" data-filter="all">🌟 All Videos <span class="count">25</span></button>
+            <button class="filter-pill" data-filter="short">⚡ Quick Shorts <span class="count">16</span></button>
+            <button class="filter-pill" data-filter="video">🎥 Deep Videos <span class="count">9</span></button>
+            <button class="filter-pill" data-filter="grit">🔥 Student Grit & Restart <span class="count">3</span></button>
+            <button class="filter-pill" data-filter="motivation">💪 Resilience & Courage <span class="count">5</span></button>
+            <button class="filter-pill" data-filter="mindset">🧠 Wisdom & Mindset <span class="count">5</span></button>
+            <button class="filter-pill" data-filter="relationships">💛 Relationships & Love <span class="count">7</span></button>
+            <button class="filter-pill" data-filter="calm">🌙 Sleep & Positivity <span class="count">3</span></button>
+        </div>
+    </section>
+
+    <!-- Video Cards Main Grid -->
+    <main class="videos-main-wrap">
+        <div class="video-grid" id="videoGrid">
+            <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Empty State (No Search Results) -->
+        <div class="no-results-box" id="noResultsBox">
+            <div class="no-results-icon">🔎</div>
+            <h3 class="no-results-title">No matching resources found</h3>
+            <p class="no-results-desc">Try searching for other keywords like "speech", "quotes", "stress", or reset filters.</p>
+            <button class="filter-pill active" onclick="resetSearchAndFilters()">Reset Filters</button>
+        </div>
+    </main>
+
+    <!-- IN-SITE CINEMA VIDEO PLAYER MODAL -->
+    <div class="cinema-modal-overlay" id="cinemaModal" role="dialog" aria-modal="true" aria-labelledby="playerTitle">
+        <div class="cinema-player-card" id="cinemaCard">
+            <!-- Player Top Bar -->
+            <div class="player-top-bar">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span class="player-badge-type" id="playerBadgeType">⚡ Short</span>
+                    <span style="font-size:12px;color:#9d96c9;font-weight:600;" id="playerCategoryText">Student Grit</span>
+                </div>
+                <button class="player-close-btn" id="playerCloseBtn" title="Close video (Esc)">✕</button>
+            </div>
+
+            <!-- YouTube Iframe Container (Zero Redirection) -->
+            <div class="iframe-container" id="iframeContainer">
+                <iframe id="videoIframe"
+                    src=""
+                    title="Student Mind Support Video Player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+            <!-- Player Info & Controls Footer -->
+            <div class="player-info-footer">
+                <div class="player-title-row">
+                    <div>
+                        <h2 class="player-video-title" id="playerTitle">Video Title</h2>
+                        <div class="player-video-meta">
+                            <span id="playerAuthor">Creator</span> • 
+                            <span id="playerDesc" style="color:#b2aacf;">Inspiring wisdom</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="player-nav-controls">
+                    <button class="btn-player-nav" id="btnPrevVideo">⏮ Previous</button>
+                    <span class="player-shortcut-hint">Shortcuts: ◀ ▶ to navigate • Esc to close</span>
+                    <button class="btn-player-nav" id="btnNextVideo">Next ⏭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-left">
+                <strong>Student Mind Support</strong> • Safe, Confidential Psychoeducational Space
+                <div style="font-size:11.5px;margin-top:4px;">All videos play securely on-site via YouTube Embedded Player API for educational & wellness support.</div>
+            </div>
+            <ul class="footer-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="chat.html">AI Chat</a></li>
+                <li><a href="book.html">Counsellor Booking</a></li>
+                <li><a href="peer-support.html">Peer Support</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Site Presence & Notifications Script -->
+    <script src="site-presence.js"></script>
+
+    <!-- Videos Data & Hub Logic -->
+    <script>
+        // ── 25 CURATED PSYCHOEDUCATIONAL VIDEOS ─────────────────────────
+        const VIDEO_RESOURCES = [
+            {
+                id: "ocaZ0J2pj2g",
+                title: "Some Best Quotes by Albert Einstein | Timeless Wisdom",
+                channel: "Motivate Sphere",
+                type: "short",
+                category: "mindset",
+                categoryName: "Wisdom & Mindset",
+                badge: "Einstein • Quotes",
+                desc: "Albert Einstein's profound reflections on facing obstacles, imagination, and perseverance."
+            },
+            {
+                id: "It5JkkrjQJ0",
+                title: "Dr. APJ Abdul Kalam Motivational Quotes | Ignited Minds",
+                channel: "MOTIVATIONAL SUMAN",
+                type: "short",
+                category: "mindset",
+                categoryName: "Wisdom & Mindset",
+                badge: "APJ Abdul Kalam",
+                desc: "Transforming failure into fuel — inspiring words from India's beloved teacher and scientist."
+            },
+            {
+                id: "uf6eqBqgai8",
+                title: "True Friendship & Authentic Bonds | Heartwarming Quotes",
+                channel: "The Path of Motivation",
+                type: "short",
+                category: "relationships",
+                categoryName: "Relationships & Friendship",
+                badge: "Friendship",
+                desc: "A soothing reflection on true friends who listen and stand by your side during storm clouds."
+            },
+            {
+                id: "uRKeeelqWxw",
+                title: "These Albert Einstein Quotes Are Life Changing! (Deep Motivation)",
+                channel: "Team Fearless",
+                type: "video",
+                category: "mindset",
+                categoryName: "Wisdom & Mindset",
+                badge: "Deep Mindset",
+                desc: "In-depth motivational guidance analyzing Einstein's principles for mental clarity and peace."
+            },
+            {
+                id: "0IQozBD0xOg",
+                title: "Amitabh Bachchan Eye-Opening Speech | Powerful Life Lessons",
+                channel: "English Network",
+                type: "video",
+                category: "motivation",
+                categoryName: "Resilience & Fighting Spirit",
+                badge: "Resilience",
+                desc: "Legendary actor Amitabh Bachchan on resilience, staying grounded, and overcoming severe career crises."
+            },
+            {
+                id: "8WsBXbB5gXI",
+                title: "Don't Go to Sleep Until You Do This | Peaceful Night Reset",
+                channel: "Chryzor Mindset",
+                type: "short",
+                category: "calm",
+                categoryName: "Calm & Sleep Hygiene",
+                badge: "Night Routine",
+                desc: "A nighttime psychological reset to clear anxious thoughts from your head before sleep."
+            },
+            {
+                id: "lXIM6krQo8M",
+                title: "Don't Compare Yourself to Anyone | Life Changing Parable",
+                channel: "Wise Mindset",
+                type: "video",
+                category: "mindset",
+                categoryName: "Self-Worth & Confidence",
+                badge: "Self-Worth",
+                desc: "How constant comparison steals your joy and why honoring your own timeline is everything."
+            },
+            {
+                id: "vbks3PaCJuM",
+                title: "You Can't Do It! | Sushmita Sen Fierce Speech to Doubters",
+                channel: "Thunder Motivation",
+                type: "short",
+                category: "motivation",
+                categoryName: "Inner Strength",
+                badge: "Inner Strength",
+                desc: "Sushmita Sen's empowering speech on silencing the inner critic and rising when told you can't."
+            },
+            {
+                id: "uxwWfARUObM",
+                title: "An Intelligent Person Never Shares These 3 Things | Abraham Lincoln",
+                channel: "Quotes Library",
+                type: "video",
+                category: "mindset",
+                categoryName: "Wisdom & Mindset",
+                badge: "Life Strategy",
+                desc: "Timeless psychological wisdom from Abraham Lincoln on protecting your peace of mind and focus."
+            },
+            {
+                id: "wlOKT7X8lrA",
+                title: "Tum Mujhko Kab Tak Rokoge | Amitabh Bachchan Motivational Poem",
+                channel: "SHOYAB RAJPUT",
+                type: "video",
+                category: "motivation",
+                categoryName: "Resilience & Fighting Spirit",
+                badge: "Fighting Spirit",
+                desc: "Electrifying rendition of the timeless Hindi poem on rising back up every time defeat strikes."
+            },
+            {
+                id: "Jpl1Hz8K6mI",
+                title: "Three Material Things That Teach You Success | Shah Rukh Khan",
+                channel: "Inspire Bramhand",
+                type: "video",
+                category: "motivation",
+                categoryName: "Success Mindset",
+                badge: "Perspective",
+                desc: "Shah Rukh Khan shares poignant, humble life reflections on ambition, gratitude, and staying real."
+            },
+            {
+                id: "ptholsATgzE",
+                title: "मैं हार नहीं मानूंगा (Mai Haar Nahi Manunga) | Atal Bihari Vajpayee",
+                channel: "UrBro MohitBaneta",
+                type: "video",
+                category: "motivation",
+                categoryName: "Resilience & Fighting Spirit",
+                badge: "Never Give Up",
+                desc: "Atal Bihari Vajpayee's immortal verses on unbreakable willpower when facing life's dark tunnels."
+            },
+            {
+                id: "ydj-gpaRgh8",
+                title: "Denzel Washington Inspirational Speech That Leaves You Speechless",
+                channel: "Mind Therapy",
+                type: "video",
+                category: "motivation",
+                categoryName: "Courage & Purpose",
+                badge: "Courage",
+                desc: "Denzel Washington's unforgettable commencement talk on failing forward and taking bold chances."
+            },
+            {
+                id: "XFl3lFJjZks",
+                title: "12th Fail Motivational Edit | The Unstoppable #Restart Spirit",
+                channel: "editz Harshit",
+                type: "short",
+                category: "grit",
+                categoryName: "Student Grit & Academics",
+                badge: "12th Fail • Restart",
+                desc: "The relentless grit of Manoj Kumar Sharma: when exam failure hits, you pause, breathe, and #Restart."
+            },
+            {
+                id: "B7gqUm3Usgg",
+                title: "Five Life Lessons From 12th Fail | Overcoming Failures",
+                channel: "Learn with Jaspal",
+                type: "short",
+                category: "grit",
+                categoryName: "Student Grit & Academics",
+                badge: "12th Fail • Lessons",
+                desc: "Five crucial lessons on resilience, genuine mentors, and perseverance through competitive exams."
+            },
+            {
+                id: "ZtVjfYYCx5M",
+                title: "Kamyab Hone Ke Liye Nahi, Kabil Hone Ke Liye Padho | 3 Idiots",
+                channel: "David Gavit",
+                type: "short",
+                category: "grit",
+                categoryName: "Student Grit & Academics",
+                badge: "3 Idiots • Mindset",
+                desc: "Rancho's golden philosophy: Study for mastery and joy of learning, not merely for marks or fear."
+            },
+            {
+                id: "-i73MCg3JgU",
+                title: "Best Relationship & Mental Clarity Advice | Gaur Gopal Das",
+                channel: "GGD Thoughts",
+                type: "short",
+                category: "relationships",
+                categoryName: "Relationships & Emotional Balance",
+                badge: "Clarity",
+                desc: "Monk Gaur Gopal Das on navigating misunderstandings, letting go of ego, and cherishing loved ones."
+            },
+            {
+                id: "HwLK9dBQn0g",
+                title: "The Power of Positivity | Best Video For Positive Thinking",
+                channel: "Motivation2Study",
+                type: "video",
+                category: "calm",
+                categoryName: "Calm & Positivity",
+                badge: "Positive Mindset",
+                desc: "Science-backed cognitive reframing to overcome catastrophic thinking and restore calm focus."
+            },
+            {
+                id: "lfWIAFY1TIU",
+                title: "The Power of a Positive Attitude | Mindset Shift Story",
+                channel: "Zarqan Tales",
+                type: "video",
+                category: "calm",
+                categoryName: "Calm & Positivity",
+                badge: "Perspective",
+                desc: "A captivating storytelling guide showing how your internal state dictates your external peace."
+            },
+            {
+                id: "IkfDM0-Xe9I",
+                title: "Relationship & Friendship Advice | Jaya Kishori",
+                channel: "Hustle With Zindagi",
+                type: "short",
+                category: "relationships",
+                categoryName: "Relationships & Emotional Balance",
+                badge: "Jaya Kishori",
+                desc: "Spiritual speaker Jaya Kishori on healthy expectations, emotional maturity, and mutual respect."
+            },
+            {
+                id: "q6aWfjOUQIs",
+                title: "सब कुछ वापस आ सकता है लेकिन यह समय नहीं... | Jaya Kishori",
+                channel: "sanatan XYZ",
+                type: "short",
+                category: "mindset",
+                categoryName: "Wisdom & Time",
+                badge: "Value of Time",
+                desc: "A touching Hindi reminder on valuing your youth and present moments before time slips away."
+            },
+            {
+                id: "qz-w2vDDDt0",
+                title: "Protecting Your Self-Respect & Peace of Mind | Jaya Kishori",
+                channel: "Sanatani Editzzz",
+                type: "short",
+                category: "relationships",
+                categoryName: "Self-Worth & Boundaries",
+                badge: "Self-Respect",
+                desc: "Why protecting your emotional boundaries and self-respect is essential for mental wellness."
+            },
+            {
+                id: "TUWFDrdV6_s",
+                title: "The Significance of True Friendships in Life | Jaya Kishori",
+                channel: "Nikhil Dwivedi",
+                type: "short",
+                category: "relationships",
+                categoryName: "Relationships & Friendship",
+                badge: "Friendships",
+                desc: "Why true friends who correct you with love and celebrate your growth are life's greatest gift."
+            },
+            {
+                id: "o_6LX91ikBw",
+                title: "The Key to a Truly Successful Relationship | Sadhguru",
+                channel: "Shemaroo Spiritual Life",
+                type: "short",
+                category: "relationships",
+                categoryName: "Relationships & Emotional Balance",
+                badge: "Sadhguru",
+                desc: "Sadhguru explains moving from emotional demands to an overflowing sense of gratitude and ease."
+            },
+            {
+                id: "-duTwEY9QWc",
+                title: "The Pure Meaning of Love & Connection | Chitralekhaji",
+                channel: "DRK STUTI",
+                type: "short",
+                category: "relationships",
+                categoryName: "Empathy & Connection",
+                badge: "Empathy",
+                desc: "A gentle spiritual reflection on unconditional love, empathy, and emotional healing."
+            }
+        ];
+
+        // State Management
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let currentlyPlayingIndex = -1;
+        let filteredVideos = [...VIDEO_RESOURCES];
+
+        // DOM Elements
+        const videoGrid = document.getElementById('videoGrid');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const resultsCount = document.getElementById('resultsCount');
+        const noResultsBox = document.getElementById('noResultsBox');
+
+        // Cinema Modal Elements
+        const cinemaModal = document.getElementById('cinemaModal');
+        const cinemaCard = document.getElementById('cinemaCard');
+        const videoIframe = document.getElementById('videoIframe');
+        const playerCloseBtn = document.getElementById('playerCloseBtn');
+        const playerBadgeType = document.getElementById('playerBadgeType');
+        const playerCategoryText = document.getElementById('playerCategoryText');
+        const playerTitle = document.getElementById('playerTitle');
+        const playerAuthor = document.getElementById('playerAuthor');
+        const playerDesc = document.getElementById('playerDesc');
+        const btnPrevVideo = document.getElementById('btnPrevVideo');
+        const btnNextVideo = document.getElementById('btnNextVideo');
+
+        // Render Cards
+        function renderVideos() {
+            filteredVideos = VIDEO_RESOURCES.filter(video => {
+                // Category/Type Filter
+                if (currentFilter === 'short' && video.type !== 'short') return false;
+                if (currentFilter === 'video' && video.type !== 'video') return false;
+                if (currentFilter !== 'all' && currentFilter !== 'short' && currentFilter !== 'video') {
+                    if (video.category !== currentFilter) return false;
+                }
+
+                // Search Query Filter
+                if (searchQuery.trim()) {
+                    const q = searchQuery.toLowerCase();
+                    const inTitle = video.title.toLowerCase().includes(q);
+                    const inChannel = video.channel.toLowerCase().includes(q);
+                    const inCategory = video.categoryName.toLowerCase().includes(q);
+                    const inBadge = video.badge.toLowerCase().includes(q);
+                    const inDesc = video.desc.toLowerCase().includes(q);
+                    if (!inTitle && !inChannel && !inCategory && !inBadge && !inDesc) return false;
+                }
+
+                return true;
+            });
+
+            // Update Counts
+            resultsCount.textContent = `Showing ${filteredVideos.length} ${filteredVideos.length === 1 ? 'resource' : 'resources'}`;
+
+            if (filteredVideos.length === 0) {
+                videoGrid.innerHTML = '';
+                noResultsBox.style.display = 'block';
+                return;
+            }
+
+            noResultsBox.style.display = 'none';
+
+            videoGrid.innerHTML = filteredVideos.map((video, idx) => {
+                const isShort = video.type === 'short';
+                const formatLabel = isShort ? '⚡ Short' : '🎥 Full Video';
+                const formatClass = isShort ? 'short' : 'video';
+                const thumbUrl = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+
+                return `
+                    <article class="video-card ${isShort ? 'is-short' : ''}" data-id="${video.id}" onclick="openPlayerByVideoId('${video.id}')">
+                        <div class="thumb-wrap">
+                            <img class="thumb-img" src="${thumbUrl}" alt="${escapeHtml(video.title)}" loading="lazy">
+                            <span class="badge-format ${formatClass}">${formatLabel}</span>
+                            <span class="badge-onsite">▶ Play On-Site</span>
+                            <div class="play-overlay">
+                                <div class="play-btn-circle" title="Play Video">▶</div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-topic-tag">${escapeHtml(video.badge)}</div>
+                            <h3 class="card-title">${escapeHtml(video.title)}</h3>
+                            <div class="card-channel">${escapeHtml(video.channel)}</div>
+                            <div class="card-footer-action">
+                                <span style="font-size:11.5px;color:var(--text-muted);">${video.categoryName}</span>
+                                <button class="btn-watch-card" type="button">▶ Watch Inside</button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // Open Cinema Player (Plays directly on-site, NO REDIRECT)
+        function openPlayerByVideoId(videoId) {
+            const index = filteredVideos.findIndex(v => v.id === videoId);
+            if (index === -1) {
+                // If not in current filtered list, find in global list
+                const globalIndex = VIDEO_RESOURCES.findIndex(v => v.id === videoId);
+                if (globalIndex !== -1) {
+                    playVideoByIndex(globalIndex, VIDEO_RESOURCES);
+                }
+                return;
+            }
+            playVideoByIndex(index, filteredVideos);
+        }
+
+        function playVideoByIndex(index, list = filteredVideos) {
+            if (index < 0 || index >= list.length) return;
+            currentlyPlayingIndex = index;
+            const video = list[index];
+
+            const isShort = video.type === 'short';
+
+            // Configure modal sizing for 9:16 Shorts vs 16:9 Landscape
+            if (isShort) {
+                cinemaCard.classList.add('is-short-mode');
+                playerBadgeType.className = 'player-badge-type short';
+                playerBadgeType.textContent = '⚡ YouTube Short';
+            } else {
+                cinemaCard.classList.remove('is-short-mode');
+                playerBadgeType.className = 'player-badge-type video';
+                playerBadgeType.textContent = '🎥 Full Motivational Video';
+            }
+
+            playerCategoryText.textContent = video.categoryName;
+            playerTitle.textContent = video.title;
+            playerAuthor.textContent = video.channel;
+            playerDesc.textContent = video.desc;
+
+            // Zero Redirection: Set iframe embed with clean parameters
+            videoIframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0&playsinline=1&modestbranding=1`;
+
+            // Open modal with smooth transition
+            cinemaModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+
+            // Update prev/next button states
+            btnPrevVideo.disabled = (index === 0);
+            btnNextVideo.disabled = (index === list.length - 1);
+            btnPrevVideo.style.opacity = (index === 0) ? '0.4' : '1';
+            btnNextVideo.style.opacity = (index === list.length - 1) ? '0.4' : '1';
+        }
+
+        // Close Player & Immediately Stop Audio/Video
+        function closePlayer() {
+            cinemaModal.classList.remove('open');
+            document.body.style.overflow = '';
+            // Resetting iframe src stops playback immediately
+            videoIframe.src = '';
+            currentlyPlayingIndex = -1;
+        }
+
+        // Previous & Next Video Controls
+        btnPrevVideo.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentlyPlayingIndex > 0) {
+                playVideoByIndex(currentlyPlayingIndex - 1);
+            }
+        });
+
+        btnNextVideo.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentlyPlayingIndex < filteredVideos.length - 1) {
+                playVideoByIndex(currentlyPlayingIndex + 1);
+            }
+        });
+
+        playerCloseBtn.addEventListener('click', closePlayer);
+
+        cinemaModal.addEventListener('click', (e) => {
+            if (e.target === cinemaModal) {
+                closePlayer();
+            }
+        });
+
+        // Keyboard Shortcuts: ESC to close, Left/Right arrow to navigate
+        window.addEventListener('keydown', (e) => {
+            if (!cinemaModal.classList.contains('open')) return;
+
+            if (e.key === 'Escape') {
+                closePlayer();
+            } else if (e.key === 'ArrowLeft') {
+                if (currentlyPlayingIndex > 0) playVideoByIndex(currentlyPlayingIndex - 1);
+            } else if (e.key === 'ArrowRight') {
+                if (currentlyPlayingIndex < filteredVideos.length - 1) playVideoByIndex(currentlyPlayingIndex + 1);
+            }
+        });
+
+        // Search Input Handling
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            clearSearchBtn.style.display = searchQuery ? 'block' : 'none';
+            renderVideos();
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.style.display = 'none';
+            searchInput.focus();
+            renderVideos();
+        });
+
+        // Filter Pills Click
+        document.querySelectorAll('.filter-pill[data-filter]').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('.filter-pill[data-filter]').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentFilter = pill.getAttribute('data-filter');
+                renderVideos();
+            });
+        });
+
+        function resetSearchAndFilters() {
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.style.display = 'none';
+            currentFilter = 'all';
+            document.querySelectorAll('.filter-pill[data-filter]').forEach(p => {
+                p.classList.toggle('active', p.getAttribute('data-filter') === 'all');
+            });
+            renderVideos();
+        }
+
+        // Utility: HTML Escaping
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // ── Auth & Header User State ──────────────────────────────────
+        function updateAuthUI() {
+            const token = localStorage.getItem('authToken');
+            const userName = localStorage.getItem('userName') || 'Student';
+            const userRole = localStorage.getItem('userRole') || 'student';
+            const userBadge = document.getElementById('userBadge');
+            const authBtn = document.getElementById('authBtn');
+
+            if (token) {
+                userBadge.style.display = 'inline-flex';
+                userBadge.innerHTML = `<span>Hi, ${escapeHtml(userName)}</span> <span class="role-pill">${escapeHtml(userRole)}</span>`;
+                authBtn.textContent = 'Logout';
+                authBtn.style.background = '#fee2e2';
+                authBtn.style.color = '#dc2626';
+            } else {
+                userBadge.style.display = 'none';
+                authBtn.textContent = 'Login';
+                authBtn.style.background = '#ede9fe';
+                authBtn.style.color = '#6d4dff';
+            }
+        }
+
+        function handleAuthClick() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                if (confirm('Are you sure you want to log out?')) {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userRole');
+                    updateAuthUI();
+                    window.location.reload();
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Mobile Menu Drawer Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+        if (mobileMenuBtn && mobileNavDrawer) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileNavDrawer.classList.toggle('open');
+            });
+            mobileNavDrawer.addEventListener('click', (e) => {
+                if (e.target === mobileNavDrawer) {
+                    mobileNavDrawer.classList.remove('open');
+                }
+            });
+        }
+
+        // Auto-Play if URL hash or query specifies video ID (e.g. resources.html?v=ocaZ0J2pj2g)
+        function checkUrlAutoPlay() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const vParam = urlParams.get('v');
+            if (vParam) {
+                openPlayerByVideoId(vParam);
+            }
+        }
+
+        // Initialize on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthUI();
+            renderVideos();
+            checkUrlAutoPlay();
+        });
+    </script>
+</body>
+</html>
