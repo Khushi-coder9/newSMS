@@ -333,9 +333,28 @@
             gap: 8px;
             color: var(--purple);
             font-weight: 700;
-            font-size: 14px;
-            background: none;
-            border: none;
+            font-size: 14.5px;
+            background: rgba(109, 77, 255, 0.07);
+            border: 1.5px solid rgba(109, 77, 255, 0.22);
+            padding: 10px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-learn:hover {
+            background: rgba(109, 77, 255, 0.14);
+            border-color: var(--purple);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(109, 77, 255, 0.18);
+        }
+        .btn-learn:active {
+            transform: translateY(0);
+        }
+        .btn-learn svg {
+            transition: transform 0.25s ease;
+        }
+        .btn-learn:hover svg {
+            transform: scale(1.12);
         }
 
         .hero-art {
@@ -1049,7 +1068,7 @@
                 </p>
                 <div class="hero-ctas">
                     <a class="btn-primary" href="chat.html">Start Your Journey <span>→</span></a>
-                    <button class="btn-learn">
+                    <button class="btn-learn" id="learnMoreBtn" type="button" aria-haspopup="dialog" aria-controls="learnMoreModal" title="Watch platform introduction video">
                         <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
                             <circle cx="11" cy="11" r="9.2" stroke="#6d4dff" stroke-width="1.7"/>
                             <path d="M9.1 7.7L14.8 11L9.1 14.3V7.7Z" fill="#6d4dff"/>
@@ -2469,6 +2488,50 @@
     </div>
     <!-- ═══ END SURVEY MODAL ═══ -->
 
+    <!-- ═══ LEARN MORE VIDEO MODAL ═══ -->
+    <div class="modal-bg" id="learnMoreModal" role="dialog" aria-modal="true" aria-labelledby="learnMoreTitle" style="z-index: 10000;">
+        <div class="modal" style="width: min(860px, 94vw); max-width: 860px; padding: 22px 24px; border-radius: 24px; box-shadow: 0 25px 60px -10px rgba(28, 24, 72, 0.45); background: #ffffff;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #6d4dff 0%, #a855f7 100%); color: #fff; display: grid; place-items: center; font-size: 22px; flex-shrink: 0; box-shadow: 0 6px 18px rgba(109, 77, 255, 0.35);">
+                        🎬
+                    </div>
+                    <div>
+                        <h2 id="learnMoreTitle" style="font-size: 21px; font-weight: 800; color: #1c1848; margin: 0; letter-spacing: -0.02em;">Welcome to Student Mind Support</h2>
+                        <p style="font-size: 13px; color: #5a5878; margin: 3px 0 0; line-height: 1.4;">Watch our introduction video to discover how your safe space for mental well-being works.</p>
+                    </div>
+                </div>
+                <button type="button" id="closeLearnMoreModalX" aria-label="Close introduction video" style="width: 36px; height: 36px; border-radius: 50%; border: none; background: #f4efff; color: #6d4dff; font-size: 20px; font-weight: 700; cursor: pointer; display: grid; place-items: center; transition: all 0.2s ease;">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Video Player Wrap -->
+            <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #0c0a1f; border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 10px 30px rgba(28, 24, 72, 0.25);">
+                <video id="introVideoPlayer" controls preload="metadata" playsinline style="width: 100%; height: 100%; object-fit: contain; display: block; background: #000;">
+                    <source src="public/videos/Introduction_HyGen.mp4" type="video/mp4">
+                    <source src="videos/Introduction_HyGen.mp4" type="video/mp4">
+                    <source src="public/videos/Introduction_HeyGen.mp4" type="video/mp4">
+                    Your browser does not support HTML5 video streaming.
+                </video>
+            </div>
+
+            <!-- Highlights Strip & Action Buttons -->
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #f0ebff;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 11.5px; font-weight: 700; background: #f0ebff; color: #6d4dff; padding: 4px 10px; border-radius: 999px;">💬 24/7 AI First-Aid</span>
+                    <span style="font-size: 11.5px; font-weight: 700; background: #e0f7fa; color: #0284c7; padding: 4px 10px; border-radius: 999px;">📅 Confidential Booking</span>
+                    <span style="font-size: 11.5px; font-weight: 700; background: #fef3c7; color: #b45309; padding: 4px 10px; border-radius: 999px;">🤝 Peer Community</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button type="button" id="closeLearnMoreBtn" style="padding: 9px 18px; border-radius: 999px; border: 1.5px solid #dfd5ff; background: #fff; color: #5a5878; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">Close</button>
+                    <a href="chat.html" class="btn-primary" style="padding: 9px 20px; font-size: 13.5px; text-decoration: none; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">Start Your Journey →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ═══ END LEARN MORE VIDEO MODAL ═══ -->
+
     <script>
         const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '80' && window.location.port !== ''
             ? 'http://localhost:5000/api'
@@ -3385,9 +3448,65 @@
 
             buildDots();
         })();
+
         // ═════════════════════════════════════════════════════════════
-        // END SURVEY CONTROLLER
+        // LEARN MORE INTRODUCTION VIDEO MODAL CONTROLLER
         // ═════════════════════════════════════════════════════════════
+        (function() {
+            const learnMoreBtn = document.getElementById('learnMoreBtn') || document.querySelector('.btn-learn');
+            const learnMoreModal = document.getElementById('learnMoreModal');
+            const introVideoPlayer = document.getElementById('introVideoPlayer');
+            const closeLearnMoreModalX = document.getElementById('closeLearnMoreModalX');
+            const closeLearnMoreBtn = document.getElementById('closeLearnMoreBtn');
+
+            function openLearnMoreVideo() {
+                if (!learnMoreModal) return;
+                learnMoreModal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+                if (introVideoPlayer) {
+                    introVideoPlayer.currentTime = 0;
+                    introVideoPlayer.play().catch(e => console.log('Autoplay policy deferred playback:', e));
+                }
+            }
+
+            function closeLearnMoreVideo() {
+                if (!learnMoreModal) return;
+                learnMoreModal.classList.remove('show');
+                document.body.style.overflow = '';
+                if (introVideoPlayer) {
+                    introVideoPlayer.pause();
+                }
+            }
+
+            if (learnMoreBtn) {
+                learnMoreBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openLearnMoreVideo();
+                });
+            }
+
+            if (closeLearnMoreModalX) {
+                closeLearnMoreModalX.addEventListener('click', closeLearnMoreVideo);
+            }
+
+            if (closeLearnMoreBtn) {
+                closeLearnMoreBtn.addEventListener('click', closeLearnMoreVideo);
+            }
+
+            if (learnMoreModal) {
+                learnMoreModal.addEventListener('click', (e) => {
+                    if (e.target === learnMoreModal) {
+                        closeLearnMoreVideo();
+                    }
+                });
+            }
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && learnMoreModal && learnMoreModal.classList.contains('show')) {
+                    closeLearnMoreVideo();
+                }
+            });
+        })();
 
     </script>
 

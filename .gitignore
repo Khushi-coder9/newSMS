@@ -12,6 +12,13 @@ backend/node_modules/
 backend/.env
 backend/.env.local
 
+# Large media files (handled via direct server sync, exceeds GitHub 100MB limit)
+*.mp4
+*.mkv
+*.mov
+public/videos/
+videos/
+
 # Python
 __pycache__/
 *.pyc
