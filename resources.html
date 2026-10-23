@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Psychoeducational Resource Hub | Student Mind Support</title>
-    <meta name="description" content="Watch inspirational speeches, psychological coping guides, and wisdom shorts inside Student Mind Support. Play directly on-site without any external redirection.">
+    <meta name="description" content="Watch inspirational speeches, listen to relaxation audios and breathing guides, and read clinically-grounded mental wellbeing manuals on-site without any external redirection.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +18,7 @@
             --primary-glow: rgba(109, 77, 255, 0.25);
             --emerald: #10b981;
             --emerald-light: #ecfdf5;
+            --cyan: #06b6d4;
             --amber: #f59e0b;
             --rose: #f43f5e;
             --heading: #1c1848;
@@ -57,7 +58,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.94);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border);
@@ -248,7 +249,7 @@
         .resources-hero {
             background: linear-gradient(135deg, #f6f3ff 0%, #ede8ff 50%, #f4fbff 100%);
             border-bottom: 1px solid #e7e2fa;
-            padding: 48px 24px 36px;
+            padding: 44px 24px 32px;
             position: relative;
             overflow: hidden;
         }
@@ -301,7 +302,7 @@
         }
 
         .hero-title {
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 800;
             color: var(--heading);
             letter-spacing: -0.03em;
@@ -316,30 +317,65 @@
         }
 
         .hero-subtitle {
-            font-size: 16px;
+            font-size: 15.5px;
             color: var(--text-muted);
-            max-width: 760px;
+            max-width: 780px;
             line-height: 1.6;
-            margin-bottom: 26px;
+            margin-bottom: 24px;
         }
 
-        .hero-features-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--heading);
-        }
-
-        .hero-feat-item {
+        /* ── Hub 3-Pillar Section Tabs ────────────────────────────────── */
+        .hub-pillars-nav {
             display: flex;
             align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 6px 12px;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .hub-pillar-btn {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1.5px solid #dcd5ff;
+            color: var(--heading);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 10px 20px;
             border-radius: 999px;
-            border: 1px solid rgba(220, 213, 255, 0.7);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hub-pillar-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 6px 18px rgba(109, 77, 255, 0.15);
+        }
+
+        .hub-pillar-btn.active {
+            background: linear-gradient(135deg, #6d4dff, #512bd9);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        .hub-pillar-btn .count-badge {
+            background: rgba(0, 0, 0, 0.08);
+            font-size: 11.5px;
+            padding: 3px 9px;
+            border-radius: 99px;
+            font-weight: 800;
+        }
+
+        .hub-pillar-btn.active .count-badge {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
         }
 
         /* ── Controls Section (Search & Filter Pills) ─────────────────── */
@@ -468,15 +504,52 @@
             color: #ffffff;
         }
 
-        /* ── Videos Grid ──────────────────────────────────────────────── */
-        .videos-main-wrap {
+        /* ── Section Wrapper Styles ───────────────────────────────────── */
+        .resource-section-panel {
+            display: none;
             max-width: 1240px;
             margin: 24px auto 60px;
             padding: 0 24px;
-            flex: 1;
             width: 100%;
         }
 
+        .resource-section-panel.active {
+            display: block;
+            animation: fadeInSection 0.3s ease;
+        }
+
+        @keyframes fadeInSection {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1.5px solid var(--border);
+        }
+
+        .section-header-banner h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--heading);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header-banner p {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* ── Videos Grid ──────────────────────────────────────────────── */
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -502,16 +575,14 @@
             border-color: #d8d0f8;
         }
 
-        /* Card Thumbnail Wrapper */
         .thumb-wrap {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 ratio */
+            padding-top: 56.25%;
             background: #110e26;
             overflow: hidden;
         }
 
-        /* Shorts card has slightly taller preview indicator */
         .video-card.is-short .thumb-wrap {
             padding-top: 70%;
         }
@@ -530,7 +601,6 @@
             transform: scale(1.06);
         }
 
-        /* Play Button Overlay */
         .play-overlay {
             position: absolute;
             inset: 0;
@@ -557,7 +627,7 @@
             font-size: 20px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
             transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            padding-left: 3px; /* visual center for play arrow */
+            padding-left: 3px;
         }
 
         .video-card:hover .play-btn-circle {
@@ -605,7 +675,6 @@
             gap: 4px;
         }
 
-        /* Card Content */
         .card-content {
             padding: 16px 18px 18px;
             display: flex;
@@ -678,32 +747,689 @@
             color: #ffffff;
         }
 
-        .no-results-box {
-            text-align: center;
-            padding: 60px 20px;
-            background: #ffffff;
+        /* ── SECTION 1: MENTAL WELLBEING AUDIOS STYLES ────────────────── */
+        .audio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 22px;
+            margin-bottom: 30px;
+        }
+
+        .audio-card {
+            background: var(--card-bg);
             border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            grid-column: 1 / -1;
+            border: 1.5px solid var(--border);
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .audio-card:hover {
+            transform: translateY(-4px);
+            border-color: #c4b5fd;
+            box-shadow: var(--shadow-md);
+        }
+
+        .audio-card.is-playing {
+            border-color: var(--primary);
+            background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+            box-shadow: 0 10px 28px rgba(109, 77, 255, 0.16);
+        }
+
+        .audio-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .audio-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ede8ff, #d8cefe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(109, 77, 255, 0.12);
+        }
+
+        .audio-meta-wrap {
+            flex: 1;
+        }
+
+        .audio-category-badge {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        .audio-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--heading);
+            line-height: 1.3;
+        }
+
+        .audio-duration-pill {
+            background: #f1f0f7;
+            color: #635f83;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 99px;
+            white-space: nowrap;
+        }
+
+        .audio-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .audio-card-action {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid #f2effa;
+        }
+
+        .btn-play-audio {
+            background: var(--heading);
+            color: #ffffff;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-play-audio:hover {
+            background: var(--primary);
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .audio-card.is-playing .btn-play-audio {
+            background: var(--primary);
+        }
+
+        /* Soundwave animation */
+        .equalizer-wave {
             display: none;
+            align-items: center;
+            gap: 3px;
+            height: 18px;
         }
 
-        .no-results-icon {
-            font-size: 48px;
+        .audio-card.is-playing .equalizer-wave {
+            display: flex;
+        }
+
+        .eq-bar {
+            width: 3.5px;
+            height: 100%;
+            background: var(--primary);
+            border-radius: 99px;
+            animation: bounceWave 0.8s ease-in-out infinite alternate;
+        }
+
+        .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+        .eq-bar:nth-child(4) { animation-delay: 0.1s; }
+
+        @keyframes bounceWave {
+            0% { height: 4px; }
+            100% { height: 18px; }
+        }
+
+        /* ── Breathing Pacer Feature Box ─────────────────────────────── */
+        .breath-pacer-card {
+            background: linear-gradient(135deg, #1c1848 0%, #2a2266 100%);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .breath-pacer-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(109, 77, 255, 0.35) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .breath-pacer-info {
+            max-width: 520px;
+            z-index: 1;
+        }
+
+        .breath-pacer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            font-size: 11.5px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 99px;
             margin-bottom: 12px;
+            color: #d1c8ff;
         }
 
-        .no-results-title {
+        .breath-pacer-title {
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .breath-pacer-desc {
+            font-size: 14px;
+            color: #b7b0d9;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .breath-circle-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 1;
+        }
+
+        .breath-visual-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(109, 77, 255, 0.7) 0%, rgba(78, 205, 196, 0.5) 100%);
+            box-shadow: 0 0 35px rgba(78, 205, 196, 0.4);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 800;
+            font-size: 15px;
+            color: #ffffff;
+            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .breath-visual-circle.inhale {
+            transform: scale(1.3);
+            box-shadow: 0 0 50px rgba(109, 77, 255, 0.8);
+        }
+
+        .breath-visual-circle.hold {
+            transform: scale(1.3);
+            border-color: #ffd166;
+        }
+
+        .breath-visual-circle.exhale {
+            transform: scale(0.9);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .breath-step-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #dcd7ff;
+            letter-spacing: 0.03em;
+        }
+
+        /* ── Floating Interactive Audio Player Bar ───────────────────── */
+        .floating-audio-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            width: calc(100% - 40px);
+            max-width: 900px;
+            background: rgba(28, 24, 72, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 12px 20px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            color: #ffffff;
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .floating-audio-bar.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .audio-bar-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6d4dff, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .audio-bar-info {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .audio-bar-title {
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .audio-bar-sub {
+            font-size: 11.5px;
+            color: #b0a9d8;
+        }
+
+        .audio-bar-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-audio-ctl {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .btn-audio-ctl:hover {
+            color: #4ecdc4;
+            transform: scale(1.1);
+        }
+
+        .btn-audio-play-main {
+            width: 38px;
+            height: 38px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn-audio-play-main:hover {
+            background: #8062ff;
+            color: #fff;
+        }
+
+        .audio-progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1.5;
+            min-width: 180px;
+        }
+
+        .audio-time-label {
+            font-size: 11.5px;
+            color: #b2abdb;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .audio-scrub-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .audio-scrub-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+
+        .btn-close-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #ffffff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-close-bar:hover {
+            background: #f43f5e;
+        }
+
+        /* ── SECTION 2: MENTAL WELLBEING GUIDES STYLES ────────────────── */
+        .guides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .guide-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+
+        .guide-card:hover {
+            transform: translateY(-5px);
+            border-color: #c4b5fd;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .guide-top-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .guide-category-tag {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .guide-read-time {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 99px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .guide-title {
             font-size: 18px;
             font-weight: 800;
             color: var(--heading);
+            line-height: 1.35;
+        }
+
+        .guide-desc {
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .guide-takeaways-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #fbfaff;
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            border: 1px dashed #e2dcff;
+        }
+
+        .guide-takeaways-list li {
+            font-size: 12.5px;
+            color: #55507a;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.45;
+        }
+
+        .guide-takeaways-list li::before {
+            content: '✓';
+            color: var(--emerald);
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .guide-langs-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        .guide-lang-chip {
+            background: #f1f0f7;
+            color: #4a456e;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .guide-footer-action {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 14px;
+            border-top: 1px solid #f2effa;
+        }
+
+        .btn-read-guide {
+            background: var(--heading);
+            color: #ffffff;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .guide-card:hover .btn-read-guide {
+            background: var(--primary);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        /* ── GUIDE FULL READER MODAL ─────────────────────────────────── */
+        .guide-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(14, 11, 38, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .guide-modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .guide-reader-card {
+            background: #ffffff;
+            border-radius: 22px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            width: 100%;
+            max-width: 820px;
+            max-height: 88vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.96);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .guide-modal-overlay.open .guide-reader-card {
+            transform: scale(1);
+        }
+
+        .reader-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1.5px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            background: #faf9fd;
+        }
+
+        .reader-close-btn {
+            background: #ede9fe;
+            border: none;
+            color: var(--primary);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .reader-close-btn:hover {
+            background: #f43f5e;
+            color: #ffffff;
+        }
+
+        .reader-body {
+            padding: 26px 28px;
+            overflow-y: auto;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #3b375b;
+        }
+
+        .reader-body h3 {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--heading);
+            margin: 22px 0 10px;
+        }
+
+        .reader-body h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 16px 0 8px;
+        }
+
+        .reader-body p {
+            margin-bottom: 14px;
+        }
+
+        .reader-callout-box {
+            background: #f5f2ff;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: 14px 18px;
+            margin: 18px 0;
+            font-size: 14px;
+            color: #383168;
+        }
+
+        .reader-step-card {
+            background: #ffffff;
+            border: 1.5px solid #e7e2fa;
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            margin-bottom: 12px;
+        }
+
+        .reader-step-num {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 99px;
             margin-bottom: 6px;
         }
 
-        .no-results-desc {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
+        .reader-footer {
+            padding: 14px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #faf9fd;
         }
 
         /* ── IN-SITE CINEMA VIDEO PLAYER MODAL ───────────────────────── */
@@ -745,7 +1471,6 @@
             transform: scale(1);
         }
 
-        /* Modal adapted for YouTube Shorts (Vertical 9:16 layout) */
         .cinema-player-card.is-short-mode {
             max-width: 440px;
         }
@@ -802,17 +1527,15 @@
             transform: scale(1.08);
         }
 
-        /* Video Frame Box */
         .iframe-container {
             position: relative;
             width: 100%;
             background: #000000;
-            padding-top: 56.25%; /* 16:9 widescreen */
+            padding-top: 56.25%;
         }
 
-        /* Shorts Container ratio */
         .cinema-player-card.is-short-mode .iframe-container {
-            padding-top: 155%; /* 9:16 vertical ratio */
+            padding-top: 155%;
             max-height: 72vh;
         }
 
@@ -825,7 +1548,6 @@
             border: none;
         }
 
-        /* Player Details & Navigation Footer */
         .player-info-footer {
             padding: 16px 20px;
             background: #17142b;
@@ -893,6 +1615,34 @@
             color: #7b749d;
         }
 
+        .no-results-box {
+            text-align: center;
+            padding: 60px 20px;
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            grid-column: 1 / -1;
+            display: none;
+        }
+
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .no-results-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--heading);
+            margin-bottom: 6px;
+        }
+
+        .no-results-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
         /* ── Site Footer ──────────────────────────────────────────────── */
         .site-footer {
             background: #ffffff;
@@ -939,14 +1689,18 @@
             .nav-links { display: none; }
             .mobile-menu-btn { display: flex; }
             .hero-title { font-size: 28px; }
-            .video-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+            .video-grid, .audio-grid, .guides-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+            .breath-pacer-card { flex-direction: column; text-align: center; }
+            .breath-circle-wrap { margin: 0 auto; }
         }
 
         @media (max-width: 600px) {
             .hero-title { font-size: 24px; }
-            .video-grid { grid-template-columns: 1fr; }
+            .video-grid, .audio-grid, .guides-grid { grid-template-columns: 1fr; }
             .search-and-stats { flex-direction: column; align-items: stretch; }
             .search-box-wrap { max-width: 100%; }
+            .floating-audio-bar { flex-wrap: wrap; bottom: 10px; padding: 12px; }
+            .audio-progress-wrap { order: 3; width: 100%; min-width: 100%; }
         }
     </style>
 </head>
@@ -994,7 +1748,7 @@
                 <a href="index.html" class="mobile-nav-item">🏠 Home</a>
                 <a href="chat.html" class="mobile-nav-item">💬 AI First-Aid Chat</a>
                 <a href="book.html" class="mobile-nav-item">📅 Book Appointment</a>
-                <a href="resources.html" class="mobile-nav-item active">📚 Resource Hub (25 Videos)</a>
+                <a href="resources.html" class="mobile-nav-item active">📚 Resource Hub (Videos, Audios & Guides)</a>
                 <a href="peer-support.html" class="mobile-nav-item">🤝 Peer Support & Community</a>
                 <a href="dashboard.html" class="mobile-nav-item">📊 Wellness Dashboard</a>
             </div>
@@ -1006,16 +1760,28 @@
         <div class="hero-inner">
             <div class="hero-pill-badge">
                 <span class="dot"></span>
-                <span>Psychoeducational Video Hub • 25 Curated Videos</span>
+                <span>Psychoeducational Resource Hub • 3 Core Pillars</span>
             </div>
-            <h1 class="hero-title">Mindset, Resilience & <span>Growth Library</span></h1>
-            <p class="hero-subtitle">Handpicked motivational speeches, psychological coping guides, and student wisdom shorts. Watch directly inside Student Mind Support without any external redirection.</p>
+            <h1 class="hero-title">Mental Wellbeing & <span>Growth Library</span></h1>
+            <p class="hero-subtitle">Handpicked motivational speeches, therapeutic relaxation audios, and evidence-based mental wellbeing guides — all interactive and playable directly inside your campus safe space.</p>
 
-            <div class="hero-features-bar">
-                <div class="hero-feat-item">✨ <strong>100% In-Site Player</strong> (No YouTube redirect)</div>
-                <div class="hero-feat-item">⚡ <strong>16 Inspiring Shorts</strong> (Quick 60s bursts)</div>
-                <div class="hero-feat-item">🎥 <strong>9 Deep-Dive Speeches</strong> (Life-changing stories)</div>
-                <div class="hero-feat-item">🌿 <strong>Hindi & English</strong> Support</div>
+            <!-- 3-Pillar Section Tabs -->
+            <div class="hub-pillars-nav">
+                <button class="hub-pillar-btn active" data-pillar="videos" onclick="switchPillar('videos')">
+                    <span>🎥</span>
+                    <span>Motivational Videos</span>
+                    <span class="count-badge">25 Videos</span>
+                </button>
+                <button class="hub-pillar-btn" data-pillar="audios" onclick="switchPillar('audios')">
+                    <span>🎧</span>
+                    <span>Wellbeing Audios</span>
+                    <span class="count-badge">8 Tracks</span>
+                </button>
+                <button class="hub-pillar-btn" data-pillar="guides" onclick="switchPillar('guides')">
+                    <span>📖</span>
+                    <span>Wellbeing Guides</span>
+                    <span class="count-badge">6 Guides</span>
+                </button>
             </div>
         </div>
     </section>
@@ -1025,44 +1791,176 @@
         <div class="search-and-stats">
             <div class="search-box-wrap">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Search videos, speakers (e.g. 12th Fail, Einstein, Jaya Kishori)...">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search resources, topics, speakers, guides...">
                 <button id="clearSearchBtn" class="search-clear-btn">✕</button>
             </div>
             <div class="results-count-text" id="resultsCount">Showing 25 resources</div>
         </div>
 
-        <!-- Filter Pills Bar -->
+        <!-- Dynamic Filter Pills (Updates per active pillar) -->
         <div class="filter-pills-wrap" id="filterPills">
-            <button class="filter-pill active" data-filter="all">🌟 All Videos <span class="count">25</span></button>
-            <button class="filter-pill" data-filter="short">⚡ Quick Shorts <span class="count">16</span></button>
-            <button class="filter-pill" data-filter="video">🎥 Deep Videos <span class="count">9</span></button>
-            <button class="filter-pill" data-filter="grit">🔥 Student Grit & Restart <span class="count">3</span></button>
-            <button class="filter-pill" data-filter="motivation">💪 Resilience & Courage <span class="count">5</span></button>
-            <button class="filter-pill" data-filter="mindset">🧠 Wisdom & Mindset <span class="count">5</span></button>
-            <button class="filter-pill" data-filter="relationships">💛 Relationships & Love <span class="count">7</span></button>
-            <button class="filter-pill" data-filter="calm">🌙 Sleep & Positivity <span class="count">3</span></button>
+            <!-- Populated dynamically via JS -->
         </div>
     </section>
 
-    <!-- Video Cards Main Grid -->
-    <main class="videos-main-wrap">
+    <!-- ======================================================== -->
+    <!-- PILLAR 1: MOTIVATIONAL VIDEOS & SHORTS                    -->
+    <!-- ======================================================== -->
+    <section class="resource-section-panel active" id="pillar-videos">
+        <div class="section-header-banner">
+            <div>
+                <h2><span>🎥</span> Curated Speeches & Motivational Shorts</h2>
+                <p>25 inspirational talks, student grit lessons, and psychological wisdom clips with 100% in-site cinema player.</p>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:var(--emerald);background:var(--emerald-light);padding:4px 12px;border-radius:99px;">
+                ⚡ Zero YouTube Redirection
+            </span>
+        </div>
+
         <div class="video-grid" id="videoGrid">
             <!-- Populated dynamically via JS -->
         </div>
 
-        <!-- Empty State (No Search Results) -->
-        <div class="no-results-box" id="noResultsBox">
+        <div class="no-results-box" id="noVideosBox">
             <div class="no-results-icon">🔎</div>
-            <h3 class="no-results-title">No matching resources found</h3>
-            <p class="no-results-desc">Try searching for other keywords like "speech", "quotes", "stress", or reset filters.</p>
+            <h3 class="no-results-title">No matching videos found</h3>
+            <p class="no-results-desc">Try other search terms or reset filters.</p>
             <button class="filter-pill active" onclick="resetSearchAndFilters()">Reset Filters</button>
         </div>
-    </main>
+    </section>
 
-    <!-- IN-SITE CINEMA VIDEO PLAYER MODAL -->
+    <!-- ======================================================== -->
+    <!-- PILLAR 2: MENTAL WELLBEING AUDIOS & RELAXATION SOUNDSCAPES -->
+    <!-- ======================================================== -->
+    <section class="resource-section-panel" id="pillar-audios">
+        <div class="section-header-banner">
+            <div>
+                <h2><span>🎧</span> Mental Wellbeing Audios & Ambient Soundscapes</h2>
+                <p>Therapeutic relaxation audio, 4-7-8 breathing cues, sleep body scans, and lo-fi study flow.</p>
+            </div>
+            <button class="btn-play-audio" onclick="toggleBreathPacer()" style="background:var(--primary);padding:6px 14px;font-size:12.5px;">
+                🌬️ Open 4-7-8 Breath Pacer
+            </button>
+        </div>
+
+        <!-- Interactive 4-7-8 Breathing Pacer Banner Card -->
+        <div class="breath-pacer-card" id="breathPacerCard">
+            <div class="breath-pacer-info">
+                <div class="breath-pacer-badge">🌿 Clinical Vagus Nerve Exercise</div>
+                <h3 class="breath-pacer-title">4-7-8 Anti-Panic Breathing Guide</h3>
+                <p class="breath-pacer-desc">Inhale quietly through your nose for 4s, hold your breath for 7s, and exhale forcefully through your mouth for 8s. Clinically proven to reduce heart rate and abort exam panic within 3 cycles.</p>
+                <div style="display:flex;gap:12px;align-items:center;">
+                    <button class="btn-auth" id="btnToggleBreathGuide" onclick="startBreathGuideCycle()" style="background:#ffffff;color:var(--primary);font-weight:800;padding:10px 22px;">
+                        ▶ Start Guided Pacer
+                    </button>
+                    <span id="breathCycleStatus" style="font-size:13px;color:#dcd7ff;font-weight:600;">Click to begin</span>
+                </div>
+            </div>
+
+            <div class="breath-circle-wrap">
+                <div class="breath-visual-circle" id="breathVisualCircle">
+                    Breathe
+                </div>
+                <span class="breath-step-label" id="breathStepLabel">Ready</span>
+            </div>
+        </div>
+
+        <!-- Audio Tracks Grid -->
+        <div class="audio-grid" id="audioGrid">
+            <!-- Populated dynamically via JS -->
+        </div>
+
+        <div class="no-results-box" id="noAudiosBox">
+            <div class="no-results-icon">🎧</div>
+            <h3 class="no-results-title">No matching audios found</h3>
+            <p class="no-results-desc">Try searching for rain, breathing, study, or reset filters.</p>
+            <button class="filter-pill active" onclick="resetSearchAndFilters()">Reset Filters</button>
+        </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- PILLAR 3: MENTAL WELLBEING GUIDES & CLINICAL TOOLKITS     -->
+    <!-- ======================================================== -->
+    <section class="resource-section-panel" id="pillar-guides">
+        <div class="section-header-banner">
+            <div>
+                <h2><span>📖</span> Mental Wellbeing Guides & Self-Help Toolkits</h2>
+                <p>Evidence-based psychoeducational manuals for panic grounding, study burnout, sleep hygiene, and crisis support.</p>
+            </div>
+            <div class="guide-langs-row" style="font-size:12px;font-weight:700;">
+                <span>Available in:</span>
+                <span class="guide-lang-chip">English</span>
+                <span class="guide-lang-chip">हिंदी</span>
+                <span class="guide-lang-chip">தமிழ்</span>
+                <span class="guide-lang-chip">తెలుగు</span>
+                <span class="guide-lang-chip">मराठी</span>
+            </div>
+        </div>
+
+        <!-- Guides Grid -->
+        <div class="guides-grid" id="guidesGrid">
+            <!-- Populated dynamically via JS -->
+        </div>
+
+        <div class="no-results-box" id="noGuidesBox">
+            <div class="no-results-icon">📖</div>
+            <h3 class="no-results-title">No matching guides found</h3>
+            <p class="no-results-desc">Try searching for anxiety, burnout, sleep, or reset filters.</p>
+            <button class="filter-pill active" onclick="resetSearchAndFilters()">Reset Filters</button>
+        </div>
+    </section>
+
+    <!-- ── FLOATING INTERACTIVE AUDIO PLAYER BAR ────────────────────── -->
+    <div class="floating-audio-bar" id="floatingAudioBar">
+        <div class="audio-bar-thumb" id="audioBarThumb">🎧</div>
+        <div class="audio-bar-info">
+            <div class="audio-bar-title" id="audioBarTitle">Audio Track</div>
+            <div class="audio-bar-sub" id="audioBarSub">Therapeutic Soundscape</div>
+        </div>
+        <div class="audio-bar-controls">
+            <button class="btn-audio-ctl" id="btnAudioRewind" title="Rewind 10s">↺</button>
+            <button class="btn-audio-ctl btn-audio-play-main" id="btnAudioMainPlay" title="Play/Pause">▶</button>
+            <button class="btn-audio-ctl" id="btnAudioLoop" title="Loop Track">🔁</button>
+        </div>
+        <div class="audio-progress-wrap">
+            <span class="audio-time-label" id="audioCurrentTime">00:00</span>
+            <input type="range" class="audio-scrub-slider" id="audioScrubSlider" min="0" max="100" value="0">
+            <span class="audio-time-label" id="audioTotalTime">05:00</span>
+        </div>
+        <button class="btn-close-bar" id="btnCloseAudioBar" title="Stop & Close Player">✕</button>
+    </div>
+
+    <!-- ── GUIDE FULL READER MODAL ─────────────────────────────────── -->
+    <div class="guide-modal-overlay" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="readerGuideTitle">
+        <div class="guide-reader-card">
+            <div class="reader-header">
+                <div>
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                        <span style="font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.04em;" id="readerCategoryTag">CLINICAL GUIDE</span>
+                        <span class="guide-read-time" id="readerReadTime">5 min read</span>
+                    </div>
+                    <h2 style="font-size:20px;font-weight:800;color:var(--heading);line-height:1.3;" id="readerGuideTitle">Guide Title</h2>
+                </div>
+                <button class="reader-close-btn" id="readerCloseBtn" title="Close guide (Esc)">✕</button>
+            </div>
+
+            <div class="reader-body" id="readerBodyContent">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <div class="reader-footer">
+                <span style="font-size:12px;color:var(--text-muted);">Student Mind Support • Campus Psychoeducational Series</span>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-auth" onclick="window.print()" style="font-size:12px;padding:6px 14px;">🖨️ Print / Save PDF</button>
+                    <button class="btn-read-guide" onclick="closeGuideModal()" style="font-size:12px;padding:6px 14px;">Done Reading ✓</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── IN-SITE CINEMA VIDEO PLAYER MODAL ───────────────────────── -->
     <div class="cinema-modal-overlay" id="cinemaModal" role="dialog" aria-modal="true" aria-labelledby="playerTitle">
         <div class="cinema-player-card" id="cinemaCard">
-            <!-- Player Top Bar -->
             <div class="player-top-bar">
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span class="player-badge-type" id="playerBadgeType">⚡ Short</span>
@@ -1071,7 +1969,6 @@
                 <button class="player-close-btn" id="playerCloseBtn" title="Close video (Esc)">✕</button>
             </div>
 
-            <!-- YouTube Iframe Container (Zero Redirection) -->
             <div class="iframe-container" id="iframeContainer">
                 <iframe id="videoIframe"
                     src=""
@@ -1081,7 +1978,6 @@
                 </iframe>
             </div>
 
-            <!-- Player Info & Controls Footer -->
             <div class="player-info-footer">
                 <div class="player-title-row">
                     <div>
@@ -1107,7 +2003,7 @@
         <div class="footer-inner">
             <div class="footer-left">
                 <strong>Student Mind Support</strong> • Safe, Confidential Psychoeducational Space
-                <div style="font-size:11.5px;margin-top:4px;">All videos play securely on-site via YouTube Embedded Player API for educational & wellness support.</div>
+                <div style="font-size:11.5px;margin-top:4px;">In-site video playback, procedural relaxation audio soundscapes, and certified mental health guides.</div>
             </div>
             <ul class="footer-links">
                 <li><a href="index.html">Home</a></li>
@@ -1122,9 +2018,11 @@
     <!-- Site Presence & Notifications Script -->
     <script src="site-presence.js"></script>
 
-    <!-- Videos Data & Hub Logic -->
+    <!-- Unified Resources Logic: Videos, Audios & Guides -->
     <script>
-        // ── 25 CURATED PSYCHOEDUCATIONAL VIDEOS ─────────────────────────
+        // =========================================================================
+        // DATA: 25 CURATED MOTIVATIONAL VIDEOS & SHORTS
+        // =========================================================================
         const VIDEO_RESOURCES = [
             {
                 id: "ocaZ0J2pj2g",
@@ -1378,43 +2276,437 @@
             }
         ];
 
-        // State Management
+        // =========================================================================
+        // DATA: MENTAL WELLBEING AUDIOS (SECTION #1)
+        // =========================================================================
+        const AUDIO_RESOURCES = [
+            {
+                id: "audio-478",
+                title: "4-7-8 Guided Anti-Panic Breathing",
+                icon: "🌬️",
+                category: "breathing",
+                categoryName: "Breathing & Anti-Panic",
+                duration: "05:00",
+                durationSec: 300,
+                desc: "Clinical parasympathetic nervous system regulator. Calms racing heartbeat and aborts acute exam anxiety.",
+                soundType: "chimes"
+            },
+            {
+                id: "audio-sleep",
+                title: "Deep Sleep Body Scan & Delta Drift",
+                icon: "😴",
+                category: "sleep",
+                categoryName: "Sleep & Insomnia",
+                duration: "10:00",
+                durationSec: 600,
+                desc: "Progressive neuromuscular tension release combined with soft pink noise for night-owl students.",
+                soundType: "sleep_waves"
+            },
+            {
+                id: "audio-lofi",
+                title: "Midnight Library Lo-Fi Flow",
+                icon: "📚",
+                category: "focus",
+                categoryName: "Focus & Study",
+                duration: "Loop",
+                durationSec: 9999,
+                desc: "Gentle rhythmic lo-fi study pulse to drown out hostel noise and enter sustained cognitive flow.",
+                soundType: "lofi"
+            },
+            {
+                id: "audio-bowl",
+                title: "432Hz Harmonic Singing Bowl Reset",
+                icon: "🧘",
+                category: "meditation",
+                categoryName: "Meditation & Calm",
+                duration: "08:00",
+                durationSec: 480,
+                desc: "Soothing acoustic harmonic resonance to alleviate mental fatigue after heavy exam revision.",
+                soundType: "bowl"
+            },
+            {
+                id: "audio-rain",
+                title: "Monsoon Rain on Dorm Window",
+                icon: "🌧️",
+                category: "nature",
+                categoryName: "Ambient Nature",
+                duration: "Loop",
+                durationSec: 9999,
+                desc: "Pure organic rainfall soundscape to quiet racing intrusive thoughts and reduce cognitive overload.",
+                soundType: "rain"
+            },
+            {
+                id: "audio-affirmations",
+                title: "Morning Exam Day Confidence Affirmations",
+                icon: "✨",
+                category: "affirmation",
+                categoryName: "Affirmations & Confidence",
+                duration: "04:30",
+                durationSec: 270,
+                desc: "Empowering mental reframing: shifting fear of judgment into self-trust, calmness, and clear recall.",
+                soundType: "affirmation"
+            },
+            {
+                id: "audio-river",
+                title: "Mountain Stream & Forest Birdsong",
+                icon: "🌲",
+                category: "nature",
+                categoryName: "Ambient Nature",
+                duration: "Loop",
+                durationSec: 9999,
+                desc: "Natural acoustic frequency proven to decrease salivary cortisol and restore attention fatigue.",
+                soundType: "stream"
+            },
+            {
+                id: "audio-exam-panic",
+                title: "5-Minute Emergency Hallway Calm",
+                icon: "🚨",
+                category: "breathing",
+                categoryName: "Breathing & Anti-Panic",
+                duration: "05:00",
+                durationSec: 300,
+                desc: "Rapid somatic de-escalation for shaking hands, tight chest, or dizziness 10 minutes before test time.",
+                soundType: "emergency_calm"
+            }
+        ];
+
+        // =========================================================================
+        // DATA: MENTAL WELLBEING GUIDES (SECTION #2)
+        // =========================================================================
+        const GUIDE_RESOURCES = [
+            {
+                id: "guide-exam-anxiety",
+                title: "The Exam Anxiety & Panic Attack Toolkit",
+                category: "anxiety",
+                categoryName: "Exam Anxiety & Panic",
+                readTime: "5 min read",
+                takeaways: [
+                    "5-4-3-2-1 Sensory Grounding to stop hyperventilation",
+                    "Replacing catastrophic self-talk with neutral grounding scripts",
+                    "What to do 30 minutes before entering the examination hall"
+                ],
+                desc: "A clinical step-by-step emergency manual to regulate panic, brain fog, and racing heartbeat before and during competitive exams.",
+                bodyHtml: `
+                    <div class="reader-callout-box">
+                        <strong>Clinical Insight:</strong> Exam anxiety is not a sign of low intelligence; it is an overactive fight-or-flight response. Your prefrontal cortex (responsible for memory recall) temporarily shuts down when adrenaline spikes. Our goal is to signal biological safety to your amygdala.
+                    </div>
+
+                    <h3>Step 1: The 5-4-3-2-1 Somatic Grounding Checklist</h3>
+                    <p>When you feel panic rising or your mind going blank, anchor your nervous system immediately using your 5 physical senses:</p>
+                    <div class="reader-step-card">
+                        <span class="reader-step-num">5</span> <strong>Acknowledge 5 things you can see:</strong> Look for details like a clock, pen color, desk grain, or light fixture.
+                    </div>
+                    <div class="reader-step-card">
+                        <span class="reader-step-num">4</span> <strong>Acknowledge 4 things you can physically touch:</strong> Feel the weight of your feet on the floor, the edge of the desk, or your cotton shirt.
+                    </div>
+                    <div class="reader-step-card">
+                        <span class="reader-step-num">3</span> <strong>Acknowledge 3 things you can hear:</strong> Notice the whir of the ceiling fan, pen scratching on paper, or distant traffic.
+                    </div>
+                    <div class="reader-step-card">
+                        <span class="reader-step-num">2</span> <strong>Acknowledge 2 things you can smell:</strong> Your eraser, fresh paper, or hand sanitizer.
+                    </div>
+                    <div class="reader-step-card">
+                        <span class="reader-step-num">1</span> <strong>Acknowledge 1 thing you can taste:</strong> Sip room-temperature water or notice the moisture in your mouth.
+                    </div>
+
+                    <h3>Step 2: Emergency 4-7-8 Breathing (The Vagus Reset)</h3>
+                    <p>Inhale through your nose for 4 counts. Hold with lungs relaxed for 7 counts. Release through slightly parted lips for 8 counts making a gentle whooshing sound. Repeat 3 times. The prolonged exhale stimulates the vagus nerve and drops your heart rate within 90 seconds.</p>
+
+                    <h3>Step 3: Cognitive Reframing Scripts</h3>
+                    <p>Swap out catastrophic anxiety chatter with evidence-based mental anchors:</p>
+                    <ul>
+                        <li><strong>Instead of:</strong> "I'm going to fail and ruin my entire semester."<br><strong>Tell yourself:</strong> "I feel nervous because I care. This is just adrenaline. I will tackle one question at a time."</li>
+                        <li><strong>Instead of:</strong> "My mind is totally blank, I forgot everything."<br><strong>Tell yourself:</strong> "My memory is stored in my brain. Taking 3 slow breaths will let blood flow back to my recall centers."</li>
+                    </ul>
+
+                    <h3>Step 4: The 30-Minute Hallway Protocol</h3>
+                    <p>Avoid standing in circles discussing what chapters people studied. Wear headphones listening to soft rain sounds or study lo-fi. Drink water and remind yourself: <em>Your worth is never defined by a single exam paper.</em></p>
+                `
+            },
+            {
+                id: "guide-burnout",
+                title: "Beating Academic Burnout & Procrastination",
+                category: "burnout",
+                categoryName: "Burnout & Energy",
+                readTime: "6 min read",
+                takeaways: [
+                    "Distinguishing nervous system depletion from laziness",
+                    "The 2-Minute Micro-Start Rule to eliminate task paralysis",
+                    "The 50/10 Focus Protocol for sustainable deep study"
+                ],
+                desc: "Why traditional time management fails when you are emotionally exhausted, and how to recover your motivation with self-compassion.",
+                bodyHtml: `
+                    <div class="reader-callout-box">
+                        <strong>Myth Busting:</strong> Procrastination is almost never laziness. It is emotional avoidance triggered by fear of failure, perfectionism, or cognitive exhaustion.
+                    </div>
+
+                    <h3>1. The Burnout Spectrum: Nervous System Depletion</h3>
+                    <p>When you sit at your desk staring at notes for 4 hours unable to absorb a single line, your brain has entered conservation mode. Forcing yourself through shame and self-hatred only deepens burnout.</p>
+
+                    <h3>2. The 2-Minute Micro-Start Rule</h3>
+                    <p>The hardest step is overcoming the high activation energy of starting a massive chapter. Tell yourself:</p>
+                    <div class="reader-callout-box">
+                        "I am only going to open the notebook and read for exactly 2 minutes. After 2 minutes, I am 100% permitted to stop if I want."
+                    </div>
+                    <p>In 85% of cases, once the initial friction barrier is breached, the brain's natural momentum carries you forward.</p>
+
+                    <h3>3. The 50/10 Protocol for Deep Focus</h3>
+                    <ul>
+                        <li><strong>50 Minutes:</strong> Work in full airplane mode on one single concept.</li>
+                        <li><strong>10 Minutes:</strong> Non-screen recovery (drink water, do shoulder rolls, look outside at distant greenery to rest eye muscles).</li>
+                    </ul>
+
+                    <h3>4. Eliminating the "Guilt of Resting"</h3>
+                    <p>Rest is not a luxury earned only after collapse; rest is basic mental hygiene. When you rest with guilt, your brain remains in high cortisol, meaning you get neither real work done nor real rejuvenation.</p>
+                `
+            },
+            {
+                id: "guide-sleep",
+                title: "Sleep Hygiene for Night-Owl Students",
+                category: "sleep",
+                categoryName: "Sleep & Circadian Health",
+                readTime: "5 min read",
+                takeaways: [
+                    "The 10-3-2-1-0 Sleep Formula for hostel students",
+                    "How blue light suppresses melatonin release by up to 90 minutes",
+                    "The Brain Dump Journaling method for racing thoughts at 2 AM"
+                ],
+                desc: "Fixing erratic sleep cycles, dealing with hostel roommates, and sleeping deeply even during high-stress exam periods.",
+                bodyHtml: `
+                    <div class="reader-callout-box">
+                        <strong>Fact:</strong> Sleeping 7 hours enhances memory consolidation by over 40% compared to pulling all-nighters. When you sleep, your brain literally flushes metabolic waste and replays key study memories.
+                    </div>
+
+                    <h3>The 10-3-2-1-0 Sleep Formula</h3>
+                    <ul>
+                        <li><strong>10 Hours Before Bed:</strong> Cut off caffeine (tea, coffee, energy drinks). Caffeine has a 5-7 hour half-life.</li>
+                        <li><strong>3 Hours Before Bed:</strong> Finish heavy meals to allow digestion to settle.</li>
+                        <li><strong>2 Hours Before Bed:</strong> Stop intense revision and homework. Let your mind de-escalate.</li>
+                        <li><strong>1 Hour Before Bed:</strong> Disconnect from scrolling social media and switch phone screens to Night Shift / Warm Mode.</li>
+                        <li><strong>0 Times:</strong> Hit the snooze button in the morning — waking at the first alarm keeps your circadian rhythm crisp.</li>
+                    </ul>
+
+                    <h3>The 2 AM Brain Dump Journal</h3>
+                    <p>If you lie in bed staring at the ceiling with tomorrow's deadlines racing through your mind, keep a small notepad next to your bed. Write down every single task, fear, or reminder without filtering. Once it is physically on paper, tell your brain: <em>"It is stored safely; I do not need to hold it right now."</em></p>
+                `
+            },
+            {
+                id: "guide-imposter",
+                title: "Overcoming Imposter Syndrome & College Loneliness",
+                category: "imposter",
+                categoryName: "Self-Worth & Social Connection",
+                readTime: "5 min read",
+                takeaways: [
+                    "Why 70% of university students secretly feel like frauds",
+                    "The 'One Low-Stakes Conversation' habit to defeat isolation",
+                    "Separating your human worth from your grades and rank"
+                ],
+                desc: "How to stop comparing your private struggles to everyone else's public highlights, and build authentic friendships on campus.",
+                bodyHtml: `
+                    <div class="reader-callout-box">
+                        <strong>Reality Check:</strong> Everyone on campus looks like they have everything figured out on Instagram and LinkedIn. In reality, behind dorm doors, nearly every student battles self-doubt, homesickness, and loneliness.
+                    </div>
+
+                    <h3>1. The Imposter Distortion</h3>
+                    <p>Imposter syndrome makes you attribute your successes to 'luck' or 'easy questions' while attributing any small mistake to your 'inherent incompetence'. Start an <strong>Evidence Folder</strong>: save positive feedback from professors, kind notes from peers, and challenges you previously overcame.</p>
+
+                    <h3>2. The Low-Stakes Connection Habit</h3>
+                    <p>Loneliness cannot be solved by waiting for someone to notice you. Make it a daily ritual to initiate one low-stakes micro-interaction:</p>
+                    <ul>
+                        <li>"Hey, do you know which classroom Professor Sharma is lecturing in today?"</li>
+                        <li>"Great question you asked in seminar earlier!"</li>
+                        <li>"Are you going down to the canteen? Mind if I walk over with you?"</li>
+                    </ul>
+                    <p>Low-pressure questions build familiar safety before deep friendship blossoms.</p>
+                `
+            },
+            {
+                id: "guide-boundaries",
+                title: "Setting Healthy Boundaries with Family & Peers",
+                category: "relationships",
+                categoryName: "Relationships & Boundaries",
+                readTime: "4 min read",
+                takeaways: [
+                    "Word-for-word scripts to say 'No' politely without guilt",
+                    "Navigating parental academic pressure and comparison with cousins",
+                    "Protecting your study focus from chronic peer drama"
+                ],
+                desc: "How to protect your mental energy and study peace without being rude or damaging close relationships.",
+                bodyHtml: `
+                    <div class="reader-callout-box">
+                        <strong>Golden Rule:</strong> Boundaries are not walls to keep people out; they are clear doors that show where your responsibility ends and someone else's begins.
+                    </div>
+
+                    <h3>Scripts You Can Use Word-for-Word</h3>
+                    <div class="reader-step-card">
+                        <strong>To friends asking you to hang out when you need to study:</strong><br>
+                        <em>"I really value catching up with you, but I have a major deadline I need to protect tonight. Can we grab chai together on Saturday afternoon instead?"</em>
+                    </div>
+                    <div class="reader-step-card">
+                        <strong>To relatives comparing your marks to someone else:</strong><br>
+                        <em>"I respect your concern for my career. Right now, I'm focusing on my personal milestones and mental well-being, and I'd love your blessing for my journey."</em>
+                    </div>
+                    <div class="reader-step-card">
+                        <strong>To peers constantly unloading emotional venting:</strong><br>
+                        <em>"I hear how difficult things are for you, and I care about you. Right now, my own mental bandwidth is depleted, so I won't be able to give this the attention it deserves. Have you considered speaking to campus counsellor Dr. Sunita?"</em>
+                    </div>
+                `
+            },
+            {
+                id: "guide-firstaid",
+                title: "Psychological First-Aid: Helping a Friend in Distress",
+                category: "firstaid",
+                categoryName: "Crisis Support & Peer First-Aid",
+                readTime: "6 min read",
+                takeaways: [
+                    "The L.I.S.T.E.N. Protocol for acute student distress",
+                    "Phrases that heal vs toxic positivity phrases that hurt",
+                    "24/7 Verified Free Mental Health Helplines Directory"
+                ],
+                desc: "What to do when a roommate or friend expresses intense despair, panic, or thoughts of giving up. A vital campus guide.",
+                bodyHtml: `
+                    <div class="reader-callout-box">
+                        <strong>Emergency Helpline Directory (India):</strong><br>
+                        • <strong>Tele-MANAS (Govt of India):</strong> 14416 or 1800-891-4416 (24/7 Free & Confidential)<br>
+                        • <strong>KIRAN (Mental Health Helpline):</strong> 1800-599-0019<br>
+                        • <strong>Vandrevala Foundation Helpline:</strong> +91 9999 666 555<br>
+                        • <strong>AASRA Crisis Line:</strong> +91 98204 66726
+                    </div>
+
+                    <h3>The L.I.S.T.E.N. Protocol</h3>
+                    <ul>
+                        <li><strong>L - Look:</strong> Notice sudden withdrawal, skipped classes, unwashed clothes, or giving away prized possessions.</li>
+                        <li><strong>I - Inquire:</strong> Ask gently in private: <em>"Hey, I've noticed you seem weighed down recently. How have you really been feeling?"</em></li>
+                        <li><strong>S - Silence & Listen:</strong> Do not interrupt to give unsolicited advice. Silence allows them to process.</li>
+                        <li><strong>T - Take Seriously:</strong> Never dismiss thoughts of hopelessness with "Everyone has stress" or "Just be positive."</li>
+                        <li><strong>E - Encourage Support:</strong> Offer to walk together to the campus counselling center.</li>
+                        <li><strong>N - Never Keep Suicidal Intent a Secret:</strong> If a peer is in immediate physical danger, stay with them and notify campus health services or emergency helplines immediately.</li>
+                    </ul>
+                `
+            }
+        ];
+
+        // =========================================================================
+        // STATE MANAGEMENT
+        // =========================================================================
+        let currentPillar = 'videos'; // 'videos' | 'audios' | 'guides'
         let currentFilter = 'all';
         let searchQuery = '';
-        let currentlyPlayingIndex = -1;
+        let currentlyPlayingVideoIndex = -1;
         let filteredVideos = [...VIDEO_RESOURCES];
 
-        // DOM Elements
-        const videoGrid = document.getElementById('videoGrid');
-        const searchInput = document.getElementById('searchInput');
-        const clearSearchBtn = document.getElementById('clearSearchBtn');
-        const resultsCount = document.getElementById('resultsCount');
-        const noResultsBox = document.getElementById('noResultsBox');
+        // Audio Player State
+        let currentPlayingAudioId = null;
+        let isAudioPlaying = false;
+        let audioProgressTimer = null;
+        let simulatedAudioCurrentSec = 0;
+        let simulatedAudioTotalSec = 300;
+        let isAudioLooped = false;
+        let webAudioContext = null;
+        let ambientOscillator = null;
+        let ambientGainNode = null;
+        let noiseNode = null;
 
-        // Cinema Modal Elements
-        const cinemaModal = document.getElementById('cinemaModal');
-        const cinemaCard = document.getElementById('cinemaCard');
-        const videoIframe = document.getElementById('videoIframe');
-        const playerCloseBtn = document.getElementById('playerCloseBtn');
-        const playerBadgeType = document.getElementById('playerBadgeType');
-        const playerCategoryText = document.getElementById('playerCategoryText');
-        const playerTitle = document.getElementById('playerTitle');
-        const playerAuthor = document.getElementById('playerAuthor');
-        const playerDesc = document.getElementById('playerDesc');
-        const btnPrevVideo = document.getElementById('btnPrevVideo');
-        const btnNextVideo = document.getElementById('btnNextVideo');
+        // Breathing Pacer State
+        let isBreathPacerActive = false;
+        let breathPacerTimer = null;
 
-        // Render Cards
+        // =========================================================================
+        // PILLAR SWITCHING (VIDEOS / AUDIOS / GUIDES)
+        // =========================================================================
+        function switchPillar(pillarName) {
+            currentPillar = pillarName;
+            currentFilter = 'all';
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearchBtn').style.display = 'none';
+
+            // Update Hub Pillar Buttons
+            document.querySelectorAll('.hub-pillar-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-pillar') === pillarName);
+            });
+
+            // Update Visible Panels
+            document.querySelectorAll('.resource-section-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            const activePanel = document.getElementById(`pillar-${pillarName}`);
+            if (activePanel) activePanel.classList.add('active');
+
+            // Render Dynamic Filter Pills
+            renderFilterPillsForPillar();
+
+            // Render Panel Contents
+            if (pillarName === 'videos') renderVideos();
+            if (pillarName === 'audios') renderAudios();
+            if (pillarName === 'guides') renderGuides();
+        }
+
+        function renderFilterPillsForPillar() {
+            const container = document.getElementById('filterPills');
+            if (!container) return;
+
+            if (currentPillar === 'videos') {
+                container.innerHTML = `
+                    <button class="filter-pill active" data-filter="all">🌟 All Videos <span class="count">25</span></button>
+                    <button class="filter-pill" data-filter="short">⚡ Quick Shorts <span class="count">16</span></button>
+                    <button class="filter-pill" data-filter="video">🎥 Deep Videos <span class="count">9</span></button>
+                    <button class="filter-pill" data-filter="grit">🔥 Student Grit & Restart <span class="count">3</span></button>
+                    <button class="filter-pill" data-filter="motivation">💪 Resilience & Courage <span class="count">5</span></button>
+                    <button class="filter-pill" data-filter="mindset">🧠 Wisdom & Mindset <span class="count">5</span></button>
+                    <button class="filter-pill" data-filter="relationships">💛 Relationships & Love <span class="count">7</span></button>
+                    <button class="filter-pill" data-filter="calm">🌙 Sleep & Positivity <span class="count">3</span></button>
+                `;
+            } else if (currentPillar === 'audios') {
+                container.innerHTML = `
+                    <button class="filter-pill active" data-filter="all">🌟 All Audios <span class="count">8</span></button>
+                    <button class="filter-pill" data-filter="breathing">🌬️ Breathing & Anti-Panic <span class="count">2</span></button>
+                    <button class="filter-pill" data-filter="sleep">😴 Sleep & Insomnia <span class="count">1</span></button>
+                    <button class="filter-pill" data-filter="focus">📚 Focus & Lo-Fi Beats <span class="count">1</span></button>
+                    <button class="filter-pill" data-filter="nature">🌧️ Ambient Nature & Rain <span class="count">2</span></button>
+                    <button class="filter-pill" data-filter="meditation">🧘 432Hz Meditation <span class="count">1</span></button>
+                    <button class="filter-pill" data-filter="affirmation">✨ Affirmations <span class="count">1</span></button>
+                `;
+            } else if (currentPillar === 'guides') {
+                container.innerHTML = `
+                    <button class="filter-pill active" data-filter="all">🌟 All Guides <span class="count">6</span></button>
+                    <button class="filter-pill" data-filter="anxiety">⚡ Exam Panic & Stress <span class="count">1</span></button>
+                    <button class="filter-pill" data-filter="burnout">⏳ Burnout & Procrastination <span class="count">1</span></button>
+                    <button class="filter-pill" data-filter="sleep">🌙 Sleep Hygiene <span class="count">1</span></button>
+                    <button class="filter-pill" data-filter="imposter">🪞 Imposter Syndrome <span class="count">1</span></button>
+                    <button class="filter-pill" data-filter="relationships">🤝 Healthy Boundaries <span class="count">1</span></button>
+                    <button class="filter-pill" data-filter="firstaid">🚨 Crisis First-Aid <span class="count">1</span></button>
+                `;
+            }
+
+            // Bind click events on filter pills
+            container.querySelectorAll('.filter-pill[data-filter]').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    container.querySelectorAll('.filter-pill[data-filter]').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    currentFilter = pill.getAttribute('data-filter');
+                    if (currentPillar === 'videos') renderVideos();
+                    if (currentPillar === 'audios') renderAudios();
+                    if (currentPillar === 'guides') renderGuides();
+                });
+            });
+        }
+
+        // =========================================================================
+        // RENDER VIDEOS (PILLAR 1)
+        // =========================================================================
         function renderVideos() {
+            const videoGrid = document.getElementById('videoGrid');
+            const noVideosBox = document.getElementById('noVideosBox');
+            const resultsCount = document.getElementById('resultsCount');
+
             filteredVideos = VIDEO_RESOURCES.filter(video => {
-                // Category/Type Filter
                 if (currentFilter === 'short' && video.type !== 'short') return false;
                 if (currentFilter === 'video' && video.type !== 'video') return false;
                 if (currentFilter !== 'all' && currentFilter !== 'short' && currentFilter !== 'video') {
                     if (video.category !== currentFilter) return false;
                 }
 
-                // Search Query Filter
                 if (searchQuery.trim()) {
                     const q = searchQuery.toLowerCase();
                     const inTitle = video.title.toLowerCase().includes(q);
@@ -1428,18 +2720,17 @@
                 return true;
             });
 
-            // Update Counts
-            resultsCount.textContent = `Showing ${filteredVideos.length} ${filteredVideos.length === 1 ? 'resource' : 'resources'}`;
+            resultsCount.textContent = `Showing ${filteredVideos.length} ${filteredVideos.length === 1 ? 'video' : 'videos'}`;
 
             if (filteredVideos.length === 0) {
                 videoGrid.innerHTML = '';
-                noResultsBox.style.display = 'block';
+                noVideosBox.style.display = 'block';
                 return;
             }
 
-            noResultsBox.style.display = 'none';
+            noVideosBox.style.display = 'none';
 
-            videoGrid.innerHTML = filteredVideos.map((video, idx) => {
+            videoGrid.innerHTML = filteredVideos.map(video => {
                 const isShort = video.type === 'short';
                 const formatLabel = isShort ? '⚡ Short' : '🎥 Full Video';
                 const formatClass = isShort ? 'short' : 'video';
@@ -1469,15 +2760,426 @@
             }).join('');
         }
 
-        // Open Cinema Player (Plays directly on-site, NO REDIRECT)
+        // =========================================================================
+        // RENDER AUDIOS (PILLAR 2)
+        // =========================================================================
+        function renderAudios() {
+            const audioGrid = document.getElementById('audioGrid');
+            const noAudiosBox = document.getElementById('noAudiosBox');
+            const resultsCount = document.getElementById('resultsCount');
+
+            const filteredAudios = AUDIO_RESOURCES.filter(track => {
+                if (currentFilter !== 'all' && track.category !== currentFilter) return false;
+                if (searchQuery.trim()) {
+                    const q = searchQuery.toLowerCase();
+                    const inTitle = track.title.toLowerCase().includes(q);
+                    const inCategory = track.categoryName.toLowerCase().includes(q);
+                    const inDesc = track.desc.toLowerCase().includes(q);
+                    if (!inTitle && !inCategory && !inDesc) return false;
+                }
+                return true;
+            });
+
+            resultsCount.textContent = `Showing ${filteredAudios.length} ${filteredAudios.length === 1 ? 'audio track' : 'audio tracks'}`;
+
+            if (filteredAudios.length === 0) {
+                audioGrid.innerHTML = '';
+                noAudiosBox.style.display = 'block';
+                return;
+            }
+
+            noAudiosBox.style.display = 'none';
+
+            audioGrid.innerHTML = filteredAudios.map(track => {
+                const isPlayingThis = (currentPlayingAudioId === track.id && isAudioPlaying);
+
+                return `
+                    <div class="audio-card ${isPlayingThis ? 'is-playing' : ''}" id="card-${track.id}">
+                        <div class="audio-card-top">
+                            <div class="audio-card-icon">${track.icon}</div>
+                            <div class="audio-meta-wrap">
+                                <div class="audio-category-badge">${escapeHtml(track.categoryName)}</div>
+                                <h3 class="audio-title">${escapeHtml(track.title)}</h3>
+                            </div>
+                            <span class="audio-duration-pill">${track.duration}</span>
+                        </div>
+                        <p class="audio-desc">${escapeHtml(track.desc)}</p>
+                        <div class="audio-card-action">
+                            <div class="equalizer-wave">
+                                <span class="eq-bar"></span>
+                                <span class="eq-bar"></span>
+                                <span class="eq-bar"></span>
+                                <span class="eq-bar"></span>
+                            </div>
+                            <button class="btn-play-audio" onclick="toggleAudioTrack('${track.id}')">
+                                <span>${isPlayingThis ? '⏸ Pause' : '▶ Play Track'}</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // =========================================================================
+        // PROCEDURAL AMBIENT AUDIO SYNTHESIZER (WEB AUDIO API - 100% RELIABLE)
+        // =========================================================================
+        function initWebAudio() {
+            if (!webAudioContext) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) webAudioContext = new AudioCtx();
+            }
+            if (webAudioContext && webAudioContext.state === 'suspended') {
+                webAudioContext.resume();
+            }
+        }
+
+        function stopSynthesizedSound() {
+            if (ambientOscillator) {
+                try { ambientOscillator.stop(); } catch(_) {}
+                ambientOscillator = null;
+            }
+            if (noiseNode) {
+                try { noiseNode.stop(); } catch(_) {}
+                noiseNode = null;
+            }
+        }
+
+        function playSynthesizedAmbient(soundType) {
+            initWebAudio();
+            if (!webAudioContext) return;
+            stopSynthesizedSound();
+
+            const ctx = webAudioContext;
+            ambientGainNode = ctx.createGain();
+            ambientGainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+            ambientGainNode.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 1.2);
+            ambientGainNode.connect(ctx.destination);
+
+            if (soundType === 'chimes' || soundType === 'emergency_calm') {
+                // Peaceful 432Hz / 528Hz calming tone
+                ambientOscillator = ctx.createOscillator();
+                ambientOscillator.type = 'sine';
+                ambientOscillator.frequency.setValueAtTime(432, ctx.currentTime);
+                // Gentle vibrato
+                const lfo = ctx.createOscillator();
+                lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
+                const lfoGain = ctx.createGain();
+                lfoGain.gain.setValueAtTime(4, ctx.currentTime);
+                lfo.connect(lfoGain);
+                lfoGain.connect(ambientOscillator.frequency);
+                lfo.start();
+
+                ambientOscillator.connect(ambientGainNode);
+                ambientOscillator.start();
+            } else if (soundType === 'bowl') {
+                // Tibetan singing bowl 432Hz harmonic
+                ambientOscillator = ctx.createOscillator();
+                ambientOscillator.type = 'triangle';
+                ambientOscillator.frequency.setValueAtTime(432, ctx.currentTime);
+                ambientOscillator.connect(ambientGainNode);
+                ambientOscillator.start();
+            } else if (soundType === 'rain' || soundType === 'sleep_waves' || soundType === 'stream') {
+                // Procedural gentle pink/brown noise rain simulation
+                const bufferSize = ctx.sampleRate * 2;
+                const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.035;
+                    b6 = white * 0.115926;
+                }
+                noiseNode = ctx.createBufferSource();
+                noiseNode.buffer = noiseBuffer;
+                noiseNode.loop = true;
+
+                // Lowpass filter for warm soothing rain
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(soundType === 'stream' ? 1200 : 700, ctx.currentTime);
+
+                noiseNode.connect(filter);
+                filter.connect(ambientGainNode);
+                noiseNode.start();
+            } else {
+                // Lo-Fi warm acoustic tone
+                ambientOscillator = ctx.createOscillator();
+                ambientOscillator.type = 'sine';
+                ambientOscillator.frequency.setValueAtTime(220, ctx.currentTime);
+                ambientOscillator.connect(ambientGainNode);
+                ambientOscillator.start();
+            }
+        }
+
+        // Audio Player Controls
+        function toggleAudioTrack(trackId) {
+            const track = AUDIO_RESOURCES.find(t => t.id === trackId);
+            if (!track) return;
+
+            if (currentPlayingAudioId === trackId && isAudioPlaying) {
+                pauseAudio();
+            } else {
+                playAudio(track);
+            }
+        }
+
+        function playAudio(track) {
+            currentPlayingAudioId = track.id;
+            isAudioPlaying = true;
+            simulatedAudioCurrentSec = 0;
+            simulatedAudioTotalSec = track.durationSec === 9999 ? 1800 : track.durationSec;
+
+            // Start sound
+            playSynthesizedAmbient(track.soundType);
+
+            // Update Floating Player UI
+            const bar = document.getElementById('floatingAudioBar');
+            document.getElementById('audioBarThumb').textContent = track.icon;
+            document.getElementById('audioBarTitle').textContent = track.title;
+            document.getElementById('audioBarSub').textContent = track.categoryName;
+            document.getElementById('btnAudioMainPlay').textContent = '⏸';
+            bar.classList.add('show');
+
+            // Timer for scrub bar
+            clearInterval(audioProgressTimer);
+            audioProgressTimer = setInterval(() => {
+                if (isAudioPlaying) {
+                    simulatedAudioCurrentSec++;
+                    if (simulatedAudioCurrentSec >= simulatedAudioTotalSec) {
+                        if (isAudioLooped) {
+                            simulatedAudioCurrentSec = 0;
+                        } else {
+                            pauseAudio();
+                        }
+                    }
+                    updateAudioProgressUI();
+                }
+            }, 1000);
+
+            renderAudios();
+        }
+
+        function pauseAudio() {
+            isAudioPlaying = false;
+            stopSynthesizedSound();
+            document.getElementById('btnAudioMainPlay').textContent = '▶';
+            renderAudios();
+        }
+
+        function stopAndCloseAudio() {
+            pauseAudio();
+            currentPlayingAudioId = null;
+            clearInterval(audioProgressTimer);
+            document.getElementById('floatingAudioBar').classList.remove('show');
+            renderAudios();
+        }
+
+        function updateAudioProgressUI() {
+            const curM = Math.floor(simulatedAudioCurrentSec / 60);
+            const curS = simulatedAudioCurrentSec % 60;
+            const totM = Math.floor(simulatedAudioTotalSec / 60);
+            const totS = simulatedAudioTotalSec % 60;
+            document.getElementById('audioCurrentTime').textContent = `${String(curM).padStart(2,'0')}:${String(curS).padStart(2,'0')}`;
+            document.getElementById('audioTotalTime').textContent = `${String(totM).padStart(2,'0')}:${String(totS).padStart(2,'0')}`;
+            const pct = (simulatedAudioCurrentSec / simulatedAudioTotalSec) * 100;
+            document.getElementById('audioScrubSlider').value = pct;
+        }
+
+        // Floating player button listeners
+        document.getElementById('btnAudioMainPlay').addEventListener('click', () => {
+            if (isAudioPlaying) {
+                pauseAudio();
+            } else if (currentPlayingAudioId) {
+                const track = AUDIO_RESOURCES.find(t => t.id === currentPlayingAudioId);
+                if (track) {
+                    isAudioPlaying = true;
+                    playSynthesizedAmbient(track.soundType);
+                    document.getElementById('btnAudioMainPlay').textContent = '⏸';
+                    renderAudios();
+                }
+            }
+        });
+
+        document.getElementById('btnAudioRewind').addEventListener('click', () => {
+            simulatedAudioCurrentSec = Math.max(0, simulatedAudioCurrentSec - 10);
+            updateAudioProgressUI();
+        });
+
+        document.getElementById('btnAudioLoop').addEventListener('click', () => {
+            isAudioLooped = !isAudioLooped;
+            document.getElementById('btnAudioLoop').style.color = isAudioLooped ? '#4ecdc4' : '#ffffff';
+        });
+
+        document.getElementById('btnCloseAudioBar').addEventListener('click', stopAndCloseAudio);
+
+        document.getElementById('audioScrubSlider').addEventListener('input', (e) => {
+            const pct = parseFloat(e.target.value);
+            simulatedAudioCurrentSec = Math.floor((pct / 100) * simulatedAudioTotalSec);
+            updateAudioProgressUI();
+        });
+
+        // ── 4-7-8 Breathing Pacer Animation ─────────────────────────────
+        function toggleBreathPacer() {
+            switchPillar('audios');
+            const card = document.getElementById('breathPacerCard');
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                startBreathGuideCycle();
+            }
+        }
+
+        function startBreathGuideCycle() {
+            const circle = document.getElementById('breathVisualCircle');
+            const stepLabel = document.getElementById('breathStepLabel');
+            const statusLabel = document.getElementById('breathCycleStatus');
+            const btn = document.getElementById('btnToggleBreathGuide');
+
+            if (isBreathPacerActive) {
+                isBreathPacerActive = false;
+                clearTimeout(breathPacerTimer);
+                circle.className = 'breath-visual-circle';
+                circle.textContent = 'Breathe';
+                stepLabel.textContent = 'Paused';
+                statusLabel.textContent = 'Click to restart';
+                btn.textContent = '▶ Start Guided Pacer';
+                return;
+            }
+
+            isBreathPacerActive = true;
+            btn.textContent = '⏸ Pause Pacer';
+
+            function runCycle() {
+                if (!isBreathPacerActive) return;
+
+                // Step 1: Inhale (4s)
+                circle.className = 'breath-visual-circle inhale';
+                circle.textContent = 'Inhale';
+                stepLabel.textContent = 'Inhale slowly through nose (4s)';
+                statusLabel.textContent = 'Phase: Inhaling...';
+
+                breathPacerTimer = setTimeout(() => {
+                    if (!isBreathPacerActive) return;
+
+                    // Step 2: Hold (7s)
+                    circle.className = 'breath-visual-circle hold';
+                    circle.textContent = 'Hold';
+                    stepLabel.textContent = 'Hold gently with lungs relaxed (7s)';
+                    statusLabel.textContent = 'Phase: Holding...';
+
+                    breathPacerTimer = setTimeout(() => {
+                        if (!isBreathPacerActive) return;
+
+                        // Step 3: Exhale (8s)
+                        circle.className = 'breath-visual-circle exhale';
+                        circle.textContent = 'Exhale';
+                        stepLabel.textContent = 'Exhale gently through mouth (8s)';
+                        statusLabel.textContent = 'Phase: Exhaling...';
+
+                        breathPacerTimer = setTimeout(() => {
+                            if (!isBreathPacerActive) return;
+                            runCycle();
+                        }, 8000);
+
+                    }, 7000);
+
+                }, 4000);
+            }
+
+            runCycle();
+        }
+
+        // =========================================================================
+        // RENDER GUIDES (PILLAR 3)
+        // =========================================================================
+        function renderGuides() {
+            const guidesGrid = document.getElementById('guidesGrid');
+            const noGuidesBox = document.getElementById('noGuidesBox');
+            const resultsCount = document.getElementById('resultsCount');
+
+            const filteredGuides = GUIDE_RESOURCES.filter(guide => {
+                if (currentFilter !== 'all' && guide.category !== currentFilter) return false;
+                if (searchQuery.trim()) {
+                    const q = searchQuery.toLowerCase();
+                    const inTitle = guide.title.toLowerCase().includes(q);
+                    const inCategory = guide.categoryName.toLowerCase().includes(q);
+                    const inDesc = guide.desc.toLowerCase().includes(q);
+                    if (!inTitle && !inCategory && !inDesc) return false;
+                }
+                return true;
+            });
+
+            resultsCount.textContent = `Showing ${filteredGuides.length} ${filteredGuides.length === 1 ? 'guide' : 'guides'}`;
+
+            if (filteredGuides.length === 0) {
+                guidesGrid.innerHTML = '';
+                noGuidesBox.style.display = 'block';
+                return;
+            }
+
+            noGuidesBox.style.display = 'none';
+
+            guidesGrid.innerHTML = filteredGuides.map(guide => `
+                <article class="guide-card" onclick="openGuideReader('${guide.id}')">
+                    <div class="guide-top-meta">
+                        <span class="guide-category-tag">${escapeHtml(guide.categoryName)}</span>
+                        <span class="guide-read-time">📖 ${guide.readTime}</span>
+                    </div>
+                    <h3 class="guide-title">${escapeHtml(guide.title)}</h3>
+                    <p class="guide-desc">${escapeHtml(guide.desc)}</p>
+                    <ul class="guide-takeaways-list">
+                        ${guide.takeaways.map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+                    </ul>
+                    <div class="guide-footer-action">
+                        <div class="guide-langs-row">
+                            <span class="guide-lang-chip">English</span>
+                            <span class="guide-lang-chip">हिंदी</span>
+                            <span class="guide-lang-chip">தமிழ்</span>
+                        </div>
+                        <button class="btn-read-guide" type="button">Read Guide →</button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // ── Guide Reader Modal Logic ────────────────────────────────────
+        function openGuideReader(guideId) {
+            const guide = GUIDE_RESOURCES.find(g => g.id === guideId);
+            if (!guide) return;
+
+            document.getElementById('readerCategoryTag').textContent = guide.categoryName;
+            document.getElementById('readerReadTime').textContent = `📖 ${guide.readTime}`;
+            document.getElementById('readerGuideTitle').textContent = guide.title;
+            document.getElementById('readerBodyContent').innerHTML = guide.bodyHtml;
+
+            const modal = document.getElementById('guideModal');
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGuideModal() {
+            document.getElementById('guideModal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('readerCloseBtn').addEventListener('click', closeGuideModal);
+        document.getElementById('guideModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('guideModal')) closeGuideModal();
+        });
+
+        // =========================================================================
+        // CINEMA VIDEO MODAL PLAYER (ZERO REDIRECT)
+        // =========================================================================
         function openPlayerByVideoId(videoId) {
             const index = filteredVideos.findIndex(v => v.id === videoId);
             if (index === -1) {
-                // If not in current filtered list, find in global list
                 const globalIndex = VIDEO_RESOURCES.findIndex(v => v.id === videoId);
-                if (globalIndex !== -1) {
-                    playVideoByIndex(globalIndex, VIDEO_RESOURCES);
-                }
+                if (globalIndex !== -1) playVideoByIndex(globalIndex, VIDEO_RESOURCES);
                 return;
             }
             playVideoByIndex(index, filteredVideos);
@@ -1485,12 +3187,14 @@
 
         function playVideoByIndex(index, list = filteredVideos) {
             if (index < 0 || index >= list.length) return;
-            currentlyPlayingIndex = index;
+            currentlyPlayingVideoIndex = index;
             const video = list[index];
 
             const isShort = video.type === 'short';
+            const cinemaCard = document.getElementById('cinemaCard');
+            const playerBadgeType = document.getElementById('playerBadgeType');
+            const videoIframe = document.getElementById('videoIframe');
 
-            // Configure modal sizing for 9:16 Shorts vs 16:9 Landscape
             if (isShort) {
                 cinemaCard.classList.add('is-short-mode');
                 playerBadgeType.className = 'player-badge-type short';
@@ -1501,75 +3205,75 @@
                 playerBadgeType.textContent = '🎥 Full Motivational Video';
             }
 
-            playerCategoryText.textContent = video.categoryName;
-            playerTitle.textContent = video.title;
-            playerAuthor.textContent = video.channel;
-            playerDesc.textContent = video.desc;
+            document.getElementById('playerCategoryText').textContent = video.categoryName;
+            document.getElementById('playerTitle').textContent = video.title;
+            document.getElementById('playerAuthor').textContent = video.channel;
+            document.getElementById('playerDesc').textContent = video.desc;
 
             // Zero Redirection: Set iframe embed with clean parameters
             videoIframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&rel=0&playsinline=1&modestbranding=1`;
 
-            // Open modal with smooth transition
-            cinemaModal.classList.add('open');
+            document.getElementById('cinemaModal').classList.add('open');
             document.body.style.overflow = 'hidden';
 
-            // Update prev/next button states
-            btnPrevVideo.disabled = (index === 0);
-            btnNextVideo.disabled = (index === list.length - 1);
-            btnPrevVideo.style.opacity = (index === 0) ? '0.4' : '1';
-            btnNextVideo.style.opacity = (index === list.length - 1) ? '0.4' : '1';
+            const btnPrev = document.getElementById('btnPrevVideo');
+            const btnNext = document.getElementById('btnNextVideo');
+            btnPrev.disabled = (index === 0);
+            btnNext.disabled = (index === list.length - 1);
+            btnPrev.style.opacity = (index === 0) ? '0.4' : '1';
+            btnNext.style.opacity = (index === list.length - 1) ? '0.4' : '1';
         }
 
-        // Close Player & Immediately Stop Audio/Video
-        function closePlayer() {
-            cinemaModal.classList.remove('open');
+        function closeVideoPlayer() {
+            document.getElementById('cinemaModal').classList.remove('open');
             document.body.style.overflow = '';
-            // Resetting iframe src stops playback immediately
-            videoIframe.src = '';
-            currentlyPlayingIndex = -1;
+            document.getElementById('videoIframe').src = '';
+            currentlyPlayingVideoIndex = -1;
         }
 
-        // Previous & Next Video Controls
-        btnPrevVideo.addEventListener('click', (e) => {
+        document.getElementById('playerCloseBtn').addEventListener('click', closeVideoPlayer);
+        document.getElementById('cinemaModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('cinemaModal')) closeVideoPlayer();
+        });
+
+        document.getElementById('btnPrevVideo').addEventListener('click', (e) => {
             e.stopPropagation();
-            if (currentlyPlayingIndex > 0) {
-                playVideoByIndex(currentlyPlayingIndex - 1);
-            }
+            if (currentlyPlayingVideoIndex > 0) playVideoByIndex(currentlyPlayingVideoIndex - 1);
         });
 
-        btnNextVideo.addEventListener('click', (e) => {
+        document.getElementById('btnNextVideo').addEventListener('click', (e) => {
             e.stopPropagation();
-            if (currentlyPlayingIndex < filteredVideos.length - 1) {
-                playVideoByIndex(currentlyPlayingIndex + 1);
-            }
+            if (currentlyPlayingVideoIndex < filteredVideos.length - 1) playVideoByIndex(currentlyPlayingVideoIndex + 1);
         });
 
-        playerCloseBtn.addEventListener('click', closePlayer);
-
-        cinemaModal.addEventListener('click', (e) => {
-            if (e.target === cinemaModal) {
-                closePlayer();
-            }
-        });
-
-        // Keyboard Shortcuts: ESC to close, Left/Right arrow to navigate
+        // =========================================================================
+        // GLOBAL KEYBOARD SHORTCUTS
+        // =========================================================================
         window.addEventListener('keydown', (e) => {
-            if (!cinemaModal.classList.contains('open')) return;
-
             if (e.key === 'Escape') {
-                closePlayer();
-            } else if (e.key === 'ArrowLeft') {
-                if (currentlyPlayingIndex > 0) playVideoByIndex(currentlyPlayingIndex - 1);
-            } else if (e.key === 'ArrowRight') {
-                if (currentlyPlayingIndex < filteredVideos.length - 1) playVideoByIndex(currentlyPlayingIndex + 1);
+                closeVideoPlayer();
+                closeGuideModal();
+            } else if (document.getElementById('cinemaModal').classList.contains('open')) {
+                if (e.key === 'ArrowLeft' && currentlyPlayingVideoIndex > 0) {
+                    playVideoByIndex(currentlyPlayingVideoIndex - 1);
+                } else if (e.key === 'ArrowRight' && currentlyPlayingVideoIndex < filteredVideos.length - 1) {
+                    playVideoByIndex(currentlyPlayingVideoIndex + 1);
+                }
             }
         });
 
-        // Search Input Handling
+        // =========================================================================
+        // SEARCH INPUT HANDLING
+        // =========================================================================
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+
         searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value;
             clearSearchBtn.style.display = searchQuery ? 'block' : 'none';
-            renderVideos();
+            if (currentPillar === 'videos') renderVideos();
+            if (currentPillar === 'audios') renderAudios();
+            if (currentPillar === 'guides') renderGuides();
         });
 
         clearSearchBtn.addEventListener('click', () => {
@@ -1577,17 +3281,9 @@
             searchQuery = '';
             clearSearchBtn.style.display = 'none';
             searchInput.focus();
-            renderVideos();
-        });
-
-        // Filter Pills Click
-        document.querySelectorAll('.filter-pill[data-filter]').forEach(pill => {
-            pill.addEventListener('click', () => {
-                document.querySelectorAll('.filter-pill[data-filter]').forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-                currentFilter = pill.getAttribute('data-filter');
-                renderVideos();
-            });
+            if (currentPillar === 'videos') renderVideos();
+            if (currentPillar === 'audios') renderAudios();
+            if (currentPillar === 'guides') renderGuides();
         });
 
         function resetSearchAndFilters() {
@@ -1595,10 +3291,13 @@
             searchQuery = '';
             clearSearchBtn.style.display = 'none';
             currentFilter = 'all';
-            document.querySelectorAll('.filter-pill[data-filter]').forEach(p => {
+            const pillsContainer = document.getElementById('filterPills');
+            pillsContainer.querySelectorAll('.filter-pill[data-filter]').forEach(p => {
                 p.classList.toggle('active', p.getAttribute('data-filter') === 'all');
             });
-            renderVideos();
+            if (currentPillar === 'videos') renderVideos();
+            if (currentPillar === 'audios') renderAudios();
+            if (currentPillar === 'guides') renderGuides();
         }
 
         // Utility: HTML Escaping
@@ -1612,7 +3311,9 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // ── Auth & Header User State ──────────────────────────────────
+        // =========================================================================
+        // AUTH & HEADER USER STATE
+        // =========================================================================
         function updateAuthUI() {
             const token = localStorage.getItem('authToken');
             const userName = localStorage.getItem('userName') || 'Student';
@@ -1658,26 +3359,34 @@
                 mobileNavDrawer.classList.toggle('open');
             });
             mobileNavDrawer.addEventListener('click', (e) => {
-                if (e.target === mobileNavDrawer) {
-                    mobileNavDrawer.classList.remove('open');
-                }
+                if (e.target === mobileNavDrawer) mobileNavDrawer.classList.remove('open');
             });
         }
 
-        // Auto-Play if URL hash or query specifies video ID (e.g. resources.html?v=ocaZ0J2pj2g)
-        function checkUrlAutoPlay() {
+        // Auto-Check Hash or Query (e.g. resources.html#audios or resources.html?pillar=guides)
+        function checkUrlParams() {
+            const hash = window.location.hash.replace('#', '').toLowerCase();
             const urlParams = new URLSearchParams(window.location.search);
-            const vParam = urlParams.get('v');
-            if (vParam) {
-                openPlayerByVideoId(vParam);
+            const pillarParam = urlParams.get('pillar') || hash;
+            const videoParam = urlParams.get('v');
+
+            if (pillarParam === 'audios' || pillarParam === 'guides') {
+                switchPillar(pillarParam);
+            } else {
+                switchPillar('videos');
+            }
+
+            if (videoParam) {
+                openPlayerByVideoId(videoParam);
             }
         }
 
-        // Initialize on Load
+        // =========================================================================
+        // INITIALIZE ON LOAD
+        // =========================================================================
         document.addEventListener('DOMContentLoaded', () => {
             updateAuthUI();
-            renderVideos();
-            checkUrlAutoPlay();
+            checkUrlParams();
         });
     </script>
 </body>
