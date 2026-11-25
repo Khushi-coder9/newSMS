@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="app-config.js"></script>
     <title>Chat • Student Mind Support</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1217,9 +1218,7 @@
             throw new Error(lastError);
         }
 
-        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '80' && window.location.port !== ''
-            ? 'http://localhost:5000/api'
-            : '/api';
+        const API_BASE = window.SMS_API_BASE || '/api';
         let userDifficultiesSet = new Set();
         let userKeywordsSet = new Set();
 
@@ -1334,10 +1333,10 @@
 
             addBubble("user", userText);
             history.push({ role: "user", text: userText });
-            if (history.length > 24) history = history.slice(-24);
-            // Crisis detection runs silently on the backend - no alert bubble shown to student.
-            // The AI (Gemini / offlineReply) handles the conversation naturally, like a real psychiatrist.
-
+            if (history.length > 24) history = history.slice(-24);
+            // Crisis detection runs silently on the backend - no alert bubble shown to student.
+            // The AI (Gemini / offlineReply) handles the conversation naturally, like a real psychiatrist.
+
             input.value = "";
             sendBtn.disabled = true;
             addTyping();

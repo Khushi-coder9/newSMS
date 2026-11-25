@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="app-config.js"></script>
   <title>Appointment Action • Student Mind Support</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -306,9 +307,7 @@
 
   <script>
     // Robust API base URL resolution
-    const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-      ? 'http://localhost:5000/api'
-      : '/api';
+    const API_BASE = window.SMS_API_BASE || '/api';
 
     const params = new URLSearchParams(window.location.search);
     const token  = params.get('token') || '';

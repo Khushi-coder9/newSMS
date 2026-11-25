@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="app-config.js"></script>
     <title>Your Circle • Peer Support Platform | Student Mind Support</title>
     <meta name="description" content="Connect, share and feel supported with anonymous student communities, peer buddy matching, support circles, and empathetic AI guidance.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2374,9 +2375,7 @@
     <!-- LOGIC & SCRIPTS -->
     <script>
         // API Base
-        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '80' && window.location.port !== ''
-            ? 'http://localhost:5000/api'
-            : '/api';
+        const API_BASE = window.SMS_API_BASE || '/api';
 
         let authToken = localStorage.getItem('authToken');
         let currentActiveTab = 'tab-community';

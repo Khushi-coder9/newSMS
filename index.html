@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="app-config.js"></script>
     <title>Student Mind Support</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2533,9 +2534,7 @@
     <!-- ═══ END LEARN MORE VIDEO MODAL ═══ -->
 
     <script>
-        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '80' && window.location.port !== ''
-            ? 'http://localhost:5000/api'
-            : '/api';
+        const API_BASE = window.SMS_API_BASE || '/api';
         let authToken = localStorage.getItem('authToken');
         let currentSignupRole = 'student';
         let currentLoginRole = 'student';
@@ -3319,9 +3318,7 @@
                 const token = localStorage.getItem('authToken');
                 if (!token) return;
                 try {
-                    await fetch((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port
-                        ? 'http://localhost:5000/api/survey/submit'
-                        : '/api/survey/submit',
+                    await fetch(`${API_BASE}/survey/submit`,
                     {
                         method: 'POST',
                         headers: {

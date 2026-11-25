@@ -1,0 +1,29 @@
+{
+  "appId": "org.studentmindsupport.app",
+  "appName": "Student Mind Support",
+  "webDir": "www",
+  "server": {
+    "url": "https://studentmindsupport.duckdns.org",
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": [
+      "studentmindsupport.duckdns.org",
+      "100.31.107.145"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1800,
+      "launchAutoHide": true,
+      "backgroundColor": "#1f1b4d",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#1f1b4d"
+    }
+  }
+}
